@@ -1,0 +1,22 @@
+version: '3'
+services:
+  #Api
+  promocode-factory-api:
+    build: src
+    container_name: 'promocode-factory-api'
+    restart: always
+    ports:
+      - "8091:80"
+    environment:
+      - "ConnectionStrings:PromoCodeFactoryDb=Host=promocode-factory-db;Database=promocode_factory_db;Username=postgres;Password=docker"          
+    depends_on: 
+      - promocode-factory-db
+  #Db
+  promocode-factory-db:
+    image: "postgres:9.6.17"
+    container_name: 'promocode-factory-db'
+    restart: always 
+    ports:
+      - 5433:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
