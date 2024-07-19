@@ -38,7 +38,8 @@ Cистема `Promocode Factory` для выдачи промокодов па�
   - если лимит превышен или закончился срок его действия, то промокод нельзя выдать.
 
 # Общая архитектура MVP
-![image](https://github.com/Aleksei-Iagur/PromocodeFactory-HW2/assets/16374510/13b10f1b-d331-4ffb-ac2b-1d0cbf34b6de)
+![337460998-13b10f1b-d331-4ffb-ac2b-1d0cbf34b6de](https://github.com/user-attachments/assets/b3d5d6a5-20c5-40cb-afee-b16512382535)
 
 # Общая архитектура микросервисов
-![image](https://github.com/Aleksei-Iagur/PromocodeFactory-HW2/assets/16374510/a6c0d55a-6a84-470b-a67d-fef6b56d1104)
+![337461037-a6c0d55a-6a84-470b-a67d-fef6b56d1104](https://github.com/user-attachments/assets/2bc2d6fe-5b0f-4e18-a943-c61f9e1efa28)
+
