@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.Administration.WebHost", "Pcf.Administration.WebHost\Pcf.Administration.WebHost.csproj", "{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.Administration.DataAccess", "Pcf.Administration.DataAccess\Pcf.Administration.DataAccess.csproj", "{D7E675A3-9872-47D6-B906-797B7B866534}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.Administration.Core", "Pcf.Administration.Core\Pcf.Administration.Core.csproj", "{65FEF446-C247-4EA6-B83B-A38E6B062878}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7E675A3-9872-47D6-B906-797B7B866534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7E675A3-9872-47D6-B906-797B7B866534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7E675A3-9872-47D6-B906-797B7B866534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7E675A3-9872-47D6-B906-797B7B866534}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

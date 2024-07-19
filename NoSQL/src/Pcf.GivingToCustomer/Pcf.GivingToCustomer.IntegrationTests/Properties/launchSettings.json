@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Pcf.GivingToCustomer.IntegrationTests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:59664;http://localhost:59665"
+    }
+  }
+}
