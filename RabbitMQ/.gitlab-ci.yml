@@ -1,0 +1,21 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+before_script:
+  - docker info
+
+build:
+  only:
+    - develop
+  before_script:
+    - docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
+  script:
+    - docker build -t ${CI_REGISTRY}/${CI_PROJECT_PATH}:latest src
+    - docker push ${CI_REGISTRY}/${CI_PROJECT_PATH}:latest
+  after_script:
+    - docker logout ${CI_REGISTRY}
+  stage: build
+  tags: 
+    - docker

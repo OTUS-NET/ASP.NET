@@ -1,0 +1,69 @@
+services:
+  #Administration Db
+  promocode-factory-administration-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-administration-db'
+    restart: always 
+    ports:
+      - 5433:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+
+  #Administration Api
+  promocode-factory-administration-api:
+    build: src/Pcf.Administration/
+    container_name: 'promocode-factory-administration-api'
+    restart: always
+    ports:
+      - "8091:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=postgres;Password=docker"          
+    depends_on: 
+      - promocode-factory-administration-db
+
+
+  #ReceivingFromPartner Db
+  promocode-factory-receiving-from-partner-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-receiving-from-partner-db'
+    restart: always 
+    ports:
+      - 5434:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+
+  #ReceivingFromPartner Api
+  promocode-factory-receiving-from-partner-api:
+    build: src/Pcf.ReceivingFromPartner/
+    container_name: 'promocode-factory-receiving-from-partner-api'
+    restart: always
+    ports:
+      - "8092:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryReceivingFromPartnerDb=Host=promocode-factory-receiving-from-partner-db;Database=promocode_factory_receiving_from_partner_db;Username=postgres;Password=docker"
+      - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api"    
+      - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api"       
+    depends_on: 
+      - promocode-factory-receiving-from-partner-db
+  
+  #GivingToCustomer Db
+  promocode-factory-giving-to-customer-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-giving-to-customer-db'
+    restart: always 
+    ports:
+      - 5435:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+
+  #GivingToCustomer Api
+  promocode-factory-giving-to-customer-api:
+    build: src/Pcf.GivingToCustomer/
+    container_name: 'promocode-factory-giving-to-customer-api'
+    restart: always
+    ports:
+      - "8093:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
+    depends_on: 
+      - promocode-factory-giving-to-customer-db
