@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PromoCodeFactory.DataAccess
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PromoCodeFactory.Core", "PromoCodeFactory.Core\PromoCodeFactory.Core.csproj", "{FA64A24E-D404-4E7D-89A8-B87E134F697F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromoCodeFactory.Service", "PromoCodeFactory.Service\PromoCodeFactory.Service.csproj", "{F3AC0432-860D-494F-8F3C-7C05DB2891E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FA64A24E-D404-4E7D-89A8-B87E134F697F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA64A24E-D404-4E7D-89A8-B87E134F697F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA64A24E-D404-4E7D-89A8-B87E134F697F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3AC0432-860D-494F-8F3C-7C05DB2891E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3AC0432-860D-494F-8F3C-7C05DB2891E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3AC0432-860D-494F-8F3C-7C05DB2891E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3AC0432-860D-494F-8F3C-7C05DB2891E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

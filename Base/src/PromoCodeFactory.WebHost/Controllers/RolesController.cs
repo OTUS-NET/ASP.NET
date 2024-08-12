@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.Service.Roles;
+using PromoCodeFactory.Service.RoleServices.ViewModel;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -15,11 +16,11 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class RolesController
     {
-        private readonly IRepository<Role> _rolesRepository;
+        private readonly IRoleService _roleService;
 
-        public RolesController(IRepository<Role> rolesRepository)
+        public RolesController(IRoleService roleService)
         {
-            _rolesRepository = rolesRepository;
+            _roleService = roleService;
         }
 
         /// <summary>
@@ -27,19 +28,9 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<RoleItemResponse>> GetRolesAsync()
-        {
-            var roles = await _rolesRepository.GetAllAsync();
-
-            var rolesModelList = roles.Select(x =>
-                new RoleItemResponse()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList();
-
-            return rolesModelList;
+        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync()
+        {   
+            return await _roleService.GetRolesAsync();
         }
     }
 }
