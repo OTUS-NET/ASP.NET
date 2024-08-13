@@ -63,9 +63,18 @@ namespace PromoCodeFactory.WebHost.Controllers
         }
 
         [HttpPost]
-        public async Task CreateEmployee(EmployeeCreateRequest employee)
+        public async Task<ActionResult> CreateEmployee(EmployeeCreateRequest employee)
         {
-            await _employerService.CreateEmployee(employee);
+            try
+            {
+                await _employerService.CreateEmployee(employee);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpDelete]
@@ -75,7 +84,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             {
                 await _employerService.DeleteEmployeeAsync(id);
 
-                return Ok();
+                return NoContent();
             }
             catch (NotFoundException e)
             {
@@ -94,7 +103,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             {
                 await _employerService.UpdateEmployeeAsync(employee);
 
-                return Ok();
+                return NoContent();
             }
             catch (NotFoundException e)
             {
