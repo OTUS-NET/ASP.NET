@@ -13,6 +13,7 @@
     <ItemGroup>
       <ProjectReference Include="..\PromoCodeFactory.Core\PromoCodeFactory.Core.csproj" />
       <ProjectReference Include="..\PromoCodeFactory.DataAccess\PromoCodeFactory.DataAccess.csproj" />
+      <ProjectReference Include="..\PromoCodeFactory.Service\PromoCodeFactory.Service.csproj" />
     </ItemGroup>
 
 </Project>

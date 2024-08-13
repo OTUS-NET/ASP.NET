@@ -7,7 +7,7 @@ namespace PromoCodeFactory.DataAccess.Data
 {
     public static class FakeDataFactory
     {
-        public static IList<Employee> Employees => new List<Employee>()
+        public static List<Employee> Employees => new List<Employee>()
         {
             new Employee()
             {
@@ -35,7 +35,7 @@ namespace PromoCodeFactory.DataAccess.Data
             },
         };
 
-        public static IList<Role> Roles => new List<Role>()
+        public static List<Role> Roles => new List<Role>()
         {
             new Role()
             {
