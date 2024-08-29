@@ -87,7 +87,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                 return BadRequest("Данный партнер не активен");
             
             //Установка лимита партнеру
-            var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
+            var activeLimit = partner.PartnerLimits?.FirstOrDefault(x => 
                 !x.CancelDate.HasValue);
             
             if (activeLimit != null)
@@ -117,7 +117,9 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             await _partnersRepository.UpdateAsync(partner);
             
-            return CreatedAtAction(nameof(GetPartnerLimitAsync), new {id = partner.Id, limitId = newLimit.Id}, null);
+            return CreatedAtAction(
+                nameof(GetPartnerLimitAsync), 
+                new {id = partner.Id, limitId = newLimit.Id}, null);
         }
         
         [HttpPost("{id}/canceledLimits")]
