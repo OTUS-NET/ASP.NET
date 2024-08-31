@@ -22,10 +22,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Install dependencies
-        run: dotnet restore .\UnitTests\src\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj
+        run: dotnet restore ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
 
       - name: Build
-        run: dotnet build .\UnitTests\src\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj
+        run: dotnet build ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
 
       - name: Test
-        run: dotnet test .\UnitTests\src\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj
+        run: dotnet test ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
