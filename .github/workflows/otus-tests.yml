@@ -22,17 +22,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore .\UnitTests\src\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj
 
       - name: Build
-        run: dotnet build
+        run: dotnet build .\UnitTests\src\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj
 
-      - name: XUnit Viewer
-        id: xunit-viewer
-        uses: AutoModality/action-xunit-viewer@v1  
-        
-      - name: Attach the report
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ steps.xunit-viewer.outputs.report-name }}
-          path: ${{ steps.xunit-viewer.outputs.report-dir }}
+      - name: Test
+        run: dotnet test .\UnitTests\src\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj
