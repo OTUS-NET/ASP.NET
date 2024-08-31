@@ -31,6 +31,8 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             _repository = _fixture.Freeze<Mock<IRepository<Partner>>>();
             _controller = _fixture.Build<PartnersController>().OmitAutoProperties().Create();
              _partnerGuid = Guid.NewGuid();
+
+            _repository.Invocations.Clear();  // Очистка счетчика вызовов перед основным действием теста
         }
 
         /// <summary>
@@ -104,8 +106,14 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
                 .Create();
 
             _repository.Setup(service => service.GetByIdAsync(_partnerGuid)).ReturnsAsync(partner);
+
+            var request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().OmitAutoProperties()
+                .With(x => x.Limit, -1)
+                .With(x => x.EndDate, DateTime.Now)
+                .Create();
+
             //Act
-            var result = await _controller.SetPartnerPromoCodeLimitAsync(_partnerGuid, null);
+            var result = await _controller.SetPartnerPromoCodeLimitAsync(_partnerGuid, request);
 
             //Assert
 
@@ -113,8 +121,6 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
             badRequestResult.Value.Should().Be("Лимит должен быть больше 0");
             partner.NumberIssuedPromoCodes.Should().Be(0);
-            partner.PartnerLimits.FirstOrDefault().CancelDate.Should().NotBeNull();
-            partnerLimit.CancelDate.Should().NotBeNull();
            
             _repository.Verify(r => r.GetByIdAsync(_partnerGuid), Times.Once);
             _repository.Verify(r => r.UpdateAsync(partner), Times.Never);
@@ -122,35 +128,121 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
 
 
         //При установке лимита нужно отключить предыдущий лимит;
+        [Fact]
         public async Task SetPartnerPromoCodeLimitAsync_SetLimit_CancelPreviousLimit()
         {
             //Arrange
+            var partnerLimit = _fixture.Build<PartnerPromoCodeLimit>().OmitAutoProperties()
+                .With(x => x.Id, Guid.NewGuid())
+                .With(x => x.CancelDate, (DateTime?)null)
+                .With(x => x.EndDate, _fixture.Create<DateTime>())
+                .With(x => x.Limit, _fixture.Create<int>())
+                .Do(x => x.Limit = Math.Abs(x.Limit) + 1)
+                .Create();
+
+            var partner = _fixture.Build<Partner>().OmitAutoProperties()
+                .With(x => x.Id, _partnerGuid)
+                .With(x => x.IsActive, true)
+                .With(x => x.PartnerLimits, new List<PartnerPromoCodeLimit>() { partnerLimit })
+                .Create();
+
+            _repository.Setup(service => service.GetByIdAsync(_partnerGuid)).ReturnsAsync(partner);
+
+            var request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().OmitAutoProperties()
+                .With(x => x.Limit, -1)
+                .With(x => x.EndDate, DateTime.Now)
+                .Create();
 
             //Act
+            var result = await _controller.SetPartnerPromoCodeLimitAsync(_partnerGuid, request);
 
             //Assert
+
+            result.Should().NotBeNull();
+            partner.PartnerLimits.FirstOrDefault().CancelDate.Should().NotBeNull();
+            
+            _repository.Verify(r => r.GetByIdAsync(_partnerGuid), Times.Once);
+            _repository.Verify(r => r.UpdateAsync(partner), Times.Never);
         }
 
         //Лимит должен быть больше 0;
+        [Fact]
         public async Task SetPartnerPromoCodeLimitAsync_ZeroLimit_BadRequestLimitMustBeGreaterZero()
         {
             //Arrange
+            var partnerLimit = _fixture.Build<PartnerPromoCodeLimit>().OmitAutoProperties()
+                .With(x => x.Id, Guid.NewGuid())
+                .With(x => x.CancelDate, (DateTime?)null)
+                .With(x => x.EndDate, _fixture.Create<DateTime>())
+                .With(x => x.Limit, _fixture.Create<int>())
+                .Do(x => x.Limit = Math.Abs(x.Limit) + 1)
+                .Create();
+
+            var partner = _fixture.Build<Partner>().OmitAutoProperties()
+                .With(x => x.Id, _partnerGuid)
+                .With(x => x.IsActive, true)
+                .With(x => x.PartnerLimits, new List<PartnerPromoCodeLimit>() { partnerLimit })
+                .Create();
+
+            _repository.Setup(service => service.GetByIdAsync(_partnerGuid)).ReturnsAsync(partner);
+
+            var request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().OmitAutoProperties()
+                .With(x => x.Limit, -1)
+                .With(x => x.EndDate, DateTime.Now)
+                .Create();
 
             //Act
+            var result = await _controller.SetPartnerPromoCodeLimitAsync(_partnerGuid, request);
 
             //Assert
+
+            result.Should().NotBeNull();
+            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequestResult.Value.Should().Be("Лимит должен быть больше 0");
+
+            _repository.Verify(r => r.GetByIdAsync(_partnerGuid), Times.Once);
+            _repository.Verify(r => r.UpdateAsync(partner), Times.Never);
         }
 
         //Нужно убедиться, что сохранили новый лимит в базу данных (это нужно проверить Unit-тестом);
         //Если в текущей реализации найдутся ошибки, то их нужно исправить и желательно написать тест,
         //чтобы они больше не повторялись.
+        [Fact]
         public async Task SetPartnerPromoCodeLimitAsync_SetLimit_LimitSavedInDb()
         {
             //Arrange
+            var partnerLimit = _fixture.Build<PartnerPromoCodeLimit>().OmitAutoProperties()
+                .With(x => x.Id, Guid.NewGuid())
+                .With(x => x.CancelDate, (DateTime?)null)
+                .With(x => x.EndDate, _fixture.Create<DateTime>())
+                .With(x => x.Limit, _fixture.Create<int>())
+                .Do(x => x.Limit = Math.Abs(x.Limit) + 1)
+                .Create();
+
+            var partner = _fixture.Build<Partner>().OmitAutoProperties()
+                .With(x => x.Id, _partnerGuid)
+                .With(x => x.IsActive, true)
+                .With(x => x.PartnerLimits, new List<PartnerPromoCodeLimit>() { partnerLimit })
+                .Create();
+
+            _repository.Setup(service => service.GetByIdAsync(_partnerGuid)).ReturnsAsync(partner);
+
+            var request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().OmitAutoProperties()
+                .With(x => x.Limit, 100)
+                .With(x => x.EndDate, DateTime.Now.AddDays(3))
+                .Create();
 
             //Act
+            var result = await _controller.SetPartnerPromoCodeLimitAsync(_partnerGuid, request);
 
             //Assert
+
+            result.Should().NotBeNull();
+            
+            var createdAtActionResult = result.Should().BeOfType<CreatedAtActionResult>().Subject;
+           
+            _repository.Verify(r => r.GetByIdAsync(_partnerGuid), Times.Once);
+            _repository.Verify(r => r.UpdateAsync(partner), Times.Once);
         }
     }
 }
