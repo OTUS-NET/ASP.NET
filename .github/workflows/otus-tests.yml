@@ -28,4 +28,4 @@ jobs:
         run: dotnet build ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
 
       - name: Test
-        run: dotnet test ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
+        run: dotnet test ./UnitTests/src/PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj
