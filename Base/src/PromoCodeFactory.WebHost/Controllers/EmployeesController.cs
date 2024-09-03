@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Domain.DTOs;
 using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Controllers
@@ -17,18 +19,20 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IRepository<Employee> _employeeRepository;
+        private readonly ILogger<Employee> _logger;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(IRepository<Employee> employeeRepository, ILogger<Employee> logger)
         {
             _employeeRepository = employeeRepository;
+            _logger = logger;
         }
 
         /// <summary>
         /// Получить данные всех сотрудников
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+        [HttpGet("get-all")]
+        public async Task<ActionResult<List<EmployeeShortResponse>>> GetEmployeesAsync()
         {
             var employees = await _employeeRepository.GetAllAsync();
 
@@ -40,16 +44,18 @@ namespace PromoCodeFactory.WebHost.Controllers
                     FullName = x.FullName,
                 }).ToList();
 
-            return employeesModelList;
+            return Ok(employeesModelList);
         }
 
         /// <summary>
         /// Получить данные сотрудника по Id
         /// </summary>
         /// <returns></returns>
-        [HttpGet("{id:guid}")]
+        [HttpGet("get/{id:guid}")]
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var employee = await _employeeRepository.GetByIdAsync(id);
 
             if (employee == null)
@@ -68,7 +74,44 @@ namespace PromoCodeFactory.WebHost.Controllers
                 AppliedPromocodesCount = employee.AppliedPromocodesCount
             };
 
-            return employeeModel;
+            return Ok(employeeModel);
+        }
+
+        /// <summary>
+        /// Создать нового сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("create")]
+        public ActionResult<EmployeeResponse> CreateEmployeeAsync(CreateEmployeeDto employeeDto) // add DTO
+        {
+            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
+            // mapping
+            var employee = Employee.CreateEmployee(employeeDto);
+
+            return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { Id = employee.Id });
+        }
+
+        /// <summary>
+        /// Создать нового сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("update/{id:guid}")]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, UpdateEmployeeDto empoyee) // add DTO
+        {
+            if (!ModelState.IsValid) return BadRequest("Incorrect data");
+
+            var entry = await _employeeRepository.GetByIdAsync(id);
+            var updatedEmployee = Employee
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удалить сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("delete/{id:guid}")]
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        {
         }
     }
-}
