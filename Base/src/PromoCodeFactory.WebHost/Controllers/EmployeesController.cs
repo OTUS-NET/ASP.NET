@@ -70,5 +70,70 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             return employeeModel;
         }
+
+        /// <summary>
+        /// Создать нового сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("create")]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(EmployeeCreateDTO employeeCreateDTO)
+        {
+            var newEntity = new Employee()
+            {
+                FirstName = employeeCreateDTO.FirstName,
+                LastName = employeeCreateDTO.LastName,
+                Email = employeeCreateDTO.Email,
+                AppliedPromocodesCount = employeeCreateDTO.AppliedPromocodesCount,
+                Roles = new List<Role>(),
+            };
+
+            var result = await _employeeRepository.CreateAsync(newEntity);
+
+            return await GetEmployeeByIdAsync(result.Id);
+        }
+
+
+        /// <summary>
+        /// Обновить сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("update")]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(EmployeeUpdateDTO employeeUpdateDTO)
+        {
+            var entity = await _employeeRepository.GetByIdAsync(employeeUpdateDTO.Id);
+
+            if (entity == null)
+                return BadRequest();
+
+            entity.Email = employeeUpdateDTO.Email;
+            entity.FirstName = employeeUpdateDTO.FirstName;
+            entity.LastName = employeeUpdateDTO.LastName;
+            entity.AppliedPromocodesCount = employeeUpdateDTO.AppliedPromocodesCount;
+
+            var result = await _employeeRepository.UpdateAsync(entity);
+
+            return await GetEmployeeByIdAsync(result.Id);
+        }
+
+
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("delete/{id}")]
+        public async Task<ActionResult> DeleteEmployeeAsync(Guid id)
+        {
+            var entity = await _employeeRepository.GetByIdAsync(id);
+
+            if (entity == null)
+                return BadRequest();
+            
+            var deleted = await _employeeRepository.DeleteAsync(id);
+            if (deleted)
+                return Ok("Сотрудник удален");
+
+            return BadRequest();
+        }
+
     }
 }
