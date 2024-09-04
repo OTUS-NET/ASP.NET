@@ -85,10 +85,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// Обновить информацию о сотруднике
         /// </summary>
         /// <returns></returns>
-        [HttpPost("update")]
+        [HttpPost("update/{id:guid}")]
         public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync( // UpdateEmployeeRequest?
-            [FromQuery] Guid id,
-            [FromBody] EmployeeDto dto)
+            Guid id,
+            EmployeeDto dto)
         {
             if (!ModelState.IsValid) return BadRequest("Incorrect data.");
             var employee = dto.ToEmployee(id);
