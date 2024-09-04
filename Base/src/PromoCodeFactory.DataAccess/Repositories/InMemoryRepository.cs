@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
@@ -9,14 +10,14 @@ namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
     {
-        protected IEnumerable<T> Data { get; set; }
+        protected IList<T> Data { get; set; }
 
-        public InMemoryRepository(IEnumerable<T> data)
+        public InMemoryRepository(IList<T> data)
         {
             Data = data;
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public Task<IList<T>> GetAllAsync()
         {
             return Task.FromResult(Data);
         }
@@ -28,29 +29,26 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public Task AddAsync(T entity)
         {
-            (Data as List<T>).Add(entity);
+            Data.Add(entity);
             return Task.CompletedTask;
         }
 
         public Task UpdateByIdAsync(Guid id, T entity)
         {
-            if ((Data as List<T>).Any(e => e.Id == id))
-            {
-                DeleteByIdAsync(id);
-            }
-
+            if (!Data.Any(x => x.Id == id)) throw new ArgumentException("Id is not valid");
+            var index = Data.IndexOf(Data.FirstOrDefault(x => x.Id == id));
             entity.Id = id;
-            AddAsync(entity);
+            Data[index] = entity;
 
             return Task.CompletedTask;
         }
 
         public Task DeleteByIdAsync(Guid id)
         {
-            var entry = (Data as List<T>).FirstOrDefault(e => e?.Id == id);
+            var entry = Data.FirstOrDefault(e => e?.Id == id);
             if (entry != null)
             {
-                (Data as List<T>).Remove(entry);
+                Data.Remove(entry);
             }
             return Task.CompletedTask;
         }

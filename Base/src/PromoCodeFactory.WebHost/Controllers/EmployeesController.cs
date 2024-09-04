@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.Core.Domain.DTOs;
+using PromoCodeFactory.Core.Domain.Models.Dto;
+using PromoCodeFactory.Core.Utils;
 using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Controllers
@@ -61,7 +63,56 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (employee == null)
                 return NotFound();
 
-            var employeeModel = new EmployeeResponse()
+            return Ok(CreateResponse(employee));
+        }
+
+        /// <summary>
+        /// Создать нового сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("create")]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(EmployeeDto dto) // CreateEmployeeRequest?
+        {
+            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
+            var employee = dto.ToEmployee();
+            await _employeeRepository.AddAsync(employee);
+
+            return Ok(CreateResponse(employee));
+            //return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { Id = employee.Id });
+        }
+
+        /// <summary>
+        /// Обновить информацию о сотруднике
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("update")]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync( // UpdateEmployeeRequest?
+            [FromQuery] Guid id,
+            [FromBody] EmployeeDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
+            var employee = dto.ToEmployee(id);
+            await _employeeRepository.UpdateByIdAsync(id, employee);
+
+            return Ok(CreateResponse(employee));
+        }
+
+        /// <summary>
+        /// Удалить сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("delete/{id:guid}")]
+        public async Task<ActionResult<EmployeeResponse>> DeleteEmployeeByIdAsync(Guid id)
+        {
+            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
+
+            await _employeeRepository.DeleteByIdAsync(id);
+
+            return Ok(null);
+        }
+
+        private static EmployeeResponse CreateResponse(Employee employee) => 
+            new EmployeeResponse()
             {
                 Id = employee.Id,
                 Email = employee.Email,
@@ -73,45 +124,5 @@ namespace PromoCodeFactory.WebHost.Controllers
                 FullName = employee.FullName,
                 AppliedPromocodesCount = employee.AppliedPromocodesCount
             };
-
-            return Ok(employeeModel);
-        }
-
-        /// <summary>
-        /// Создать нового сотрудника
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("create")]
-        public ActionResult<EmployeeResponse> CreateEmployeeAsync(CreateEmployeeDto employeeDto) // add DTO
-        {
-            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
-            // mapping
-            var employee = Employee.CreateEmployee(employeeDto);
-
-            return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { Id = employee.Id });
-        }
-
-        /// <summary>
-        /// Создать нового сотрудника
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("update/{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, UpdateEmployeeDto empoyee) // add DTO
-        {
-            if (!ModelState.IsValid) return BadRequest("Incorrect data");
-
-            var entry = await _employeeRepository.GetByIdAsync(id);
-            var updatedEmployee = Employee
-
-            return Ok();
-        }
-
-        /// <summary>
-        /// Удалить сотрудника по Id
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("delete/{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
-        {
-        }
     }
+}
