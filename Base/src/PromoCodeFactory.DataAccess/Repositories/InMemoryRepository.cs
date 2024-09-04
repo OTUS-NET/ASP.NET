@@ -35,9 +35,8 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public Task UpdateByIdAsync(Guid id, T entity)
         {
-            if (!Data.Any(x => x.Id == id)) throw new ArgumentException("Id is not valid");
+            if (!Data.Any(x => x.Id == id)) throw new ArgumentException("Id is not present in the DB.");
             var index = Data.IndexOf(Data.FirstOrDefault(x => x.Id == id));
-            entity.Id = id;
             Data[index] = entity;
 
             return Task.CompletedTask;
@@ -45,6 +44,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public Task DeleteByIdAsync(Guid id)
         {
+            if (!Data.Any(x => x.Id == id)) throw new ArgumentException("Id is not present in the DB.");
             var entry = Data.FirstOrDefault(e => e?.Id == id);
             if (entry != null)
             {
