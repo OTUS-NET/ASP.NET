@@ -14,10 +14,10 @@ namespace PromoCodeFactory.WebHost
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(typeof(IRepository<Employee>), (x) => 
-                new InMemoryRepository<Employee>(FakeDataFactory.Employees));
-            services.AddSingleton(typeof(IRepository<Role>), (x) => 
+            services.AddSingleton(typeof(IRepository<Role>), (x) =>
                 new InMemoryRepository<Role>(FakeDataFactory.Roles));
+            services.AddSingleton<IEmployeeRepository>(x =>
+                new EmployeeRepository(FakeDataFactory.Employees, x.GetRequiredService<IRepository<Role>>()));
 
             services.AddOpenApiDocument(options =>
             {
@@ -42,7 +42,7 @@ namespace PromoCodeFactory.WebHost
             {
                 x.DocExpansion = "list";
             });
-            
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
