@@ -70,5 +70,77 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             return employeeModel;
         }
+
+        #region Homework 1:
+        /// <summary>
+        /// Добавить нового сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("add")]
+        public async Task<IActionResult> AddEmployeeAsync([FromBody] Employee newEmployee)
+        {
+            if (newEmployee == null)
+            {
+                return BadRequest("Invalid employee data");
+            }
+
+            newEmployee.Id = Guid.NewGuid();
+            var employeeCreated = await _employeeRepository.CreateAsync(newEmployee);
+
+            if (employeeCreated != null)
+            {
+                return Ok("Employee has been successfully edded");
+            }
+            else
+            {
+                return StatusCode(500, "An error occurred while adding the employee.");
+            }
+        }
+
+        /// <summary>
+        /// Обновить данные сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("update/{id:guid}")]
+        public async Task<IActionResult> UpdateEmployeeAsync(Guid id, [FromBody] Employee updateEmployeeData)
+        {
+            if (updateEmployeeData == null)
+            {
+                return BadRequest("Invalid employee data.");
+            }
+            updateEmployeeData.Id = id;
+            var result = await _employeeRepository.UpdateAsync(updateEmployeeData);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound($"Employee with ID: {id} not found");
+            }
+        }
+
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("delete/{id:guid}")]
+        public async Task<IActionResult> DeleteEmployeeAsync(Guid id)
+        {
+            var result = await _employeeRepository.DeleteAsync(id);
+
+            if (result)
+            {
+                return Ok($"Employee with ID: {id} was successful deleted.");
+            }
+            else
+            {
+                return NotFound($"Employee with ID: {id} not found");
+            }
+        }
+        #endregion
     }
 }
