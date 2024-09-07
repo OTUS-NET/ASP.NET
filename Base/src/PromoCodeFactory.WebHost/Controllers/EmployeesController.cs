@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.Core.Domain.Models.Dto;
-using PromoCodeFactory.Core.Utils;
+using PromoCodeFactory.WebHost.Models.Dto;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Utils;
+using System.Threading;
+using PromoCodeFactory.Core.Abstractions.Services;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -20,13 +21,11 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly IRepository<Employee> _employeeRepository;
-        private readonly ILogger<Employee> _logger;
+        private readonly IService<Employee> _employeeService;
 
-        public EmployeesController(IRepository<Employee> employeeRepository, ILogger<Employee> logger)
+        public EmployeesController(IService<Employee> employeeService)
         {
-            _employeeRepository = employeeRepository;
-            _logger = logger;
+            _employeeService = employeeService;
         }
 
         /// <summary>
@@ -34,17 +33,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get-all")]
-        public async Task<ActionResult<List<EmployeeShortResponse>>> GetEmployeesAsync()
+        public async Task<ActionResult<List<EmployeeShortResponse>>> GetEmployeesAsync(CancellationToken cts)
         {
-            var employees = await _employeeRepository.GetAllAsync();
-
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
+            var employees = await _employeeService.GetAllAsync(cts);
+            var employeesModelList = employees.ToEmployeeShortResponse();
 
             return Ok(employeesModelList);
         }
@@ -54,16 +46,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("get/{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id, CancellationToken cts)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
-                return NotFound();
-
-            return Ok(CreateResponse(employee));
+            var employee = await _employeeService.GetByIdAsync(id, cts);
+            return Ok(employee.ToEmployeeResponse());
         }
 
         /// <summary>
@@ -71,14 +57,13 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("create")]
-        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(EmployeeDto dto) // CreateEmployeeRequest?
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(EmployeeDto dto, CancellationToken cts) // CreateEmployeeRequest?
         {
-            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
             var employee = dto.ToEmployee();
-            await _employeeRepository.AddAsync(employee);
+            await _employeeService.AddAsync(employee, cts);
 
-            return Ok(CreateResponse(employee));
-            //return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { Id = employee.Id });
+            return Ok(employee.ToEmployeeResponse());
+            //return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { Id = employee.Id }, employee);
         }
 
         /// <summary>
@@ -88,13 +73,13 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpPost("update/{id:guid}")]
         public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync( // UpdateEmployeeRequest?
             Guid id,
-            EmployeeDto dto)
+            EmployeeDto dto,
+            CancellationToken cts)
         {
-            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
             var employee = dto.ToEmployee(id);
-            await _employeeRepository.UpdateByIdAsync(id, employee);
+            await _employeeService.UpdateByIdAsync(id, employee, cts);
 
-            return Ok(CreateResponse(employee));
+            return Ok(employee.ToEmployeeResponse());
         }
 
         /// <summary>
@@ -102,27 +87,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("delete/{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> DeleteEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult<EmployeeResponse>> DeleteEmployeeByIdAsync(Guid id, CancellationToken cts)
         {
-            if (!ModelState.IsValid) return BadRequest("Incorrect data.");
-
-            await _employeeRepository.DeleteByIdAsync(id);
+            await _employeeService.DeleteByIdAsync(id, cts);
 
             return Ok(null);
         }
-
-        private static EmployeeResponse CreateResponse(Employee employee) => 
-            new EmployeeResponse()
-            {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
     }
 }

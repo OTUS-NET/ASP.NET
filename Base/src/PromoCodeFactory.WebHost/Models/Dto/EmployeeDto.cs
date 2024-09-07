@@ -1,7 +1,7 @@
 ﻿using PromoCodeFactory.Core.Domain.Administration;
 using System.Collections.Generic;
 
-namespace PromoCodeFactory.Core.Domain.Models.Dto
+namespace PromoCodeFactory.WebHost.Models.Dto
 {
     public class EmployeeDto
     {

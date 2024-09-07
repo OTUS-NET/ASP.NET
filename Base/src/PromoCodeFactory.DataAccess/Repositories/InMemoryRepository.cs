@@ -1,56 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Exceptions;
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
     {
         protected IList<T> Data { get; set; }
+        private readonly ILogger<T> _logger;
 
-        public InMemoryRepository(IList<T> data)
+        public InMemoryRepository(IList<T> data, ILogger<T> logger)
         {
             Data = data;
+            _logger = logger;
         }
 
-        public Task<IList<T>> GetAllAsync()
+        public Task<IList<T>> GetAllAsync(CancellationToken cts)
         {
             return Task.FromResult(Data);
         }
 
-        public Task<T> GetByIdAsync(Guid id)
+        public Task<T> GetByIdAsync(Guid id, CancellationToken cts)
         {
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
         }
 
-        public Task AddAsync(T entity)
+        public Task AddAsync(T entity, CancellationToken cts)
         {
             Data.Add(entity);
             return Task.CompletedTask;
         }
 
-        public Task UpdateByIdAsync(Guid id, T entity)
+        public Task UpdateByIdAsync(Guid id, T entity, CancellationToken cts)
         {
-            if (!Data.Any(x => x.Id == id)) throw new ArgumentException("Id is not present in the DB.");
-            var index = Data.IndexOf(Data.FirstOrDefault(x => x.Id == id));
-            Data[index] = entity;
-
+            Data[Data.IndexOf(Data.FirstOrDefault(x => x.Id == id))] = entity;
             return Task.CompletedTask;
         }
 
-        public Task DeleteByIdAsync(Guid id)
+        public Task DeleteByIdAsync(Guid id, CancellationToken cts)
         {
-            if (!Data.Any(x => x.Id == id)) throw new ArgumentException("Id is not present in the DB.");
-            var entry = Data.FirstOrDefault(e => e?.Id == id);
-            if (entry != null)
-            {
-                Data.Remove(entry);
-            }
+            Data.Remove(Data.FirstOrDefault(e => e?.Id == id));
             return Task.CompletedTask;
+        }
+
+        public Task<bool> Exists(Guid id)
+        {
+            return Task.FromResult(Data.Any(x => x.Id == id)); 
         }
     }
 }
