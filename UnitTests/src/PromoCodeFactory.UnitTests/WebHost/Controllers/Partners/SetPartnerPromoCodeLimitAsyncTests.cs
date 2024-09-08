@@ -228,7 +228,7 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             _repository.Setup(service => service.GetByIdAsync(_partnerGuid)).ReturnsAsync(partner);
 
             var request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().OmitAutoProperties()
-                .With(x => x.Limit, 100)
+                .With(x => x.Limit, 5)
                 .With(x => x.EndDate, DateTime.Now.AddDays(3))
                 .Create();
 
@@ -243,6 +243,45 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
            
             _repository.Verify(r => r.GetByIdAsync(_partnerGuid), Times.Once);
             _repository.Verify(r => r.UpdateAsync(partner), Times.Once);
+        }
+
+        //Лимит должен быть меньше или равен 10;
+        [Fact]
+        public async Task SetPartnerPromoCodeLimitAsync_ZeroLimit_BadRequestLimitMustBeLowerOrEqual10()
+        {
+            //Arrange
+            var partnerLimit = _fixture.Build<PartnerPromoCodeLimit>().OmitAutoProperties()
+                .With(x => x.Id, Guid.NewGuid())
+                .With(x => x.CancelDate, (DateTime?)null)
+                .With(x => x.EndDate, _fixture.Create<DateTime>())
+                .With(x => x.Limit, _fixture.Create<int>())
+                .Do(x => x.Limit = Math.Abs(x.Limit) + 1)
+                .Create();
+
+            var partner = _fixture.Build<Partner>().OmitAutoProperties()
+                .With(x => x.Id, _partnerGuid)
+                .With(x => x.IsActive, true)
+                .With(x => x.PartnerLimits, new List<PartnerPromoCodeLimit>() { partnerLimit })
+                .Create();
+
+            _repository.Setup(service => service.GetByIdAsync(_partnerGuid)).ReturnsAsync(partner);
+
+            var request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().OmitAutoProperties()
+                .With(x => x.Limit, 11)
+                .With(x => x.EndDate, DateTime.Now)
+                .Create();
+
+            //Act
+            var result = await _controller.SetPartnerPromoCodeLimitAsync(_partnerGuid, request);
+
+            //Assert
+
+            result.Should().NotBeNull();
+            var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequestResult.Value.Should().Be("Лимит должен быть меньше или равен 10");
+
+            _repository.Verify(r => r.GetByIdAsync(_partnerGuid), Times.Once);
+            _repository.Verify(r => r.UpdateAsync(partner), Times.Never);
         }
     }
 }
