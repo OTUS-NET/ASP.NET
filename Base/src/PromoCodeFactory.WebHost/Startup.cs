@@ -6,6 +6,7 @@ using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
+using PromoCodeFactory.WebHost.Middleware;
 
 namespace PromoCodeFactory.WebHost
 {
@@ -13,10 +14,13 @@ namespace PromoCodeFactory.WebHost
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddProblemDetails();
+            services.AddExceptionHandler<EntityNotFoundExceptionHandler>();
+
             services.AddControllers();
-            services.AddSingleton(typeof(IRepository<Employee>), (x) => 
+            services.AddSingleton(typeof(IRepository<Employee>), (x) =>
                 new InMemoryRepository<Employee>(FakeDataFactory.Employees));
-            services.AddSingleton(typeof(IRepository<Role>), (x) => 
+            services.AddSingleton(typeof(IRepository<Role>), (x) =>
                 new InMemoryRepository<Role>(FakeDataFactory.Roles));
 
             services.AddOpenApiDocument(options =>
@@ -37,12 +41,14 @@ namespace PromoCodeFactory.WebHost
                 app.UseHsts();
             }
 
+            app.UseExceptionHandler();
+
             app.UseOpenApi();
             app.UseSwaggerUi(x =>
             {
                 x.DocExpansion = "list";
             });
-            
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
