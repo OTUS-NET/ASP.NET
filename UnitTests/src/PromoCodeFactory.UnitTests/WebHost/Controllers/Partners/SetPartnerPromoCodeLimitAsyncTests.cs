@@ -18,6 +18,7 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
 
     public class SetPartnerPromoCodeLimitAsyncTests
     {
+        //Если партнер не найден, то также нужно выдать ошибку 404;
         [Theory, AutoMoqData]
         public async void SetPartnerPromoCodeLimitAsync_PartnerNotFound_Return404(
             Guid id,
@@ -39,8 +40,9 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
 
             // Assert
             result.Should().BeOfType<NotFoundResult>();
-        } 
+        }
 
+        // Если партнер заблокирован, то есть поле IsActive=false в классе Partner, то также нужно выдать ошибку 400;
         [Theory, AutoMoqData]
         public async void SetPartnerPromoCodeLimitAsync_PartnerLocked_Return400(
             Guid id,
@@ -66,6 +68,7 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             result.Should().BeOfType<BadRequestObjectResult>();
         }
 
+        // Если партнеру выставляется лимит, то мы должны обнулить количество промокодов, которые партнер выдал NumberIssuedPromoCodes, если лимит закончился, то количество не обнуляется;
         [Theory, AutoMoqData]
         public async void SetPartnerPromoCodeLimitAsync_PartnerHasActivePromocodeLimit_ResetPromocodeLimitAndAlsoDisablePreviousLimit(
             Guid id,
@@ -95,6 +98,7 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             limit.Should().NotBeNull();
         }
 
+        // При установке лимита нужно отключить предыдущий лимит;
         [Theory, AutoMoqData]
         public async void SetPartnerPromoCodeLimitAsync_PartnerHasNotActivePromocodeLimit_NotResetPromocodeLimit(
             Guid id,
@@ -121,6 +125,7 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             partner.NumberIssuedPromoCodes.Should().Be(5);
         }
 
+        // Лимит должен быть больше 0;
         [Theory, AutoMoqData]
         public async void SetPartnerPromoCodeLimitAsync_LimitAndAlsoRequestLimitLessToZero_Return400(
             Guid id,
@@ -148,32 +153,8 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             result.Should().BeOfType<BadRequestObjectResult>();
         }
 
-        [Theory, AutoMoqData]
-        public async void SetPartnerPromoCodeLimitAsync_PartnerExistsAndNotLockedAndRequestLimitGreaterOrEqualToZero_PromocodeLimitSaved(
-            Guid id,
-            [Frozen] Mock<IRepository<Partner>> repositoryMock,
-            [NoAutoProperties] PartnersController controller)
-        {
-            // Arrange
-            Fixture fixture = new()
-            {
-                OmitAutoProperties = true
-            };
-            SetPartnerPromoCodeLimitRequest request = fixture.Build<SetPartnerPromoCodeLimitRequest>()
-                .With(i => i.Limit, 1).Create();
-            Partner partner = fixture.Build<Partner>()
-                .With(i => i.IsActive, true)
-                .With(i => i.PartnerLimits, new List<PartnerPromoCodeLimit>()).Create();
-            repositoryMock
-                .Setup(i => i.GetByIdAsync(id)).Returns(Task.FromResult(partner));
-
-            // Act
-            //todo
-        }
-
-
-        // Дополнительные тесты, которые не указаны в ТЗ
-
+        // Нужно убедиться, что сохранили новый лимит в базу данных (это нужно проверить Unit-тестом);
+        // Если в текущей реализации найдутся ошибки, то их нужно исправить и желательно написать тест, чтобы они больше не повторялись.
         public async void SetPartnerPromoCodeLimitAsync_PartnerExistsAndNotLockedAndAlsoRequestLimitGreaterOrEqualToZero_Return201(
             Guid id,
             [Frozen] Mock<IRepository<Partner>> repositoryMock,
@@ -198,6 +179,8 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             // Assert
             result.Should().BeOfType<CreatedAtActionResult>();
         }
+
+        // Дополнительные тесты, которые не указаны в ТЗ
 
         public async void SetPartnerPromoCodeLimitAsync_PartnerLimitsIsNull_Return201(
            Guid id,
