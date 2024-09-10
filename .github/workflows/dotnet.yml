@@ -21,8 +21,13 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore './UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj'
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build './UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj'
+    - name: Restore test dependencies
+      run: dotnet restore './UnitTests/src/PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj'
+    - name: Build
+      run: dotnet build './UnitTests/src/PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj'
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test './UnitTests/src/PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj' --no-build --verbosity normal
+    - run: echo "🐱‍👤This job's status is ${{ job.status }}." 
