@@ -1,0 +1,13 @@
+﻿@PromoCodeFactory.WebHost_HostAddress = https://localhost:5001
+
+GET {{PromoCodeFactory.WebHost_HostAddress}}/api/v1/employees/{id:guid}
+
+###
+
+GET {{PromoCodeFactory.WebHost_HostAddress}}/api/v1/employees
+
+###
+
+GET {{PromoCodeFactory.WebHost_HostAddress}}/api/v1/Roles
+
+###

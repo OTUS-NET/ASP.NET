@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
@@ -48,14 +49,14 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult<EmployeeResponseDto>> GetEmployeeByIdAsync(Guid id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
 
             if (employee == null)
                 return NotFound();
 
-            var employeeModel = new EmployeeResponse()
+            var employeeModel = new EmployeeResponseDto()
             {
                 Id = employee.Id,
                 Email = employee.Email,
@@ -68,7 +69,86 @@ namespace PromoCodeFactory.WebHost.Controllers
                 AppliedPromocodesCount = employee.AppliedPromocodesCount
             };
 
-            return employeeModel;
+            return Ok(employeeModel);
+        }
+
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> RemoveEmployeeByIdAsync(Guid id)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(id);
+
+            if (employee == null)
+                return NotFound();
+
+            _employeeRepository.RemoveByIdAsync(id);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Создать сотрудника
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<EmployeeResponseDto>> CreateEmployee([FromBody] CreateEmployeeDto employeeDto)
+        {
+            if (employeeDto == null)
+                return BadRequest();
+
+            var employee = new Employee()
+            {
+                Id = Guid.NewGuid(),
+                Email = employeeDto.Email,
+                FirstName = employeeDto.FirstName,
+                LastName = employeeDto.LastName
+            };
+
+            var newEmployee = await _employeeRepository.Add(employee);
+
+            var dto = new EmployeeResponseDto
+            {
+                FullName = newEmployee.FullName,
+                Email = newEmployee.Email,
+                Id = newEmployee.Id
+            };
+
+            return Created($"{Request.GetDisplayUrl()}/{dto.Id}", dto);
+        }
+
+        /// <summary>
+        /// Обновить сотрудника
+        /// </summary>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<EmployeeResponseDto>> UpdateEmployee(Guid id, [FromBody] CreateEmployeeDto employeeDto)
+        {
+            if (employeeDto == null)
+                return BadRequest();
+
+            var employee = await _employeeRepository.GetByIdAsync(id);
+
+            if (employee != null)
+            {
+                employee.FirstName = employeeDto.FirstName;
+                employee.Email = employeeDto.Email;
+                employee.LastName = employeeDto.LastName;
+
+                var updatedEmployee = await _employeeRepository.UpdateByIdAsync(id, employee);
+
+                var dto = new EmployeeResponseDto
+                {
+                    FullName = updatedEmployee.FullName,
+                    Email = updatedEmployee.Email,
+                    Id = updatedEmployee.Id
+                };
+
+                return Ok(dto);
+            }
+
+            return NotFound();
+
         }
     }
 }
