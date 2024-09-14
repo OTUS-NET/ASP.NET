@@ -1,0 +1,9 @@
+@PromoCodeFactory_HostAddress = http://localhost:5000
+
+GET {{PromoCodeFactory_HostAddress}}/api/v1/Employees HTTP/1.1
+Accept: : application/json
+
+###
+
+GET  {{PromoCodeFactory_HostAddress}}/swagger/v1/swagger.json HTTP/1.1
+Accept: : application/json
