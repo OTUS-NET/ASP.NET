@@ -46,9 +46,14 @@ namespace PromoCodeFactory.WebHost.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeResponse), 201)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<EmployeeResponse>> CreateEmployee([FromBody] CreateEmployeeRequest request)
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] CreateEmployeeRequest request)
         {
+            var employees = await employeeRepository.GetAllAsync();
+            if (employees.Where(e => e.FirstName == request.FirstName && e.LastName == request.LastName).FirstOrDefault() != null) return BadRequest("An employee with that name already exists");
+            if (employees.Where(e => e.Email == request.Email).FirstOrDefault() != null) return BadRequest("An employee with that email already exists");
+
             if (request.NamesRoles.Count() == 0) return BadRequest("Roles is Empty");
             var roles = (await roleRepository.GetAllAsync()).Where(r => request.NamesRoles.Contains(r.Name));
             if (roles.Count() == 0) return NotFound("Role not Found");
@@ -59,11 +64,12 @@ namespace PromoCodeFactory.WebHost.Controllers
             return mapper.Map<EmployeeResponse>(response);
         }
 
-        [HttpPut("{id: int}")]
+        [HttpPut("{id:guid}")]
+        [ProducesResponseType(202)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<EmployeeResponse>> UpdateEmployee(Guid id, [FromBody] UpdateEmployeeRequest request)
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, [FromBody] UpdateEmployeeRequest request)
         {
             if (await employeeRepository.GetByIdAsync(id) == null) return NotFound("Employee id not found");
             var updateEmployee = mapper.Map<Employee>(request);
@@ -72,17 +78,19 @@ namespace PromoCodeFactory.WebHost.Controllers
                 var roles = (await roleRepository.GetAllAsync()).Where(r => request.NamesRoles.Contains(r.Name));
                 updateEmployee.Roles = roles.ToList();
             }
+            else updateEmployee.Roles = new List<Role>();
 
             var response = await employeeRepository.UpdateAsync(id, updateEmployee);
             return mapper.Map<EmployeeResponse>(response);
         }
-        [HttpDelete("{id:Guid}")]
+
+        [HttpDelete("{id:guid}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task DeleteEmployee(Guid id) 
+        public async Task DeleteEmployeeAsync(Guid id)
         {
-            if ( (await employeeRepository.GetByIdAsync(id)) == null)  NotFound("Employee id not found");
+            if ((await employeeRepository.GetByIdAsync(id)) == null) NotFound("Employee id not found");
             await employeeRepository.DeleteAsync(id);
             NoContent();
         }

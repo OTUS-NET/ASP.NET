@@ -23,7 +23,7 @@ namespace PromoCodeFactory.DataAccess
             updateEmployee.FirstName = employee.FirstName;
             updateEmployee.LastName = employee.LastName;
             updateEmployee.Email = employee.Email;
-            if(employee.Roles.Count != 0) updateEmployee.Roles = employee.Roles;
+            if(employee.Roles?.Count != 0) updateEmployee.Roles = employee.Roles;
             updateEmployee.AppliedPromocodesCount = employee.AppliedPromocodesCount;
 
             Monitor.Exit(lockObj);

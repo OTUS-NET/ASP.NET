@@ -10,7 +10,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T>: IRepository<T> where T: BaseEntity
     {
-        protected object lockObj = new object();
+        protected static object lockObj = new object();
         protected IEnumerable<T> Data { get; set; }
 
         public InMemoryRepository(IEnumerable<T> data)
