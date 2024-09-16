@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+  mongorep:
+    image: ${DOCKER_REGISTRY-}mongorep
+    build:
+      context: .
+      dockerfile: MongoRep/Dockerfile
+
+  # MONGO
+  mongo-single:
+    image: "mongo"
+    container_name: mongo-single
+    ports:
+      - 27044:27017
+  ##web-host
+  pcf.administration.webhost:
+    image: ${DOCKER_REGISTRY-}pcfadministrationwebhost
+    build:
+      context: .
+      dockerfile: Pcf.Administration/Pcf.Administration.WebHost/Dockerfile

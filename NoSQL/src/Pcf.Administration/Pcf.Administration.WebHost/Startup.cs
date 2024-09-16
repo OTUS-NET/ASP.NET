@@ -36,6 +36,7 @@ namespace Pcf.Administration.WebHost
                 x.SuppressAsyncSuffixInActionNames = false);
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IDbInitializer, EfDbInitializer>();
+            services.AddScoped<MongoDBContext, MongoDBContext>();
             services.AddDbContext<DataContext>(x =>
             {
                 //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
