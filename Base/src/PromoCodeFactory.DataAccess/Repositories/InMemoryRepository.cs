@@ -30,26 +30,43 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public Task<T> CreateAsync(T entity)
         {
-            Monitor.Enter(lockObj);
-
-            entity.Id = Guid.NewGuid();
-            IEnumerable<T> enumerable = Data.Concat(new[] { entity });
-            Data = enumerable;
-
-            Monitor.Exit(lockObj);
+            try
+            {
+                Monitor.Enter(lockObj);
+                entity.Id = Guid.NewGuid();
+                IEnumerable<T> enumerable = Data.Concat(new[] { entity });
+                Data = enumerable;
+            }
+            finally { Monitor.Exit(lockObj); }
 
             return Task.FromResult(entity);
         }
 
         public Task DeleteAsync(Guid id)
         {
-            Monitor.Enter(lockObj);
+            try
+            {
+                Monitor.Enter(lockObj);
+                IEnumerable<T> enumerable = Data.Where(x => x.Id != id);
+                Data = enumerable;
+            }
+            finally { Monitor.Exit(lockObj); }
 
-            IEnumerable<T> enumerable = Data.Where(x => x.Id != id);
-            Data = enumerable;
+            return Task.FromResult(Data);
+        }
 
-            Monitor.Exit(lockObj);
-            return Task.FromResult(enumerable);
+        public Task<T> UpdateAsync(Guid id, T entity)
+        {
+            try
+            {
+                Monitor.Enter(lockObj);
+                var date = Data.Where(x => x.Id != id).ToList();
+                date.Add(entity);
+                Data = date;
+            }
+            finally { Monitor.Exit(lockObj); }
+
+            return Task.FromResult(entity);
         }
     }
 }

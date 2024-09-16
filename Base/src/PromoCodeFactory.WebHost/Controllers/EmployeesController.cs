@@ -15,7 +15,7 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class EmployeesController(IEmployeesRepository employeeRepository, IRepository<Role> roleRepository, IMapper mapper) : ControllerBase
+    public class EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
         /// Получить данные всех сотрудников
@@ -50,10 +50,6 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] CreateEmployeeRequest request)
         {
-            var employees = await employeeRepository.GetAllAsync();
-            if (employees.Where(e => e.FirstName == request.FirstName && e.LastName == request.LastName).FirstOrDefault() != null) return BadRequest("An employee with that name already exists");
-            if (employees.Where(e => e.Email == request.Email).FirstOrDefault() != null) return BadRequest("An employee with that email already exists");
-
             if (request.NamesRoles.Count() == 0) return BadRequest("Roles is Empty");
             var roles = (await roleRepository.GetAllAsync()).Where(r => request.NamesRoles.Contains(r.Name));
             if (roles.Count() == 0) return NotFound("Role not Found");
@@ -71,14 +67,17 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(404)]
         public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, [FromBody] UpdateEmployeeRequest request)
         {
-            if (await employeeRepository.GetByIdAsync(id) == null) return NotFound("Employee id not found");
+            var oldEmploqyee = await employeeRepository.GetByIdAsync(id);
+            if (oldEmploqyee == null) return NotFound("Employee id not found");
+            
             var updateEmployee = mapper.Map<Employee>(request);
-            if (request.NamesRoles.Count != 0)
+            updateEmployee.Id = id;
+            if (request.NamesRoles.Count == 0) updateEmployee.Roles = oldEmploqyee.Roles;
+            else
             {
                 var roles = (await roleRepository.GetAllAsync()).Where(r => request.NamesRoles.Contains(r.Name));
                 updateEmployee.Roles = roles.ToList();
-            }
-            else updateEmployee.Roles = new List<Role>();
+            }           
 
             var response = await employeeRepository.UpdateAsync(id, updateEmployee);
             return mapper.Map<EmployeeResponse>(response);
