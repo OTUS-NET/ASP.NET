@@ -1,4 +1,12 @@
 services:
+  #mongo
+  mongo:
+   image: mongo:latest
+   container_name: mongodb
+   ports:
+    - "27017:27017"
+   volumes:
+    - ./mongo_data:/data/db
   #Administration Db
   promocode-factory-administration-db:
     image: "postgres:latest"
