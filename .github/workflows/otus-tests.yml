@@ -1,0 +1,31 @@
+name: Otus-UnitTests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dependencies
+        run: dotnet restore ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
+
+      - name: Build
+        run: dotnet build ./UnitTests/src/PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj
+
+      - name: Test
+        run: dotnet test ./UnitTests/src/PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj

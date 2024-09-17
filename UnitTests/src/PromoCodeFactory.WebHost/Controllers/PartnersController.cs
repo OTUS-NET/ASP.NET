@@ -104,6 +104,9 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (request.Limit <= 0)
                 return BadRequest("Лимит должен быть больше 0");
             
+            if(request.Limit >= 10)
+                return BadRequest("Лимит должен быть меньше или равен 10");
+
             var newLimit = new PartnerPromoCodeLimit()
             {
                 Limit = request.Limit,
