@@ -7,68 +7,149 @@ using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
 
-namespace PromoCodeFactory.WebHost.Controllers
+namespace PromoCodeFactory.WebHost.Controllers;
+
+/// <summary>
+/// Сотрудники
+/// </summary>
+[ApiController]
+[Route("api/v1/[controller]")]
+public class EmployeesController(IRepository<Employee> employeeRepository) : ControllerBase
 {
+    private readonly IRepository<Employee> _employeeRepository = employeeRepository;
+
     /// <summary>
-    /// Сотрудники
+    /// Получить данные всех сотрудников
     /// </summary>
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public class EmployeesController : ControllerBase
+    [HttpGet("[action]")]
+    public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
     {
-        private readonly IRepository<Employee> _employeeRepository;
+        var employees = await _employeeRepository.GetAllAsync();
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
-        {
-            _employeeRepository = employeeRepository;
-        }
-
-        /// <summary>
-        /// Получить данные всех сотрудников
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
-        {
-            var employees = await _employeeRepository.GetAllAsync();
-
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
-
-            return employeesModelList;
-        }
-
-        /// <summary>
-        /// Получить данные сотрудника по Id
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
-        {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
-                return NotFound();
-
-            var employeeModel = new EmployeeResponse()
+        var employeesModelList = employees.Select(x =>
+            new EmployeeShortResponse
             {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
+                Id = x.Id,
+                Email = x.Email,
+                FullName = x.FullName,
+            }).ToList();
 
-            return employeeModel;
+        return employeesModelList;
+    }
+
+    /// <summary>
+    /// Получить данные сотрудника по Id
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync([FromRoute] Guid id)
+    {
+        var employee = await _employeeRepository.GetByIdAsync(id);
+
+        if (employee == null)
+            return NotFound();
+
+        var employeeModel = new EmployeeResponse()
+        {
+            Id = employee.Id,
+            Email = employee.Email,
+            Roles = employee.Roles.Select(x => new RoleItemResponse()
+            {
+                Name = x.Name,
+                Description = x.Description
+            }).ToList(),
+            FullName = employee.FullName,
+            AppliedPromocodesCount = employee.AppliedPromocodesCount
+        };
+
+        return employeeModel;
+    }
+
+    /// <summary>
+    /// Создать сотрудника
+    /// </summary>
+    [HttpPost("[action]")]
+    public async Task<ActionResult> Create([FromBody] EmployeeSetDto data)
+    {
+        var employee = new Employee
+        {
+            Id = Guid.NewGuid(),
+            Email = data.Email,
+            FirstName = data.FirstName,
+            LastName = data.LastName,
+        };
+
+        if (data.Role is not null)
+        {
+            employee.Roles.Add(new Role
+            {
+                Id = Guid.NewGuid(),
+                Name = data.Role.Name,
+                Description = data.Role.Description,
+            });
         }
+
+        await _employeeRepository.CreateAsync(employee);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Обновить данные сотрудника
+    /// </summary>
+    /// <returns></returns>
+    [HttpPatch("{id:guid}")]
+    public async Task<ActionResult> Update([FromRoute] Guid id, EmployeeSetDto data)
+    {
+        var employee = await _employeeRepository.GetByIdAsync(id);
+
+        if (employee is null)
+        {
+            return NotFound("Employee not found");
+        }
+
+        employee.Email = data.Email;
+        employee.FirstName = data.FirstName;
+        employee.LastName = data.LastName;
+
+        var role = employee.Roles.FirstOrDefault();
+
+        if (data.Role is not null)
+        {
+            if (role is null)
+            {
+                employee.Roles.Add(new Role
+                {
+                    Name = data.Role.Name,
+                    Description = data.Role.Description,
+                });
+            }
+            else
+            {
+                role.Name = data.Role.Name;
+                role.Description = data.Role.Description;
+            }
+        }
+
+        await _employeeRepository.UpdateAsync(employee);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Удалить сотрудника
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> Delete([FromRoute] Guid id)
+    {
+        var employee = await _employeeRepository.GetByIdAsync(id);
+
+        if (employee is null)
+        {
+            return NotFound("Employee not found");
+        }
+
+        await _employeeRepository.DeleteAsync(employee.Id);
+
+        return Ok();
     }
 }
