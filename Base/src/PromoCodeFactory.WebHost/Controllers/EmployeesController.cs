@@ -80,7 +80,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("Create")]
-        public async Task<object> CreateEmployeeAsync(EmployeeDtoCreate employee)
+        public async Task<ActionResult<string>> CreateEmployeeAsync(EmployeeDtoCreate employee)
         {
             var Roles = await _roleRepository.GetAllAsync();
             string Error = employee.Validate(Roles);
@@ -100,7 +100,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("Change/{id:guid}")]
-        public async Task<object> ChangeEmployeeAsync(Guid id, EmployeeDtoCreate employee)
+        public async Task<IActionResult> ChangeEmployeeAsync(Guid id, EmployeeDtoCreate employee)
         {
             var Roles = await _roleRepository.GetAllAsync();
             string Error = employee.Validate(Roles);
@@ -112,11 +112,8 @@ namespace PromoCodeFactory.WebHost.Controllers
             var currEmployee = await _employeeRepository.GetByIdAsync(id);
             if (currEmployee == null)
                 return NotFound();
-            currEmployee.FirstName = employee.FirstName;
-            currEmployee.LastName = employee.LastName;
-            currEmployee.Email = employee.Email;
-            currEmployee.Roles = employee.GetRoles();
-            await _employeeRepository.UpdateByIdAsync(id,currEmployee);
+            
+            await _employeeRepository.UpdateByIdAsync(id,employee.ToEmployee());
 
             return Ok(null);
         }
