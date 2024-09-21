@@ -31,14 +31,6 @@ namespace PromoCodeFactory.DataAccess.Repositories
             return Task.CompletedTask;
         }
 
-        public Task UpdateByIdAsync(Guid id, T item)
-        {
-
-            int index = (Data as List<T>).FindIndex(e => e?.Id == id);
-            (Data as List<T>)[index]=item;
-
-            return Task.CompletedTask;
-        }
 
         public Task<bool> DeleteByIdAsync(Guid id)
         {

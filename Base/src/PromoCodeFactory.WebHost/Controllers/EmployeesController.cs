@@ -113,7 +113,12 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (currEmployee == null)
                 return NotFound();
             
-            await _employeeRepository.UpdateByIdAsync(id,employee.ToEmployee());
+            currEmployee.Email = employee.Email;
+            currEmployee.FirstName = employee.FirstName;
+            currEmployee.LastName = employee.LastName;
+            currEmployee.Roles=employee.GetRoles();
+
+            
 
             return Ok(null);
         }
