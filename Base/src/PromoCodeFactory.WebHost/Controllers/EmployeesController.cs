@@ -22,10 +22,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+        public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync()
         {
             var employees = await employeeRepository.GetAllAsync();
-            var employeesModelList = employees.Select(mapper.Map<EmployeeShortResponse>).ToList();
+            var employeesModelList = employees.Select(mapper.Map<EmployeeShortResponse>);
             return employeesModelList;
         }
 
@@ -87,11 +87,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task DeleteEmployeeAsync(Guid id)
+        public async Task<ActionResult> DeleteEmployeeAsync(Guid id)
         {
-            if ((await employeeRepository.GetByIdAsync(id)) == null) NotFound("Employee id not found");
+            if ((await employeeRepository.GetByIdAsync(id)) == null) return NotFound("Employee id not found");
             await employeeRepository.DeleteAsync(id);
-            NoContent();
+            return NoContent();
         }
     }
 }
