@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class UpdateEmployeeRequest
+public class CreateOrEditEmployeeRequest
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }

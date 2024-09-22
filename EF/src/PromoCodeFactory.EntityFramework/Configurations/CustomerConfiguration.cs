@@ -20,9 +20,9 @@ namespace PromoCodeFactory.EntityFramework.Configurations
             builder.HasMany(c => c.PromoCodes)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(o => o.CustomerId);
-            builder.HasMany(c => c.Preferences)
+            builder.HasMany(c => c.CustomerPreferences)
                 .WithOne(p => p.Customer)
-                .HasForeignKey(p => p.CudtomerId);
+                .HasForeignKey(p => p.CustomerId);
         }
     }
 }

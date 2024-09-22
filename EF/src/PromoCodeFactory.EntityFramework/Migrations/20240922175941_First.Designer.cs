@@ -11,8 +11,8 @@ using PromoCodeFactory.EntityFramework;
 namespace PromoCodeFactory.EntityFramework.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240922091320_FirstDownload")]
-    partial class FirstDownload
+    [Migration("20240922175941_First")]
+    partial class First
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,10 +91,7 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("CudtomerId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CustomerId")
+                    b.Property<Guid>("CustomerId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("PreferenceId")
@@ -129,7 +126,7 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("BiginDate")
+                    b.Property<DateTime>("BeginDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
@@ -178,11 +175,13 @@ namespace PromoCodeFactory.EntityFramework.Migrations
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.CustomerPreference", b =>
                 {
                     b.HasOne("PromoCodeFactory.Core.Domain.PromoCodeManagement.Customer", "Customer")
-                        .WithMany("Preferences")
-                        .HasForeignKey("CustomerId");
+                        .WithMany("CustomerPreferences")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PromoCodeFactory.Core.Domain.PromoCodeManagement.Preference", "Preference")
-                        .WithMany("Customers")
+                        .WithMany("CustomerPreferences")
                         .HasForeignKey("PreferenceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -201,7 +200,7 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                         .IsRequired();
 
                     b.HasOne("PromoCodeFactory.Core.Domain.Administration.Employee", "PartnerManager")
-                        .WithMany()
+                        .WithMany("PromoCodes")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -219,6 +218,11 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                     b.Navigation("Preference");
                 });
 
+            modelBuilder.Entity("PromoCodeFactory.Core.Domain.Administration.Employee", b =>
+                {
+                    b.Navigation("PromoCodes");
+                });
+
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.Administration.Role", b =>
                 {
                     b.Navigation("Employees");
@@ -226,14 +230,14 @@ namespace PromoCodeFactory.EntityFramework.Migrations
 
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Customer", b =>
                 {
-                    b.Navigation("Preferences");
+                    b.Navigation("CustomerPreferences");
 
                     b.Navigation("PromoCodes");
                 });
 
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Preference", b =>
                 {
-                    b.Navigation("Customers");
+                    b.Navigation("CustomerPreferences");
 
                     b.Navigation("PromoCodes");
                 });

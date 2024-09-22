@@ -8,10 +8,9 @@ namespace PromoCodeFactory.WebHost.Mapping
     {
         public EmployeesMappingProfile()
         {
-            CreateMap<CreateEmployeeRequest, Employee>();
-            CreateMap<UpdateEmployeeRequest,Employee>();
-            CreateMap<Employee,EmployeeResponse>();
-            CreateMap<Employee,EmployeeShortResponse>();
+            CreateMap<CreateOrEditEmployeeRequest, Employee>();
+            CreateMap<Employee, EmployeeResponse>();
+            CreateMap<Employee, EmployeeShortResponse>();
         }
     }
 }

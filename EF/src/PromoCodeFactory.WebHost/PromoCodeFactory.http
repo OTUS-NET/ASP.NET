@@ -17,7 +17,7 @@ Content-type: application/json; charset=utf-8
     "firstName": "Artem",
     "lastName": "Terekhov",
     "email": "Terekhov@mail.ru",
-    "namesRoles": ["Admin"],
+    "namesRoles": "Admin",
     "appliedPromocodesCount": 10
 }
 
@@ -29,7 +29,6 @@ Content-type: application/json; charset=utf-8
     "firstName": "Иван",
     "lastName": "Иванов",
     "email": "Ivanov@somemail.ru",
-    "namesRoles": [],
     "appliedPromocodesCount": 7
 }
 
@@ -41,4 +40,25 @@ Accept: : application/json
 ###
 
 GET  {{PromoCodeFactory_HostAddress}}/swagger/v1/swagger.json HTTP/1.1
+Accept: : application/json
+
+###
+
+POST {{PromoCodeFactory_HostAddress}}/api/v1/PromoCode HTTP/1.1
+Content-type: application/json; charset=utf-8
+
+{  
+    "code": "Supermarket_035",
+    "serviceInfo": "Purchase on 2000",
+    "partnerName": "The supermarket",
+    "beforeStarts": 1,
+    "howLongDay": 30,
+    "preferenceId": "c4bda62e-fc74-4256-a956-4760b3858cbd",
+    "employeeId": "f766e2bf-340a-46ea-bff3-f1700b435895",
+    "customerId": "5B2C9EA9-6097-4390-B5F4-627EF26479A7"
+}
+
+###
+
+GET {{PromoCodeFactory_HostAddress}}/api/v1/PromoCode HTTP/1.1
 Accept: : application/json

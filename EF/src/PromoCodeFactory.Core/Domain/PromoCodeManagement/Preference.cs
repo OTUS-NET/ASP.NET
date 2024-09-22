@@ -9,7 +9,8 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
     public class Preference: BaseEntity
     {
         public string Name { get; set; }
-        public virtual List<PromoCode> PromoCodes{ get; set; }
-        public virtual List<CustomerPreference> Customers { get; set; }
+        public string Description { get; set; }
+        public virtual IEnumerable<PromoCode> PromoCodes{ get; set; }
+        public virtual IEnumerable<CustomerPreference> CustomerPreferences { get; set; }
     }
 }

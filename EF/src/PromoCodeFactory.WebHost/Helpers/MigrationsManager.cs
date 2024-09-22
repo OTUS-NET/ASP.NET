@@ -21,9 +21,9 @@ namespace PromoCodeFactory.WebHost.Helpers
         {
             var scope = host.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<TDbContext>();
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
             context.Database.Migrate();
-            Seed(scope.ServiceProvider);
+            //Seed(scope.ServiceProvider);
         }
 
         public static void Seed(IServiceProvider serviceProvider) 
@@ -33,10 +33,11 @@ namespace PromoCodeFactory.WebHost.Helpers
                 var context = scope.ServiceProvider.GetService<DataContext>();
 
                 context.AddRange(FakeDataFactory.Roles);
-                context.SaveChanges();
                 context.AddRange(FakeDataFactory.Employees);
                 context.AddRange(FakeDataFactory.Preferences);
                 context.AddRange(FakeDataFactory.Customers);
+                context.AddRange(FakeDataFactory.CustomerPreferences);
+                context.AddRange(FakeDataFactory.PromoCodes);
                 context.SaveChanges();
             };
         }

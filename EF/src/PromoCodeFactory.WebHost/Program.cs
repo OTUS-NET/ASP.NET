@@ -5,6 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromoCodeFactory.EntityFramework;
 using PromoCodeFactory.WebHost.Helpers;
+using System.IO;
+using System.Reflection;
+using System;
+using Microsoft.OpenApi.Models;
 
 namespace PromoCodeFactory.WebHost
 {
@@ -26,7 +30,15 @@ namespace PromoCodeFactory.WebHost
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "EF Home Work", Version = "v1" });
+
+                // generate the XML docs that'll drive the swagger docs
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
 
 
             builder.Services.AddAutoMapper(typeof(Program));            

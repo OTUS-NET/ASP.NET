@@ -22,12 +22,8 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync()
-        {
-            var employees = await employeeRepository.GetAllAsync();
-            var employeesModelList = employees.Select(mapper.Map<EmployeeShortResponse>);
-            return employeesModelList;
-        }
+        public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync() => 
+            (await employeeRepository.GetAllAsync()).Select(mapper.Map<EmployeeShortResponse>);
 
         /// <summary>
         /// Получить данные сотрудника по Id
@@ -44,29 +40,40 @@ namespace PromoCodeFactory.WebHost.Controllers
             return employeeModel;
         }
 
+        /// <summary>
+        /// Добавить нового сотрудника, с указанием роли.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeResponse), 201)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] CreateEmployeeRequest request)
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] CreateOrEditEmployeeRequest request)
         {
-            if (request.NamesRoles.Count() == 0) return BadRequest("Roles is Empty");
-            var roles = (await roleRepository.GetAllAsync()).Where(r => request.NamesRoles.Contains(r.Name));
-            if (roles.Count() == 0) return NotFound("Role not Found");
+            if (string.IsNullOrEmpty(request.NamesRole)) return BadRequest("Roles is Empty");
+            var role = (await roleRepository.GetAllAsync()).FirstOrDefault(r => r.Name == request.NamesRole);
+            if (role == null) return NotFound("Role not Found");
 
             var employee = mapper.Map<Employee>(request);
             employee.Id = Guid.NewGuid();
-            employee.Role = roles.First();
+            employee.Role = role;
             var response = await employeeRepository.CreateAsync(employee);
             return mapper.Map<EmployeeResponse>(response);
         }
 
+        /// <summary>
+        /// Обновить данные сотрудника по Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(202)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> UpdateEmployeeAsync(Guid id, [FromBody] UpdateEmployeeRequest request)
+        public async Task<IActionResult> UpdateEmployeeAsync(Guid id, [FromBody] CreateOrEditEmployeeRequest request)
         {
             var oldEmploqyee = await employeeRepository.GetByIdAsync(id);
             if (oldEmploqyee == null) return NotFound("Employee id not found");
@@ -84,6 +91,11 @@ namespace PromoCodeFactory.WebHost.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Удалить работника по Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

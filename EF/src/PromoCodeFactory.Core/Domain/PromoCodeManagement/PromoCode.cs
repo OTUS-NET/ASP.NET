@@ -11,7 +11,7 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
     {
         public string Code { get; set; }
         public string ServiceInfo { get; set; }
-        public DateTime BiginDate { get; set; }
+        public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
         public string PartnerName { get; set; }
         public Guid CustomerId { get; set; }

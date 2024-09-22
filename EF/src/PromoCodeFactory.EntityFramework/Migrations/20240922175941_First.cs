@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PromoCodeFactory.EntityFramework.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstDownload : Migration
+    public partial class First : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,8 +55,7 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CudtomerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PreferenceId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -66,7 +65,8 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                         name: "FK_CustomerPreferences_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CustomerPreferences_Prefirences_PreferenceId",
                         column: x => x.PreferenceId,
@@ -104,7 +104,7 @@ namespace PromoCodeFactory.EntityFramework.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: true),
                     ServiceInfo = table.Column<string>(type: "TEXT", nullable: true),
-                    BiginDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    BeginDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     PartnerName = table.Column<string>(type: "TEXT", nullable: true),
                     CustomerId = table.Column<Guid>(type: "TEXT", nullable: false),
