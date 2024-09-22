@@ -16,7 +16,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "owner@somemail.ru",
                 FirstName = "Иван",
                 LastName = "Сергеев",
-                Role = Roles.FirstOrDefault(x => x.Name == "Admin"),
+                RoleId =  Roles.FirstOrDefault(x => x.Name == "Admin").Id,
                 AppliedPromocodesCount = 5
             },
             new Employee()
@@ -25,7 +25,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "andreev@somemail.ru",
                 FirstName = "Петр",
                 LastName = "Андреев",
-                Role = Roles.FirstOrDefault(x => x.Name == "PartnerManager"),
+                RoleId = Roles.FirstOrDefault(x => x.Name == "PartnerManager").Id,
                 AppliedPromocodesCount = 10
             },
         };
@@ -69,16 +69,28 @@ namespace PromoCodeFactory.DataAccess.Data
         {
             get
             {
-                var customerId = Guid.Parse("a6c8c6b1-4349-45b0-ab31-244740aaf0f0");
                 var customers = new List<Customer>()
                 {
                     new Customer()
                     {
-                        Id = customerId,
-                        Email = "ivan_sergeev@mail.ru",
+                        Id = Guid.Parse("a6c8c6b1-4349-45b0-ab31-244740aaf0f0"),
+                        Email = "ivan_pertov@mail.ru",
                         FirstName = "Иван",
-                        LastName = "Петров",
-                        //TODO: Добавить предзаполненный список предпочтений
+                        LastName = "Петров"
+                    } ,
+                    new Customer()
+                    {
+                        Id =  Guid.Parse("5B2C9EA9-6097-4390-B5F4-627EF26479A7"),
+                        Email = "petr_sidorov@mail.ru",
+                        FirstName = "Петр",
+                        LastName = "Сидоров"
+                    }  ,
+                    new Customer()
+                    {
+                        Id = Guid.Parse("9A7A499C-8AEB-4AC5-8B54-D8CA6B3F1DCD"),
+                        Email = "fedor_stepanov@mail.ru",
+                        FirstName = "Федр",
+                        LastName = "Степанов"
                     }
                 };
 

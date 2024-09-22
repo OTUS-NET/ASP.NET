@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
@@ -13,31 +15,19 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class RolesController
-    {
-        private readonly IRepository<Role> _rolesRepository;
-
-        public RolesController(IRepository<Role> rolesRepository)
-        {
-            _rolesRepository = rolesRepository;
-        }
+    public class RolesController(IRepository<Role, Guid> rolesRepository, IMapper mapper)
+    {      
 
         /// <summary>
         /// Получить все доступные роли сотрудников
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync()
+        public async Task<List<RoleItemResponse>> GetRolesAsync()
         {
-            var roles = await _rolesRepository.GetAllAsync();
+            var roles = await rolesRepository.GetAllAsync();
 
-            var rolesModelList = roles.Select(x =>
-                new RoleItemResponse()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList();
+            var rolesModelList = roles.Select(mapper.Map<RoleItemResponse>).ToList();
 
             return rolesModelList;
         }

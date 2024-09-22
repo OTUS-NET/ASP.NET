@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core.Domain.Base;
 
 namespace PromoCodeFactory.Core.Abstractions.Repositories
 {
-    public interface IRepository<T>
-        where T : BaseEntity
+    public interface IRepository<TEntity, in TId> 
+        where TEntity : IEntity<TId> 
+        where TId : struct
     {
-        Task<IEnumerable<T>> GetAllAsync();
-
-        Task<T> GetByIdAsync(Guid id);
+        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<TEntity> GetByIdAsync(TId id);
+        Task<TEntity> CreateAsync(TEntity entity);
+        Task UpdateAsync(TId id,TEntity entity);  
+        Task DeleteAsync(TId id);   
     }
 }
