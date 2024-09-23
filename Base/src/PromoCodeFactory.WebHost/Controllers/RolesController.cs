@@ -22,13 +22,8 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync()
-        {
-            var roles = await rolesRepository.GetAllAsync();
-
-            var rolesModelList = roles.Select(mapper.Map<RoleItemResponse>);
-
-            return rolesModelList;
-        }
+        [ProducesResponseType(typeof(IEnumerable<RoleItemResponse>), 200)]
+        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync() =>
+            (await rolesRepository.GetAllAsync()).Select(mapper.Map<RoleItemResponse>);
     }
 }
