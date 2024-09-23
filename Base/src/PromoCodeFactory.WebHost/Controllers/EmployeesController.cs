@@ -22,7 +22,8 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync()
+        [ProducesResponseType(typeof(IEnumerable<EmployeeShortResponse>), 200)]
+        public async Task<IEnumerable<EmployeeShortResponse>> GetAll()
         {
             var employees = await employeeRepository.GetAllAsync();
             var employeesModelList = employees.Select(mapper.Map<EmployeeShortResponse>);
@@ -34,19 +35,21 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        [ProducesResponseType(typeof(EmployeeResponse), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<EmployeeResponse>> Get(Guid id)
         {
             var employee = await employeeRepository.GetByIdAsync(id);
 
             if (employee == null)
                 return NotFound();
             var employeeModel = mapper.Map<EmployeeResponse>(employee);
-            return employeeModel;
+            return Ok(employeeModel);
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeResponse), 201)]
-        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] CreateEmployeeRequest request)
         {
@@ -57,15 +60,14 @@ namespace PromoCodeFactory.WebHost.Controllers
             var employee = mapper.Map<Employee>(request);
             employee.Roles = roles.ToList();
             var response = await employeeRepository.CreateAsync(employee);
-            return mapper.Map<EmployeeResponse>(response);
+            return CreatedAtAction(nameof(Get), new { id = response.Id }, mapper.Map<EmployeeResponse>(response)) ;
         }
 
         [HttpPut("{id:guid}")]
-        [ProducesResponseType(202)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(bool),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, [FromBody] UpdateEmployeeRequest request)
+        public async Task<IActionResult> UpdateEmployeeAsync(Guid id, [FromBody] UpdateEmployeeRequest request)
         {
             var oldEmploqyee = await employeeRepository.GetByIdAsync(id);
             if (oldEmploqyee == null) return NotFound("Employee id not found");
@@ -79,15 +81,15 @@ namespace PromoCodeFactory.WebHost.Controllers
                 updateEmployee.Roles = roles.ToList();
             }           
 
-            var response = await employeeRepository.UpdateAsync(id, updateEmployee);
-            return mapper.Map<EmployeeResponse>(response);
+            await employeeRepository.UpdateAsync(id, updateEmployee);
+            return Ok(true);
         }
 
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> DeleteEmployeeAsync(Guid id)
+        public async Task<IActionResult> DeleteEmployeeAsync(Guid id)
         {
             if ((await employeeRepository.GetByIdAsync(id)) == null) return NotFound("Employee id not found");
             await employeeRepository.DeleteAsync(id);
