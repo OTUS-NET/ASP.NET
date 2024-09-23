@@ -30,6 +30,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<PromoCodeShortResponse>), 200)]
         public async Task<IEnumerable<PromoCodeShortResponse>> GetPromocodesAsync() =>
             (await promoCodeRepository.GetAllAsync()).Select(mapper.Map<PromoCodeShortResponse>);
 

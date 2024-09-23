@@ -26,7 +26,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), 200)]
-        public async Task<IEnumerable<CustomerShortResponse>> GetCustomersAsync() =>
+        public async Task<IEnumerable<CustomerShortResponse>> GetAll() =>
             (await customerRepository.GetAllAsync()).Select(mapper.Map<CustomerShortResponse>);
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(typeof(CustomerResponse), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<CustomerResponse>> GetCustomerAsync(Guid id)
+        public async Task<ActionResult<CustomerResponse>> Get(Guid id)
         {
             var customer = await customerRepository.GetByIdAsync(id);
             if (customer == null) return NotFound();
@@ -55,7 +55,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync([FromBody]  CreateOrEditCustomerRequest request)
         {
             if (request.PreferenceIds.Count() == 0) return BadRequest("To get coupons, you need to have at least one preference");
-            else return mapper.Map<CustomerResponse>(await customerRepository.CreateAsync(mapper.Map<Customer>(request)));
+            else
+            {
+                var response = await customerRepository.CreateAsync(mapper.Map<Customer>(request));
+                return CreatedAtAction(nameof(Get), new { id = response.Id }, mapper.Map<CustomerResponse>(response));
+            }
         }
         /// <summary>
         /// Обновить данные покупателя.
@@ -65,7 +69,6 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         [HttpPut("{id:guid}")]
-        [ProducesResponseType(202)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]

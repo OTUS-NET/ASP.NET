@@ -35,7 +35,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(typeof(EmployeeResponse), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult<EmployeeResponse>> Get(Guid id)
         {
             var employee = await employeeRepository.GetByIdAsync(id);
 
@@ -52,7 +52,6 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeResponse), 201)]
-        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] CreateOrEditEmployeeRequest request)
         {
@@ -64,7 +63,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             employee.Id = Guid.NewGuid();
             employee.Role = role;
             var response = await employeeRepository.CreateAsync(employee);
-            return mapper.Map<EmployeeResponse>(response);
+            return CreatedAtAction(nameof(Get), new { id = response.Id },mapper.Map<EmployeeResponse>(response));
         }
 
         /// <summary>
@@ -74,11 +73,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("{id:guid}")]
-        [ProducesResponseType(202)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> UpdateEmployeeAsync(Guid id, [FromBody] CreateOrEditEmployeeRequest request)
+        public async Task<ActionResult<bool>> UpdateEmployeeAsync(Guid id, [FromBody] CreateOrEditEmployeeRequest request)
         {
             var oldEmploqyee = await employeeRepository.GetByIdAsync(id);
             if (oldEmploqyee == null) return NotFound("Employee id not found");
@@ -93,7 +91,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             }           
 
             await employeeRepository.UpdateAsync(id, updateEmployee);
-            return NoContent();
+            return Ok(true);
         }
 
         /// <summary>
@@ -102,14 +100,14 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(bool),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteEmployeeAsync(Guid id)
+        public async Task<ActionResult<bool>> DeleteEmployeeAsync(Guid id)
         {
             if ((await employeeRepository.GetByIdAsync(id)) == null) return NotFound("Employee id not found");
             await employeeRepository.DeleteAsync(id);
-            return NoContent();
+            return Ok(true);
         }
     }
 }
