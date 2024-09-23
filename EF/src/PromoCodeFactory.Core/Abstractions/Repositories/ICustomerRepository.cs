@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PromoCodeFactory.Core.Abstractions.Repositories
 {
-    public interface ICostomerRepository: IRepository<Customer, Guid>
+    public interface ICustomerRepository: IRepository<Customer, Guid>
     {
     }
 }

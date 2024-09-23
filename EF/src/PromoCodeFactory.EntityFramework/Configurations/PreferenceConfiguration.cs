@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PromoCodeFactory.EntityFramework.Configurations
 {
-    public class PreferenceConfiguretion : IEntityTypeConfiguration<Preference>
+    public class PreferenceConfiguration : IEntityTypeConfiguration<Preference>
     {
         public void Configure(EntityTypeBuilder<Preference> builder)
         {

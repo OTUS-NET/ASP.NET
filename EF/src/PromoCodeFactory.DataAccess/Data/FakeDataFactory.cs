@@ -65,12 +65,7 @@ namespace PromoCodeFactory.DataAccess.Data
             }
         };
 
-        public static IEnumerable<Customer> Customers
-        {
-            get
-            {
-                var customers = new List<Customer>()
-                {
+        public static IEnumerable<Customer> Customers => new List<Customer>(){
                     new Customer()
                     {
                         Id = Guid.Parse("a6c8c6b1-4349-45b0-ab31-244740aaf0f0"),
@@ -85,17 +80,10 @@ namespace PromoCodeFactory.DataAccess.Data
                         Email = "petr_sidorov@mail.ru",
                         FirstName = "Петр",
                         LastName = "Сидоров"
-                    }  
+                    }
                 };
 
-                return customers;
-            }
-        }
-        public static IEnumerable<CustomerPreference> CustomerPreferences
-        {
-            get
-            {
-                var customers = new List<CustomerPreference>()
+        public static IEnumerable<CustomerPreference> CustomerPreferences => new List<CustomerPreference>()
                 {
                     new CustomerPreference()
                     {
@@ -122,15 +110,7 @@ namespace PromoCodeFactory.DataAccess.Data
                         PreferenceId = Preferences.FirstOrDefault(x => x.Name == "Дети").Id
                     }
                 };
-
-                return customers;
-            }
-        }
-        public static IEnumerable<PromoCode> PromoCodes 
-        {
-            get
-            {
-                var promoCodes = new List<PromoCode>()
+        public static IEnumerable<PromoCode> PromoCodes => new List<PromoCode>()
                 {
                     new PromoCode()
                     {
@@ -140,20 +120,20 @@ namespace PromoCodeFactory.DataAccess.Data
                         PartnerName = "The attractions",
                         BeginDate = DateTime.Now.AddDays(5),
                         EndDate = DateTime.Now.AddDays(35),
-                        PreferenceId =Preferences.FirstOrDefault(x => x.Name == "Дети").Id,
-                        EmployeeId =Employees.FirstOrDefault(x => x.Email == "andreev@somemail.ru").Id,
+                        PreferenceId = Preferences.FirstOrDefault(x => x.Name == "Дети").Id,
+                        EmployeeId = Employees.FirstOrDefault(x => x.Email == "andreev@somemail.ru").Id,
                         CustomerId = Customers.FirstOrDefault(x => x.Email == "ivan_pertov@mail.ru").Id,
                     } ,
                     new PromoCode()
-                    {
+                    {   
                         Id = Guid.Parse("13208CF8-E793-4F86-A735-C1716E30EFEA"),
                         Code = "Performance_020",
                         ServiceInfo = "Visiting one person",
                         PartnerName = "The theatre",
                         BeginDate = DateTime.Now.AddDays(5),
                         EndDate = DateTime.Now.AddDays(35),
-                        PreferenceId =Preferences.FirstOrDefault(x => x.Name == "Театр").Id,
-                        EmployeeId =Employees.FirstOrDefault(x => x.Email == "andreev@somemail.ru").Id,
+                        PreferenceId = Preferences.FirstOrDefault(x => x.Name == "Театр").Id,
+                        EmployeeId = Employees.FirstOrDefault(x => x.Email == "andreev@somemail.ru").Id,
                         CustomerId = Customers.FirstOrDefault(x => x.Email == "ivan_pertov@mail.ru").Id,
                     }  ,
                     new PromoCode()
@@ -164,13 +144,10 @@ namespace PromoCodeFactory.DataAccess.Data
                         PartnerName = "The supermarket",
                         BeginDate = DateTime.Now.AddDays(5),
                         EndDate = DateTime.Now.AddDays(35),
-                        PreferenceId =Preferences.FirstOrDefault(x => x.Name == "Семья").Id,
-                        EmployeeId =Employees.FirstOrDefault(x => x.Email == "andreev@somemail.ru").Id,
+                        PreferenceId = Preferences.FirstOrDefault(x => x.Name == "Семья").Id,
+                        EmployeeId = Employees.FirstOrDefault(x => x.Email == "andreev@somemail.ru").Id,
                         CustomerId = Customers.FirstOrDefault(x => x.Email == "petr_sidorov@mail.ru").Id,
                     }
                 };
-                return promoCodes;
-            }
-        }
     }
 }

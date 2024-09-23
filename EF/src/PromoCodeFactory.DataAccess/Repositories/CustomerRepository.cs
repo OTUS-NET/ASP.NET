@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {
-    public class CostomerRepository : EFRepository<Customer, Guid>, ICostomerRepository
+    public class CustomerRepository : EFRepository<Customer, Guid>, ICustomerRepository
 
     {
-        public CostomerRepository(DataContext context) : base(context)
+        public CustomerRepository(DataContext context) : base(context)
         {
         }
 

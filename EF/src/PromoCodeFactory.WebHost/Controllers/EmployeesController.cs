@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Response;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -22,6 +23,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<EmployeeShortResponse>), 200)]
         public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync() => 
             (await employeeRepository.GetAllAsync()).Select(mapper.Map<EmployeeShortResponse>);
 
@@ -30,6 +32,9 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(EmployeeResponse), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
         {
             var employee = await employeeRepository.GetByIdAsync(id);

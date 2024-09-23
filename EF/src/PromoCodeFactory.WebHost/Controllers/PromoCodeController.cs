@@ -22,7 +22,7 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class PromoCodeController(IRepository<PromoCode, Guid> promoCodeRepository, 
         IRepository<Employee, Guid> employeeRepository,
         IRepository<Preference, Guid> preferenceRepository,
-        ICostomerRepository costomerRepository,
+        ICustomerRepository costomerRepository,
         IMapper mapper):ControllerBase
     {
         /// <summary>

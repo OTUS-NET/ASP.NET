@@ -18,13 +18,14 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class CustomerController(ICostomerRepository customerRepository, IMapper mapper) : ControllerBase
+    public class CustomerController(ICustomerRepository customerRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
         /// Получить данные всех покупателей
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), 200)]
         public async Task<IEnumerable<CustomerShortResponse>> GetCustomersAsync() =>
             (await customerRepository.GetAllAsync()).Select(mapper.Map<CustomerShortResponse>);
 
@@ -33,11 +34,14 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(CustomerResponse), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<ActionResult<CustomerResponse>> GetCustomerAsync(Guid id)
         {
             var customer = await customerRepository.GetByIdAsync(id);
             if (customer == null) return NotFound();
-            else return mapper.Map<CustomerResponse>(customer);
+            else return Ok(mapper.Map<CustomerResponse>(customer));
         }
 
         /// <summary>
@@ -47,7 +51,6 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(CustomerResponse), 201)]
-        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync([FromBody]  CreateOrEditCustomerRequest request)
         {
