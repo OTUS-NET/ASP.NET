@@ -1,51 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
-
+using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Domain.Base;
 namespace PromoCodeFactory.DataAccess.Repositories
 {
-    public class InMemoryRepository<T>
-        : IRepository<T>
-        where T: BaseEntity
+    public class InMemoryRepository<TEntity, TId> : IRepository<TEntity, TId>
+        where TEntity : class, IEntity<TId>
+        where TId : struct
     {
-        protected List<T> Data { get; set; }
+        protected static object lockObj = new object();
+        protected IEnumerable<TEntity> Data { get; set; }
 
-        public InMemoryRepository(List<T> data)
+        public InMemoryRepository(IEnumerable<TEntity> data)
         {
             Data = data;
         }
-        
-        public Task<IEnumerable<T>> GetAllAsync()
+
+        public Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return Task.FromResult(Data.AsEnumerable());
+            return Task.FromResult(Data);
         }
 
-        public Task<T> GetByIdAsync(Guid id)
+        public Task<TEntity> GetByIdAsync(TId id)
         {
-            return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+            return Task.FromResult(Data.FirstOrDefault(predicate: x => x.Id.Equals(id)));
         }
 
-        public Task<IEnumerable<T>> GetRangeByIdsAsync(List<Guid> ids)
+        public Task<TEntity> CreateAsync(TEntity  entity)
         {
-            return Task.FromResult(Data.Where(x => ids.Contains(x.Id)).AsEnumerable());
+            try
+            {
+                Monitor.Enter(lockObj);
+                IEnumerable<TEntity> enumerable = Data.Concat(new[] { entity });
+                Data = enumerable;
+            }
+            finally { Monitor.Exit(lockObj); }
+
+            return Task.FromResult(entity);
         }
 
-        public Task AddAsync(T entity)
+        public Task DeleteAsync(TId id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Monitor.Enter(lockObj);
+                IEnumerable<TEntity> enumerable = Data.Where(predicate: x => x.Id.Equals(id));
+                Data = enumerable;
+            }
+            finally { Monitor.Exit(lockObj); }
+
+            return Task.FromResult(Data);
         }
 
-        public Task UpdateAsync(T entity)
+        public Task UpdateAsync(TId id, TEntity entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(T entity)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                Monitor.Enter(lockObj);
+                var date = Data.Where(predicate: x => x.Id.Equals(id)).ToList();
+                date.Add(entity);
+                Data = date;
+            }
+            finally { Monitor.Exit(lockObj); }        
+            return Task.CompletedTask;
         }
     }
 }
