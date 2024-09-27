@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.WebHost.Models.Dto;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Utils;
+using System.Threading;
+using PromoCodeFactory.Core.Abstractions.Services;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -16,59 +21,77 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IService<Employee> _employeeService;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(IService<Employee> employeeService)
         {
-            _employeeRepository = employeeRepository;
+            _employeeService = employeeService;
         }
 
         /// <summary>
         /// Получить данные всех сотрудников
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+        [HttpGet("get-all")]
+        public async Task<ActionResult<List<EmployeeShortResponse>>> GetEmployeesAsync(CancellationToken cts)
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            var employees = await _employeeService.GetAllAsync(cts);
+            var employeesModelList = employees.ToEmployeeShortResponse();
 
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
-
-            return employeesModelList;
+            return Ok(employeesModelList);
         }
 
         /// <summary>
         /// Получить данные сотрудника по Id
         /// </summary>
         /// <returns></returns>
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        [HttpGet("get/{id:guid}")]
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id, CancellationToken cts)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            var employee = await _employeeService.GetByIdAsync(id, cts);
+            return Ok(employee.ToEmployeeResponse());
+        }
 
-            if (employee == null)
-                return NotFound();
+        /// <summary>
+        /// Создать нового сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("create")]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(EmployeeDto dto, CancellationToken cts) // CreateEmployeeRequest?
+        {
+            var employee = dto.ToEmployee();
+            await _employeeService.AddAsync(employee, cts);
 
-            var employeeModel = new EmployeeResponse()
-            {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
+            return Ok(employee.ToEmployeeResponse());
+            //return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { Id = employee.Id }, employee);
+        }
 
-            return employeeModel;
+        /// <summary>
+        /// Обновить информацию о сотруднике
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("update/{id:guid}")]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync( // UpdateEmployeeRequest?
+            Guid id,
+            EmployeeDto dto,
+            CancellationToken cts)
+        {
+            var employee = dto.ToEmployee(id);
+            await _employeeService.UpdateByIdAsync(id, employee, cts);
+
+            return Ok(employee.ToEmployeeResponse());
+        }
+
+        /// <summary>
+        /// Удалить сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("delete/{id:guid}")]
+        public async Task<ActionResult<EmployeeResponse>> DeleteEmployeeByIdAsync(Guid id, CancellationToken cts)
+        {
+            await _employeeService.DeleteByIdAsync(id, cts);
+
+            return Ok(null);
         }
     }
 }

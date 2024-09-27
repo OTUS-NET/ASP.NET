@@ -15,4 +15,8 @@
       <ProjectReference Include="..\PromoCodeFactory.DataAccess\PromoCodeFactory.DataAccess.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\Errors\" />
+    </ItemGroup>
+
 </Project>
