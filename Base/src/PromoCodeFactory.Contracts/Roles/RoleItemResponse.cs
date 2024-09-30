@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PromoCodeFactory.WebHost.Models;
+﻿namespace PromoCodeFactory.Contracts.Roles;
 
 public class RoleItemResponse
 {

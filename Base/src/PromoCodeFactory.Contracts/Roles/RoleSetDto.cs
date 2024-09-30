@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PromoCodeFactory.WebHost.Models;
+namespace PromoCodeFactory.Contracts.Roles;
 
 public record RoleSetDto
 {

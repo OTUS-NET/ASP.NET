@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Contracts.Employees;
+using PromoCodeFactory.Contracts.Roles;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -52,13 +53,8 @@ public class EmployeesController(IRepository<Employee> employeeRepository) : Con
         {
             Id = employee.Id,
             Email = employee.Email,
-            Roles = employee.Roles.Select(x => new RoleItemResponse()
-            {
-                Name = x.Name,
-                Description = x.Description
-            }).ToList(),
             FullName = employee.FullName,
-            AppliedPromocodesCount = employee.AppliedPromocodesCount
+            AppliedPromocodesCount = employee.AppliedPromoCodesCount
         };
 
         return employeeModel;
@@ -80,12 +76,6 @@ public class EmployeesController(IRepository<Employee> employeeRepository) : Con
 
         if (data.Role is not null)
         {
-            employee.Roles.Add(new Role
-            {
-                Id = Guid.NewGuid(),
-                Name = data.Role.Name,
-                Description = data.Role.Description,
-            });
         }
 
         await _employeeRepository.CreateAsync(employee);
@@ -110,25 +100,6 @@ public class EmployeesController(IRepository<Employee> employeeRepository) : Con
         employee.Email = data.Email;
         employee.FirstName = data.FirstName;
         employee.LastName = data.LastName;
-
-        var role = employee.Roles.FirstOrDefault();
-
-        if (data.Role is not null)
-        {
-            if (role is null)
-            {
-                employee.Roles.Add(new Role
-                {
-                    Name = data.Role.Name,
-                    Description = data.Role.Description,
-                });
-            }
-            else
-            {
-                role.Name = data.Role.Name;
-                role.Description = data.Role.Description;
-            }
-        }
 
         await _employeeRepository.UpdateAsync(employee);
 

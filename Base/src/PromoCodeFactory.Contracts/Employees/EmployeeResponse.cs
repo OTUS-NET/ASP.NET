@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using PromoCodeFactory.Contracts.Roles;
 
-namespace PromoCodeFactory.WebHost.Models;
+namespace PromoCodeFactory.Contracts.Employees;
 
 public class EmployeeResponse
 {

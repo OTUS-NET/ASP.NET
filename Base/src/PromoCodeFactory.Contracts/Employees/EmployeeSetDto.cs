@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using PromoCodeFactory.Contracts.Roles;
 
-namespace PromoCodeFactory.WebHost.Models;
+namespace PromoCodeFactory.Contracts.Employees;
 
 public record EmployeeSetDto
 {
