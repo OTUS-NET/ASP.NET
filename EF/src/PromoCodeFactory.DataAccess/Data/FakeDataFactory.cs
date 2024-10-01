@@ -16,7 +16,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "owner@somemail.ru",
                 FirstName = "Иван",
                 LastName = "Сергеев",
-                Role = Roles.FirstOrDefault(x => x.Name == "Admin"),
+                RoleId = Guid.Parse("53729686-a368-4eeb-8bfa-cc69b6050d02"),
                 AppliedPromocodesCount = 5
             },
             new Employee()
@@ -25,7 +25,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "andreev@somemail.ru",
                 FirstName = "Петр",
                 LastName = "Андреев",
-                Role = Roles.FirstOrDefault(x => x.Name == "PartnerManager"),
+                RoleId = Guid.Parse("b0ae7aac-5493-45cd-ad16-87426a5e7665"),
                 AppliedPromocodesCount = 10
             },
         };
@@ -78,12 +78,25 @@ namespace PromoCodeFactory.DataAccess.Data
                         Email = "ivan_sergeev@mail.ru",
                         FirstName = "Иван",
                         LastName = "Петров",
-                        //TODO: Добавить предзаполненный список предпочтений
                     }
                 };
 
                 return customers;
             }
         }
+
+        public static IEnumerable<CustomerPreference> CustomersPreferences => new List<CustomerPreference>
+        {
+            new()
+            { 
+                CustomerId = Guid.Parse("a6c8c6b1-4349-45b0-ab31-244740aaf0f0"),
+                PreferenceId = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c")
+            },
+            new()
+            {
+                CustomerId = Guid.Parse("a6c8c6b1-4349-45b0-ab31-244740aaf0f0"),
+                PreferenceId = Guid.Parse("76324c47-68d2-472d-abb8-33cfa8cc0c84")
+            },
+        };
     }
 }
