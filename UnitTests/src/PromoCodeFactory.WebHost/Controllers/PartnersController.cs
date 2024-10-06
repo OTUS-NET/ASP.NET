@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.FileProviders;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.WebHost.Helpers;
 using PromoCodeFactory.WebHost.Models.Request;
 using PromoCodeFactory.WebHost.Models.Response;
 using System;
@@ -15,7 +18,7 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PartnersController(IRepository<Partner, Guid> partnersRepository) :ControllerBase
+    public class PartnersController(IPartnerRepository partnersRepository) :ControllerBase
     {
         /// <summary>
         /// Список партнеров
@@ -58,10 +61,11 @@ namespace PromoCodeFactory.WebHost.Controllers
             var partner = await partnersRepository.GetByIdAsync(id);
 
             if (partner == null)
-                return NotFound();
+                return NotFound(ErrorMessages.PartnerHasNotBeenFound());
 
-            var limit = partner.PartnerLimits
-                .FirstOrDefault(x => x.Id == limitId);
+            if (!partner.IsActive) return BadRequest(ErrorMessages.PartnerIsNotActive());
+            var limit = partner.PartnerLimits.FirstOrDefault(x => x.Id == limitId);
+            if (limit == null) return NotFound();
 
             var response = new PartnerPromoCodeLimitResponse()
             {
@@ -91,7 +95,7 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             //Если партнер заблокирован, то нужно выдать исключение
             if (!partner.IsActive)
-                return BadRequest("Данный партнер не активен");
+                return BadRequest(ErrorMessages.PartnerHasNotBeenFound());
 
             //Установка лимита партнеру
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x =>
@@ -109,7 +113,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             }
 
             if (request.Limit <= 0)
-                return BadRequest("Лимит должен быть больше 0");
+                return BadRequest(ErrorMessages.LimitMustBeGreaterThanZero());
 
             var newLimit = new PartnerPromoCodeLimit()
             {
@@ -141,7 +145,7 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             //Если партнер заблокирован, то нужно выдать исключение
             if (!partner.IsActive)
-                return BadRequest("Данный партнер не активен");
+                return BadRequest(ErrorMessages.PartnerIsNotActive());
 
             //Отключение лимита
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x =>

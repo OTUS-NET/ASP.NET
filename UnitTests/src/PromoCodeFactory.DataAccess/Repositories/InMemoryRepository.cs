@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
@@ -19,11 +20,6 @@ namespace PromoCodeFactory.DataAccess.Repositories
         public InMemoryRepository(IEnumerable<TEntity> data)
         {
             Data = data;
-        }
-
-        public Task<IEnumerable<TEntity>> GetAllAsync()
-        {
-            return Task.FromResult(Data);
         }
 
         public Task<TEntity> GetByIdAsync(TId id)
@@ -68,6 +64,11 @@ namespace PromoCodeFactory.DataAccess.Repositories
             }
             finally { Monitor.Exit(lockObj); }        
             return Task.CompletedTask;
+        }
+
+        public Task<IEnumerable<TEntity>> GetAllAsync()
+        {
+            return Task.FromResult(Data);
         }
     }
 }

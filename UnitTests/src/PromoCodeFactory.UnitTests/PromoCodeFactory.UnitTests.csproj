@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="AutoFixture" Version="4.18.1" />
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.18.1" />
+    <PackageReference Include="AutoFixture.Xunit2" Version="4.18.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PromoCodeFactory.Compose\PromoCodeFactory.Compose.csproj" />
     <ProjectReference Include="..\PromoCodeFactory.Core\PromoCodeFactory.Core.csproj" />
     <ProjectReference Include="..\PromoCodeFactory.DataAccess\PromoCodeFactory.DataAccess.csproj" />
     <ProjectReference Include="..\PromoCodeFactory.EntityFramework\PromoCodeFactory.EntityFramework.csproj" />

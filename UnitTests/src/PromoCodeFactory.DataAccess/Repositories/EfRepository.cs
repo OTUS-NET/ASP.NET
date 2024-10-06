@@ -5,6 +5,7 @@ using PromoCodeFactory.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,9 +20,10 @@ namespace PromoCodeFactory.DataAccess.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-           return (await _context.Set<TEntity>().AsNoTracking().ToListAsync()).AsEnumerable();
+            IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking();
+            return await query.ToListAsync();
         }
         public virtual async Task<TEntity> GetByIdAsync(TId id)
         {

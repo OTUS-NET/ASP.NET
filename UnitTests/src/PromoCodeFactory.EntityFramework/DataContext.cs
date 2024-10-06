@@ -12,5 +12,6 @@ namespace PromoCodeFactory.EntityFramework
         public DbSet<Preference> Prefirences { get; set; }
         public DbSet<PromoCode> PromoCodes { get; set; }
         public DbSet<CustomerPreference> CustomerPreferences { get; set; }
+        public DbSet<Partner> Partners { get; set; }
     }
 }

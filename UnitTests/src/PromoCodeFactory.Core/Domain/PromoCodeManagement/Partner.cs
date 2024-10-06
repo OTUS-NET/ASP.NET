@@ -12,6 +12,6 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         //Количество выпущенных Промо-кодо
         public int NumberIssuedPromoCodes { get; set; }
         public bool IsActive { get; set; }
-        public virtual IEnumerable<PartnerPromoCodeLimit> PartnerLimits { get; set; }
+        public virtual IList<PartnerPromoCodeLimit> PartnerLimits { get; set; }
     }
 }
