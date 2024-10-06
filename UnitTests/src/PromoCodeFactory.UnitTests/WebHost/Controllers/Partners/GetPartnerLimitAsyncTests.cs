@@ -31,7 +31,10 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
             //Act
             var result = await partnersController.GetPartnerLimitAsync(partnerId, limitId);
             //Assert
-            result.Result.Should().BeAssignableTo<NotFoundResult>();
+            result.Result.Should().BeAssignableTo<NotFoundObjectResult>();
+            if (result.Result is NotFoundObjectResult notFoundResult)
+                notFoundResult.Value.Should().BeEquivalentTo(ErrorMessages.PartnerHasNotBeenFound());
+           
         }
 
         [Theory, AutoMoqData]
