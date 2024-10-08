@@ -14,6 +14,7 @@ namespace PromoCodeFactory.EntityFramework.Configurations
         public void Configure(EntityTypeBuilder<Partner> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.HasIndex(x => x.Name).IsUnique();
             builder.Property(x=>x.Name).IsRequired().HasMaxLength(256);
             builder.HasMany(p => p.PartnerLimits)

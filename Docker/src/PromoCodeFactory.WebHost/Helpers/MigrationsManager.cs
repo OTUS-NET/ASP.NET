@@ -14,9 +14,9 @@ namespace PromoCodeFactory.WebHost.Helpers
         {
             var scope = host.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<TDbContext>();
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
             context.Database.Migrate();
-            scope.ServiceProvider.Seed();
+            //scope.ServiceProvider.Seed();
         }
 
         public static void Seed(this IServiceProvider serviceProvider)

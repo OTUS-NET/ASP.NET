@@ -9,6 +9,7 @@ namespace PromoCodeFactory.EntityFramework.Configurations
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.FirstName).IsRequired().HasMaxLength(100);
             builder.Property(x => x.LastName).HasMaxLength(100);
             builder.Property(x => x.Email).IsRequired().HasMaxLength(124);

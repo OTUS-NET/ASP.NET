@@ -9,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using System;
 using Microsoft.OpenApi.Models;
+using PromoCodeFactory.WebHost.Settings;
 
 namespace PromoCodeFactory.WebHost
 {
@@ -17,10 +18,10 @@ namespace PromoCodeFactory.WebHost
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            var settings = builder.Configuration.Get<ApplicationSettings>();
             builder.Services.AddDbContext<DataContext>(options =>
             {
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"),
+                options.UseNpgsql(settings.ConnectionString,
                     optionsBuilder => optionsBuilder.MigrationsAssembly("PromoCodeFactory.EntityFramework"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
