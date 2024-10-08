@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  promocodefactory.webhost:
+    image: ${DOCKER_REGISTRY-}promocodefactorywebhost    
+    environment:
+      "ASPNETCORE_URLS": "http://+:5100"
+      "ConnectionString": "Host=promocode_db;Port=5432;Database=Promocode;UserId=postgres;Password=admin24"
+    build:
+      context: .
+      dockerfile: PromoCodeFactory.WebHost/Dockerfile
+    container_name: promocodefactory-service
+    depends_on:
+      - promocodefactory_db
+    ports:
+      - "5101:5100"
+
+  promocodefactory_db:
+    image: postgres
+    container_name: promocode_db
+    restart: always
+    environment:    
+      POSTGRES_DB: Promocode
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin24
+    volumes:
+      - 'promocodefactory_data:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+volumes:
+  promocodefactory_data:

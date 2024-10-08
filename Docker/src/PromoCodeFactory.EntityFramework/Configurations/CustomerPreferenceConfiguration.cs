@@ -14,6 +14,7 @@ namespace PromoCodeFactory.EntityFramework.Configurations
         public void Configure(EntityTypeBuilder<CustomerPreference> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
         }
     }
 }

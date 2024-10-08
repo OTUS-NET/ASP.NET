@@ -14,6 +14,7 @@ namespace PromoCodeFactory.EntityFramework.Configurations
         public void Configure(EntityTypeBuilder<PromoCode> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.HasIndex(x => x.Code).IsUnique();
             builder.Property(x => x.Code).HasMaxLength(100);
             builder.Property(x => x.ServiceInfo).HasMaxLength(500);
