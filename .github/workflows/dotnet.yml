@@ -23,7 +23,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore Docker/src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj
     - name: Build
       run: dotnet build Docker/src/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj -c Release -o content
     - name: Test
