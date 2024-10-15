@@ -68,7 +68,7 @@ jobs:
     - name: Build and push Docker Image
       uses: docker/build-push-action@v6.9.0
       with:
-        context: ..\\Docker\src\PromoCodeFactory.WebHost
+        context: ./Docker/src/PromoCodeFactory.WebHost
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
         labels: ${{ steps.meta.outputs.labels }}
