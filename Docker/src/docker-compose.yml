@@ -2,13 +2,13 @@ version: '3.4'
 
 services:
   promocodefactory.webhost:
-    image: ${DOCKER_REGISTRY-}promocodefactorywebhost    
+    image: ghcr.io/aaterekhov/promocodefactory:latest
     environment:
       "ASPNETCORE_URLS": "http://+:5100"
       "ConnectionString": "Host=promocode_db;Port=5432;Database=Promocode;UserId=postgres;Password=admin24"
-    build:
-      context: .
-      dockerfile: PromoCodeFactory.WebHost/Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: PromoCodeFactory.WebHost/Dockerfile
     container_name: promocodefactory-service
     depends_on:
       - promocodefactory_db
