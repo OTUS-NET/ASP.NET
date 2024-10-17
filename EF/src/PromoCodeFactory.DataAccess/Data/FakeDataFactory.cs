@@ -17,7 +17,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 FirstName = "Иван",
                 LastName = "Сергеев",
                 Role = Roles.FirstOrDefault(x => x.Name == "Admin"),
-                AppliedPromocodesCount = 5
+                AppliedPromoCodesCount = 5
             },
             new Employee()
             {
@@ -26,7 +26,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 FirstName = "Петр",
                 LastName = "Андреев",
                 Role = Roles.FirstOrDefault(x => x.Name == "PartnerManager"),
-                AppliedPromocodesCount = 10
+                AppliedPromoCodesCount =  10
             },
         };
 
@@ -79,6 +79,16 @@ namespace PromoCodeFactory.DataAccess.Data
                         FirstName = "Иван",
                         LastName = "Петров",
                         //TODO: Добавить предзаполненный список предпочтений
+                        CustomerPreferences =  new List<CustomerPreference>()
+                        {
+                            new CustomerPreference()
+                            {
+                                CustomerId = customerId,
+                                PreferenceId = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c")
+                            },
+                            
+                        } 
+                        
                     }
                 };
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PromoCodeFactory.WebHost.Models
 {
@@ -11,6 +12,6 @@ namespace PromoCodeFactory.WebHost.Models
 
         public RoleItemResponse Role { get; set; }
 
-        public int AppliedPromocodesCount { get; set; }
+        public int AppliedPromoCodesCount { get; set; }
     }
 }
