@@ -8,4 +8,29 @@
       <ProjectReference Include="..\PromoCodeFactory.Core\PromoCodeFactory.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0-rc.1.24451.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0-rc.1.24451.1" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.1.24431.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Repositories\InMemoryRepository.cs" />
+      <Compile Remove="Infrastructure.EntityFramework\HostExtensions.cs" />
+      <Compile Remove="Infrastructure.EntityFramework\SeedInitialData.cs" />
+      <Compile Remove="Repositories\test.cs" />
+      <Compile Remove="Migrations\20241016224024_Initial.cs" />
+      <Compile Remove="Migrations\20241016224024_Initial.Designer.cs" />
+      <Compile Remove="Migrations\20241016224217_test.cs" />
+      <Compile Remove="Migrations\20241016224217_test.Designer.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
 </Project>

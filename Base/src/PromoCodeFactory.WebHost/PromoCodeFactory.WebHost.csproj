@@ -15,4 +15,9 @@
       <ProjectReference Include="..\PromoCodeFactory.DataAccess\PromoCodeFactory.DataAccess.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Models\RoleItemRequest.cs" />
+      <Compile Remove="Models\UpdateEmployeeRequest.cs" />
+    </ItemGroup>
+
 </Project>

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Controllers
@@ -14,15 +17,25 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class PromocodesController
         : ControllerBase
     {
+        private readonly IRepository<PromoCode> _promoCodeRepository; 
         /// <summary>
         /// Получить все промокоды
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public Task<ActionResult<List<PromoCodeShortResponse>>> GetPromocodesAsync()
+        public async Task<ActionResult<List<PromoCodeShortResponse>>> GetPromocodesAsync()
         {
-            //TODO: Получить все промокоды 
-            throw new NotImplementedException();
+            var promoCodes = await _promoCodeRepository.GetAllAsync();
+            var response = promoCodes.Select(p => new PromoCodeShortResponse
+            {
+                Id = p.Id,
+                Code = p.Code,
+                ServiceInfo = p.ServiceInfo,
+                BeginDate = p.BeginDate.ToLongDateString(),
+                EndDate = p.EndDate.ToShortDateString(),
+                PartnerName = p.PartnerName
+            }).OrderBy(p => p.Id).ToList();
+            return Ok(response);
         }
 
         /// <summary>
