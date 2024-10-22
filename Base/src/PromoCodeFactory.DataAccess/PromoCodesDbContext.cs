@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Core.Administration;
+using PromoCodeFactory.Core.PromoCodeManagement;
 using PromoCodeFactory.DataAccess.Configuration;
 
 namespace PromoCodeFactory.DataAccess;

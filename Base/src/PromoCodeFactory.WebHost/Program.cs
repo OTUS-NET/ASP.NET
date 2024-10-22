@@ -1,4 +1,6 @@
 using PromoCodeFactory.DataAccess.Extensions;
+using PromoCodeFactory.DataAccess.Repositories;
+using PromoCodeFactory.DataAccess.Repositories.Impl;
 
 namespace PromoCodeFactory.WebHost;
 
@@ -26,6 +28,9 @@ public class Program
             options.Version = "1.0";
         });
 
+        builder.Services.AddControllers();
+
+        builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         builder.Services.AddPromoCodesDbContext(builder.Configuration.GetConnectionString("PromoCodesDbContext"));
 
         var app = builder.Build();

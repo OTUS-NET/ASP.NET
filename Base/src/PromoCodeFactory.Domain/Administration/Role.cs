@@ -1,4 +1,4 @@
-﻿namespace PromoCodeFactory.Core.Domain.Administration
+﻿namespace PromoCodeFactory.Core.Administration
 {
     public class Role : BaseEntity
     {

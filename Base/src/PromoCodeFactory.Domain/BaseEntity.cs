@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PromoCodeFactory.Core.Domain
+namespace PromoCodeFactory.Core
 {
     public abstract  class BaseEntity
     {

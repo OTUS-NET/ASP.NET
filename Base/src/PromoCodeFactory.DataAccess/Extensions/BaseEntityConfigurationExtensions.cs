@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core;
 
 namespace PromoCodeFactory.DataAccess.Extensions;
 

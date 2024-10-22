@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Core.PromoCodeManagement;
 using PromoCodeFactory.DataAccess.Extensions;
 
 namespace PromoCodeFactory.DataAccess.Configuration;
@@ -28,6 +28,12 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.HasMany(x => x.CustomerPreferences)
             .WithOne(x => x.Customer)
-            .HasForeignKey(x => x.CustomerId);
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.PromoCodes)
+            .WithOne(x => x.Customer)
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

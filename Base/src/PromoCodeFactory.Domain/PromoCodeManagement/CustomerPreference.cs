@@ -1,6 +1,6 @@
 using System;
 
-namespace PromoCodeFactory.Core.Domain.PromoCodeManagement;
+namespace PromoCodeFactory.Core.PromoCodeManagement;
 
 public class CustomerPreference
 {

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace PromoCodeFactory.Core.Domain.Administration
+namespace PromoCodeFactory.Core.Administration
 {
     public class Employee : BaseEntity
     {

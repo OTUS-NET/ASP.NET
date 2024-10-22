@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PromoCodeFactory.Core.Domain.PromoCodeManagement;
+namespace PromoCodeFactory.Core.PromoCodeManagement;
 
 public class Preference : BaseEntity
 {

@@ -1,7 +1,7 @@
 using System;
-using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Administration;
 
-namespace PromoCodeFactory.Core.Domain.PromoCodeManagement;
+namespace PromoCodeFactory.Core.PromoCodeManagement;
 
 public class PromoCode : BaseEntity
 {
@@ -22,4 +22,8 @@ public class PromoCode : BaseEntity
     public Guid PreferenceId { get; set; }
     
     public Preference Preference { get; set; }
+    
+    public Guid? CustomerId { get; set; }
+    
+    public Customer Customer { get; set; }
 }

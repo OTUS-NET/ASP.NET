@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Contracts.Employees;
-using PromoCodeFactory.Contracts.Roles;
-using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Administration;
+using PromoCodeFactory.DataAccess.Repositories;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -42,14 +37,14 @@ public class EmployeesController(IRepository<Employee> employeeRepository) : Con
     /// Получить данные сотрудника по Id
     /// </summary>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync([FromRoute] Guid id)
+    public async Task<ActionResult<EmployeeResponseDto>> GetEmployeeByIdAsync([FromRoute] Guid id)
     {
         var employee = await _employeeRepository.GetByIdAsync(id);
 
         if (employee == null)
             return NotFound();
 
-        var employeeModel = new EmployeeResponse()
+        var employeeModel = new EmployeeResponseDto()
         {
             Id = employee.Id,
             Email = employee.Email,

@@ -2,7 +2,7 @@
 
 namespace PromoCodeFactory.Contracts.Employees;
 
-public class EmployeeResponse
+public class EmployeeResponseDto
 {
     public Guid Id { get; set; }
 

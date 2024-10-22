@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core;
 
-namespace PromoCodeFactory.Core.Abstractions.Repositories
+namespace PromoCodeFactory.DataAccess.Repositories
 {
     public interface IRepository<T> where T: BaseEntity
     {
@@ -16,5 +17,7 @@ namespace PromoCodeFactory.Core.Abstractions.Repositories
         Task UpdateAsync(T entity);
 
         Task DeleteAsync(Guid id);
+        
+        Task LoadRelatedDataAsync<TProperty>(T entity, Expression<Func<T, TProperty>> navigationProperty);
     }
 }
