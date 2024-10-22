@@ -83,23 +83,21 @@ public class PromoCodesController(
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<List<PromoCodeResponseDto>>> GetPromoCodesAsync(
-        [FromQuery] Guid? preferenceId,
-        [FromQuery] string fromDate,
-        [FromQuery] string toDate)
+        [FromQuery] GetPromoCodeRequestDto request)
     {
         var promoCodes = await _promoCodeRepository.GetAllAsync();
 
-        if (preferenceId.HasValue)
+        if (request.PreferenceId.HasValue)
         {
-            promoCodes = promoCodes.Where(p => p.PreferenceId == preferenceId.Value);
+            promoCodes = promoCodes.Where(p => p.PreferenceId == request.PreferenceId.Value);
         }
 
-        if (DateTime.TryParse(fromDate, out var parsedFromDate))
+        if (DateTime.TryParse(request.FromDate, out var parsedFromDate))
         {
             promoCodes = promoCodes.Where(p => p.BeginDate >= parsedFromDate);
         }
 
-        if (DateTime.TryParse(toDate, out var parsedToDate))
+        if (DateTime.TryParse(request.ToDate, out var parsedToDate))
         {
             promoCodes = promoCodes.Where(p => p.EndDate <= parsedToDate);
         }

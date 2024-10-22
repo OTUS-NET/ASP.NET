@@ -54,7 +54,8 @@ public class PromoCodeConfiguration : IEntityTypeConfiguration<PromoCode>
             .HasForeignKey(x => x.PreferenceId);
         
         builder.HasOne(x => x.Customer)
-            .WithMany()
-            .HasForeignKey(x => x.CustomerId);
+            .WithMany(c => c.PromoCodes)
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
