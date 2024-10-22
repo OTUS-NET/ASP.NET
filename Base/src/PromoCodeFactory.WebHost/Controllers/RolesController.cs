@@ -1,45 +1,35 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.WebHost.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Contracts.Roles;
+using PromoCodeFactory.Core.Administration;
+using PromoCodeFactory.DataAccess.Repositories;
 
-namespace PromoCodeFactory.WebHost.Controllers
+namespace PromoCodeFactory.WebHost.Controllers;
+
+/// <summary>
+/// Роли сотрудников
+/// </summary>
+[ApiController]
+[Route("api/v1/[controller]")]
+public class RolesController(IRepository<Role> rolesRepository)
 {
+    private readonly IRepository<Role> _rolesRepository = rolesRepository;
+
     /// <summary>
-    /// Роли сотрудников
+    /// Получить все доступные роли сотрудников
     /// </summary>
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public class RolesController
+    [HttpGet]
+    public async Task<List<RoleItemResponse>> GetRolesAsync()
     {
-        private readonly IRepository<Role> _rolesRepository;
+        var roles = await _rolesRepository.GetAllAsync();
 
-        public RolesController(IRepository<Role> rolesRepository)
-        {
-            _rolesRepository = rolesRepository;
-        }
+        var rolesModelList = roles.Select(x =>
+            new RoleItemResponse()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description
+            }).ToList();
 
-        /// <summary>
-        /// Получить все доступные роли сотрудников
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<RoleItemResponse>> GetRolesAsync()
-        {
-            var roles = await _rolesRepository.GetAllAsync();
-
-            var rolesModelList = roles.Select(x =>
-                new RoleItemResponse()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList();
-
-            return rolesModelList;
-        }
+        return rolesModelList;
     }
 }
