@@ -13,15 +13,11 @@ public static class BaseEntityConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.CreatedAt)
-            .HasColumnName("created_at")
             .HasConversion<DateTime>()
-            .IsRequired()
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasDefaultValue(DateTime.Now);
 
         builder.Property(x => x.UpdatedAt)
-            .HasColumnName("updated_at")
             .HasConversion<DateTime>()
-            .IsRequired()
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasDefaultValue(DateTime.Now);
     }
 }

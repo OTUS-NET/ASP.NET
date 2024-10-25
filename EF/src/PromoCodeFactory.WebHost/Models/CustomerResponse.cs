@@ -11,7 +11,7 @@ namespace PromoCodeFactory.WebHost.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         
-        public List<CustomerPreference> CustomerPreferences { get; set; }
+        public List<string> CustomerPreferences { get; set; }
         //public List<PromoCode> PromoCodes { get; set; }
     }
 }

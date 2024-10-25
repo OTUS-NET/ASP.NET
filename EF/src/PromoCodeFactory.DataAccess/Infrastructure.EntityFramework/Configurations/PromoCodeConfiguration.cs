@@ -11,24 +11,19 @@ public class PromoCodeConfiguration : IEntityTypeConfiguration<PromoCode>
         BaseEntityConfiguration.ConfigureBaseEntity(builder);
 
         builder.Property(x => x.Code)
-            .HasColumnName("code")
             .IsRequired()
             .HasMaxLength(50);
 
         builder.Property(x => x.ServiceInfo)
-            .HasColumnName("service_info")
             .HasMaxLength(200);
 
         builder.Property(x => x.BeginDate)
-            .HasColumnName("begin_date")
             .IsRequired();
 
         builder.Property(x => x.EndDate)
-            .HasColumnName("end_date")
             .IsRequired();
 
         builder.Property(x => x.PartnerName)
-            .HasColumnName("partner_name")
             .HasMaxLength(50);
 
         builder.HasOne(x => x.PartnerManager)

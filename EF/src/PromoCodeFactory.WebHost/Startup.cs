@@ -26,16 +26,8 @@ namespace PromoCodeFactory.WebHost
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin()
-                            .AllowAnyMethod()
-                            .AllowAnyHeader();
-                    });
-            });
+            services.AddDbContext<InitDbContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             
@@ -43,7 +35,7 @@ namespace PromoCodeFactory.WebHost
             services.AddControllers();
             
             // Регистрируем EfRepository для каждого типа сущности
-            services.AddScoped<IRepository<Customer>, EfRepository<Customer>>();
+            services.AddScoped<EfRepository<Customer>, EfRepository<Customer>>();
             
             services.AddOpenApiDocument(options =>
             {
@@ -55,13 +47,7 @@ namespace PromoCodeFactory.WebHost
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Ensure the database is created
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
-            }
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
