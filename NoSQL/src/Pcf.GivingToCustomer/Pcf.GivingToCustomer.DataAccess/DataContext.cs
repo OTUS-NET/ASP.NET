@@ -21,7 +21,8 @@ namespace Pcf.GivingToCustomer.DataAccess
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
-
+            //Нужно для Mongo если не настраивать репликации в монго контейнере. Ошибка SaveChanges()
+            Database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
