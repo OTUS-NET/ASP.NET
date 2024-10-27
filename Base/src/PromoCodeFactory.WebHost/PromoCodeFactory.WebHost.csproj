@@ -8,13 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="MediatR" Version="12.4.1" />
       <PackageReference Include="NSwag.AspNetCore" Version="14.0.7" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PromoCodeFactory.Common\PromoCodeFactory.Common.csproj" />
-      <ProjectReference Include="..\PromoCodeFactory.Contracts\PromoCodeFactory.Contracts.csproj" />
-      <ProjectReference Include="..\PromoCodeFactory.DataAccess\PromoCodeFactory.DataAccess.csproj" />
+      <ProjectReference Include="..\PromoCodeFactory.Commands\PromoCodeFactory.Commands.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using PromoCodeFactory.Common.Extensions;
+using PromoCodeFactory.Commands.Commands.Customers;
+using PromoCodeFactory.Commands.Queries.Customers;
+using PromoCodeFactory.Contracts;
 using PromoCodeFactory.Contracts.Customers;
-using PromoCodeFactory.Core.PromoCodeManagement;
-using PromoCodeFactory.DataAccess.Repositories;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -11,101 +12,65 @@ namespace PromoCodeFactory.WebHost.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/v1/[controller]")]
-public class CustomersController(IRepository<Customer> customerRepository, IRepository<PromoCode> promoCodeRepository)
-    : ControllerBase
+public class CustomersController(IMediator mediator) : ControllerBase
 {
-    private readonly IRepository<Customer> _customerRepository = customerRepository;
-    private readonly IRepository<PromoCode> _promoCodeRepository = promoCodeRepository;
+    private readonly IMediator _mediator = mediator;
 
     /// <summary>
     /// Получить список всех клиентов
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<List<CustomerResponseDto>>> GetCustomersAsync()
+    public Task<IEnumerable<CustomerResponseDto>> GetAllCustomers()
     {
-        var customers = await _customerRepository.GetAllAsync();
-        
-        var customerResponses = customers.Select(x => x.MapToCustomerResponseDto()).ToList();
-        
-        return Ok(customerResponses);
+        return _mediator.Send(new GetAllCustomersQuery());
     }
 
     /// <summary>
     /// Получить клиента по ID
     /// </summary>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<CustomerResponseDto>> GetCustomerByIdAsync([FromRoute] Guid id)
+    public Task<CustomerResponseDto> GetCustomerById([FromRoute] Guid id)
     {
-        var customer = await _customerRepository.GetByIdAsync(id);
-
-        if (customer is null)
+        return _mediator.Send(new GetCustomerByIdQuery
         {
-            return NotFound();
-        }
-
-        return Ok(customer.MapToCustomerResponseDto());
+            Id = id,
+        });
     }
 
     /// <summary>
     /// Создать нового клиента
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult> CreateCustomerAsync([FromBody] CustomerSetDto customerDto)
+    public Task<ResponseId<Guid>> CreateCustomer([FromBody] CustomerSetDto data)
     {
-        var customer = new Customer
+        return _mediator.Send(new CreateCustomerCommand
         {
-            FirstName = customerDto.FirstName,
-            LastName = customerDto.LastName,
-            Email = customerDto.Email
-        };
-
-        await _customerRepository.CreateAsync(customer);
-
-        return Ok();
+            Data = data,
+        });
     }
 
     /// <summary>
     /// Обновить данные клиента
     /// </summary>
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult> UpdateCustomerAsync([FromRoute] Guid id, [FromBody] CustomerSetDto customerDto)
+    public Task UpdateCustomer([FromRoute] Guid id, [FromBody] CustomerSetDto data)
     {
-        var customer = await _customerRepository.GetByIdAsync(id);
-
-        if (customer == null)
+        return _mediator.Send(new UpdateCustomerCommand
         {
-            return NotFound();
-        }
-
-        customer.FirstName = customerDto.FirstName;
-        customer.LastName = customerDto.LastName;
-        customer.Email = customerDto.Email;
-
-        await _customerRepository.UpdateAsync(customer);
-        
-        return NoContent();
+            Id = id,
+            Data = data
+        });
     }
 
     /// <summary>
     /// Удалить клиента
     /// </summary>
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> DeleteCustomerAsync([FromRoute] Guid id)
+    public Task DeleteCustomer([FromRoute] Guid id)
     {
-        var customer = await _customerRepository.GetByIdAsync(id);
-        if (customer == null)
-            return NotFound();
-
-        // Удаление связанных промокодов
-        var promoCodes = await _promoCodeRepository.GetAllAsync();
-        
-        var customerPromoCodes = promoCodes.Where(p => p.PartnerManagerId == id).ToList();
-        foreach (var promoCode in customerPromoCodes)
+        return _mediator.Send(new DeleteCustomerCommand
         {
-            await _promoCodeRepository.DeleteAsync(promoCode.Id);
-        }
-
-        await _customerRepository.DeleteAsync(id);
-        return NoContent();
+            Id = id,
+        });
     }
 }

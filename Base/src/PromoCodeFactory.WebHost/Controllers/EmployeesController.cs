@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Commands.Commands.Employees;
+using PromoCodeFactory.Commands.Queries.Employees;
+using PromoCodeFactory.Contracts;
 using PromoCodeFactory.Contracts.Employees;
-using PromoCodeFactory.Core.Administration;
-using PromoCodeFactory.DataAccess.Repositories;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -10,112 +12,65 @@ namespace PromoCodeFactory.WebHost.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/v1/[controller]")]
-public class EmployeesController(IRepository<Employee> employeeRepository) : ControllerBase
+public class EmployeesController(IMediator mediator) : ControllerBase
 {
-    private readonly IRepository<Employee> _employeeRepository = employeeRepository;
+    private readonly IMediator _mediator = mediator;
 
     /// <summary>
     /// Получить данные всех сотрудников
     /// </summary>
     [HttpGet("[action]")]
-    public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+    public Task<List<EmployeeShortResponse>> GetEmployeesAsync()
     {
-        var employees = await _employeeRepository.GetAllAsync();
-
-        var employeesModelList = employees.Select(x =>
-            new EmployeeShortResponse
-            {
-                Id = x.Id,
-                Email = x.Email,
-                FullName = x.FullName,
-            }).ToList();
-
-        return employeesModelList;
+        return _mediator.Send(new GetAllEmployeesQuery());
     }
 
     /// <summary>
     /// Получить данные сотрудника по Id
     /// </summary>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<EmployeeResponseDto>> GetEmployeeByIdAsync([FromRoute] Guid id)
+    public Task<EmployeeResponseDto> GetEmployeeByIdAsync([FromRoute] Guid id)
     {
-        var employee = await _employeeRepository.GetByIdAsync(id);
-
-        if (employee == null)
-            return NotFound();
-
-        var employeeModel = new EmployeeResponseDto()
+        return _mediator.Send(new GetEmployeeByIdQuery
         {
-            Id = employee.Id,
-            Email = employee.Email,
-            FullName = employee.FullName,
-            AppliedPromocodesCount = employee.AppliedPromoCodesCount
-        };
-
-        return employeeModel;
+            Id = id
+        });
     }
 
     /// <summary>
     /// Создать сотрудника
     /// </summary>
     [HttpPost("[action]")]
-    public async Task<ActionResult> Create([FromBody] EmployeeSetDto data)
+    public Task<ResponseId<Guid>> Create([FromBody] EmployeeSetDto data)
     {
-        var employee = new Employee
+        return _mediator.Send(new CreateEmployeeCommand
         {
-            Id = Guid.NewGuid(),
-            Email = data.Email,
-            FirstName = data.FirstName,
-            LastName = data.LastName,
-        };
-
-        if (data.Role is not null)
-        {
-        }
-
-        await _employeeRepository.CreateAsync(employee);
-
-        return Ok();
+            Data = data,
+        });
     }
 
     /// <summary>
     /// Обновить данные сотрудника
     /// </summary>
-    /// <returns></returns>
     [HttpPatch("{id:guid}")]
-    public async Task<ActionResult> Update([FromRoute] Guid id, EmployeeSetDto data)
+    public Task Update([FromRoute] Guid id, EmployeeSetDto data)
     {
-        var employee = await _employeeRepository.GetByIdAsync(id);
-
-        if (employee is null)
+        return _mediator.Send(new UpdateEmployeeCommand
         {
-            return NotFound("Employee not found");
-        }
-
-        employee.Email = data.Email;
-        employee.FirstName = data.FirstName;
-        employee.LastName = data.LastName;
-
-        await _employeeRepository.UpdateAsync(employee);
-
-        return Ok();
+            Id = id,
+            Data = data
+        });
     }
 
     /// <summary>
     /// Удалить сотрудника
     /// </summary>
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> Delete([FromRoute] Guid id)
+    public Task Delete([FromRoute] Guid id)
     {
-        var employee = await _employeeRepository.GetByIdAsync(id);
-
-        if (employee is null)
+        return _mediator.Send(new DeleteEmployeeCommand
         {
-            return NotFound("Employee not found");
-        }
-
-        await _employeeRepository.DeleteAsync(employee.Id);
-
-        return Ok();
+            Id = id
+        });
     }
 }

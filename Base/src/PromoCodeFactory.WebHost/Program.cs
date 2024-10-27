@@ -1,6 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using PromoCodeFactory.Commands;
+using PromoCodeFactory.DataAccess;
 using PromoCodeFactory.DataAccess.Extensions;
-using PromoCodeFactory.DataAccess.Repositories;
-using PromoCodeFactory.DataAccess.Repositories.Impl;
 
 namespace PromoCodeFactory.WebHost;
 
@@ -29,8 +30,7 @@ public class Program
         });
 
         builder.Services.AddControllers();
-
-        builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<ICqrsLibrary>());
         builder.Services.AddPromoCodesDbContext(builder.Configuration.GetConnectionString("PromoCodesDbContext"));
 
         var app = builder.Build();
@@ -50,6 +50,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseRouting();
         app.MapControllers();
+        
 
         app.Run();
     }
