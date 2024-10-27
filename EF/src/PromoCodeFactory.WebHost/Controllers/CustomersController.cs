@@ -20,9 +20,13 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly EfRepository<Customer> _customerRepository;
+        private readonly EfRepository<Preference> _preferenceRepository;
 
-        public CustomersController(EfRepository<Customer> customerRepository)
+        public CustomersController(EfRepository<Customer> customerRepository,
+            EfRepository<Preference> preferenceRepository
+            )
         {
+            _preferenceRepository = preferenceRepository;
             _customerRepository = customerRepository;
         }
 
@@ -90,18 +94,25 @@ namespace PromoCodeFactory.WebHost.Controllers
                     CustomerPreferences = new List<CustomerPreference>(),
 
                 };
-                foreach (var preference in request.Preferences)
+                foreach (var name in request.PreferenceNames)
                 {
-                    var custPref = new CustomerPreference()
+                    var preference = await _preferenceRepository.GetPreferenceByNameAsync(name);
+                    if (preference != null)
                     {
-                        Customer = customer,
-                        Preference = preference
-                    };
-                    customer.CustomerPreferences.Add(custPref);
-                }
-                await _customerRepository.CreateAsync(customer, HttpContext.RequestAborted);
+                        var custPref = new CustomerPreference()
+                        {
+                            Customer = customer,
+                            CustomerId = customer.Id,
+                            Preference = preference,
+                            PreferenceId = preference.Id
+                        };
+                        customer.CustomerPreferences.Add(custPref);
+                    }
 
-                return CreatedAtAction(nameof(GetCustomerAsync), new { id = customer.Id }, customer);
+                }
+                await _customerRepository.CreateCustomersAsync(customer, HttpContext.RequestAborted);
+
+                return CreatedAtAction(nameof(GetCustomerAsync), customer.Id);
             }
             catch (OperationCanceledException)
             {
@@ -109,7 +120,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             }
 
         }
-
+  
         [HttpPut("{id}")]
         public async Task<IActionResult> EditCustomerAsync(Guid id, CreateOrEditCustomerRequest request)
         {
@@ -124,9 +135,26 @@ namespace PromoCodeFactory.WebHost.Controllers
                 customer.Email = request.Email;
                 customer.FirstName = request.FirstName;
                 customer.LastName = request.LastName;
+                customer.CustomerPreferences = new List<CustomerPreference>();
+                //участок копипасты из CreateCustomerAsync
+                foreach (var name in request.PreferenceNames)
+                {
+                    var preference = await _preferenceRepository.GetPreferenceByNameAsync(name);
+                    if (preference != null)
+                    {
+                        var custPref = new CustomerPreference()
+                        {
+                            Customer = customer,
+                            CustomerId = customer.Id,
+                            Preference = preference,
+                            PreferenceId = preference.Id
+                        };
+                        customer.CustomerPreferences.Add(custPref);
+                    }
+                }
 
 
-                await _customerRepository.UpdateAsync(customer, HttpContext.RequestAborted);
+                await _customerRepository.UpdateCustomerAsync(customer, HttpContext.RequestAborted);
 
                 return NoContent();
             }
@@ -147,7 +175,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                     return NotFound();
                 }
 
-                await _customerRepository.DeleteAsync(id, HttpContext.RequestAborted);
+                await _customerRepository.DeleteCustomerAsync(id, HttpContext.RequestAborted);
 
                 return NoContent();
             }

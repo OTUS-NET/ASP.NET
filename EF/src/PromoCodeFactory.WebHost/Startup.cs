@@ -36,6 +36,7 @@ namespace PromoCodeFactory.WebHost
             
             // Регистрируем EfRepository для каждого типа сущности
             services.AddScoped<EfRepository<Customer>, EfRepository<Customer>>();
+            services.AddScoped<EfRepository<Preference>, EfRepository<Preference>>();
             
             services.AddOpenApiDocument(options =>
             {

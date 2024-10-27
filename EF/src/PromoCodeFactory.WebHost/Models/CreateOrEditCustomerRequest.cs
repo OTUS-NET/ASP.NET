@@ -15,6 +15,6 @@ namespace PromoCodeFactory.WebHost.Models
 
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }
-        public List<Preference> Preferences { get; set; }
+        public List<string> PreferenceNames { get; set; }
     }
 }

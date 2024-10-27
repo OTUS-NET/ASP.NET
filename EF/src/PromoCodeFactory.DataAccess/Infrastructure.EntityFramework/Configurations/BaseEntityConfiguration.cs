@@ -17,7 +17,6 @@ public static class BaseEntityConfiguration
             .HasDefaultValue(DateTime.Now);
 
         builder.Property(x => x.UpdatedAt)
-            .HasConversion<DateTime>()
-            .HasDefaultValue(DateTime.Now);
+            .HasConversion<DateTime>();
     }
 }

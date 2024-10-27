@@ -1,6 +1,7 @@
 ﻿using PromoCodeFactory.Core.Domain;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
