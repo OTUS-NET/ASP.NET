@@ -16,6 +16,7 @@ using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.Core.Domain.Administration;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
+using MongoDB.Driver;
 
 namespace Pcf.Administration.WebHost
 {
@@ -35,11 +36,13 @@ namespace Pcf.Administration.WebHost
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
+            services.AddScoped<IDbInitializer, EfMongoDbInitializer>();
             services.AddDbContext<DataContext>(x =>
             {
                 //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
+                //x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
+                var mongoClient = new MongoClient((Configuration.GetConnectionString("PromocodeFactoryAdministrationDbMongo")));
+                x.UseMongoDB(mongoClient, "promocode_factory_administration_db");
                 x.UseSnakeCaseNamingConvention();
                 x.UseLazyLoadingProxies();
             });
