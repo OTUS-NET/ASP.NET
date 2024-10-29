@@ -25,6 +25,9 @@ public class CustomerConfiguration  : IEntityTypeConfiguration<Customer>
 
         builder.HasMany(x => x.CustomerPreferences)
             .WithOne(x => x.Customer)
-            .HasForeignKey(x => x.CustomerId);
+            .HasForeignKey(x => x.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        
     }
 }

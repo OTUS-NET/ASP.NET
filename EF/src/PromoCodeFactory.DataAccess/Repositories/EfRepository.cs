@@ -118,57 +118,33 @@ namespace PromoCodeFactory.DataAccess.Repositories
             return await _context.Preferences
                 .FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
         }
-
+        
         public async Task UpdateCustomerAsync(Customer customer, CancellationToken cancellationToken = default)
         {
-            // Получаем текущую сущность Customer из базы данных
-            var existingCustomer = await _context.Customers
+            var existingCustomer = _context.Customers
                 .Include(c => c.CustomerPreferences)
-                .FirstOrDefaultAsync(c => c.Id == customer.Id, cancellationToken);
+                .Single(c => c.Id == customer.Id);
 
             if (existingCustomer == null)
             {
-                throw new InvalidOperationException("Customer with the specified Id does not exist.");
+                throw new Exception("Customer not found");
             }
-
-            // Обновляем основные поля Customer
-            _context.Entry(existingCustomer).CurrentValues.SetValues(customer);
-
-            // Обновляем связанные CustomerPreference записи
-            var existingPreferences = existingCustomer.CustomerPreferences.ToList();
-            var newPreferences = customer.CustomerPreferences.ToList();
-
-            // Удаляем CustomerPreference, которых больше нет в новом наборе
-            foreach (var existingPreference in existingPreferences)
+            
+            var newPreferences = new List<CustomerPreference>();
+            
+            if (customer.CustomerPreferences != null)
             {
-                if (!newPreferences.Any(p =>
-                        p.CustomerId == existingPreference.CustomerId &&
-                        p.PreferenceId == existingPreference.PreferenceId))
+                foreach (var preference in customer.CustomerPreferences)
                 {
-                    _context.CustomerPreferences.Remove(existingPreference);
+                    newPreferences.Add(preference);
                 }
             }
-
-            // Добавляем или обновляем CustomerPreference
-            foreach (var preference in newPreferences)
-            {
-                var existingPreference = existingPreferences
-                    .FirstOrDefault(p =>
-                        p.CustomerId == preference.CustomerId && p.PreferenceId == preference.PreferenceId);
-
-                if (existingPreference != null)
-                {
-                    // Обновляем существующую связанную сущность
-                    _context.Entry(existingPreference).CurrentValues.SetValues(preference);
-                }
-                else
-                {
-                    // Добавляем новую связанную сущность
-                    existingCustomer.CustomerPreferences.Add(preference);
-                }
-            }
-
-            // Сохраняем изменения
+            // Обновляем данные Customer
+            existingCustomer.FirstName = customer.FirstName;
+            existingCustomer.LastName = customer.LastName;
+            existingCustomer.Email = customer.Email;
+            existingCustomer.CustomerPreferences = newPreferences;
+            
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
