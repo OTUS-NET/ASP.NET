@@ -1,74 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.Commands.Commands.Employees;
+using PromoCodeFactory.Commands.Queries.Employees;
+using PromoCodeFactory.Contracts;
+using PromoCodeFactory.Contracts.Employees;
 
-namespace PromoCodeFactory.WebHost.Controllers
+namespace PromoCodeFactory.WebHost.Controllers;
+
+/// <summary>
+/// Сотрудники
+/// </summary>
+[ApiController]
+[Route("api/v1/[controller]")]
+public class EmployeesController(IMediator mediator) : ControllerBase
 {
+    private readonly IMediator _mediator = mediator;
+
     /// <summary>
-    /// Сотрудники
+    /// Получить данные всех сотрудников
     /// </summary>
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public class EmployeesController : ControllerBase
+    [HttpGet("[action]")]
+    public Task<List<EmployeeShortResponse>> GetEmployeesAsync()
     {
-        private readonly IRepository<Employee> _employeeRepository;
+        return _mediator.Send(new GetAllEmployeesQuery());
+    }
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+    /// <summary>
+    /// Получить данные сотрудника по Id
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public Task<EmployeeResponseDto> GetEmployeeByIdAsync([FromRoute] Guid id)
+    {
+        return _mediator.Send(new GetEmployeeByIdQuery
         {
-            _employeeRepository = employeeRepository;
-        }
+            Id = id
+        });
+    }
 
-        /// <summary>
-        /// Получить данные всех сотрудников
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+    /// <summary>
+    /// Создать сотрудника
+    /// </summary>
+    [HttpPost("[action]")]
+    public Task<ResponseId<Guid>> Create([FromBody] EmployeeSetDto data)
+    {
+        return _mediator.Send(new CreateEmployeeCommand
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            Data = data,
+        });
+    }
 
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
-
-            return employeesModelList;
-        }
-
-        /// <summary>
-        /// Получить данные сотрудника по Id
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+    /// <summary>
+    /// Обновить данные сотрудника
+    /// </summary>
+    [HttpPatch("{id:guid}")]
+    public Task Update([FromRoute] Guid id, EmployeeSetDto data)
+    {
+        return _mediator.Send(new UpdateEmployeeCommand
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            Id = id,
+            Data = data
+        });
+    }
 
-            if (employee == null)
-                return NotFound();
-
-            var employeeModel = new EmployeeResponse()
-            {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
-
-            return employeeModel;
-        }
+    /// <summary>
+    /// Удалить сотрудника
+    /// </summary>
+    [HttpDelete("{id:guid}")]
+    public Task Delete([FromRoute] Guid id)
+    {
+        return _mediator.Send(new DeleteEmployeeCommand
+        {
+            Id = id
+        });
     }
 }

@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "PromoCodesDbContext": "Data Source=PromoCodeFactory.db"
+  }
+}
