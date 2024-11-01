@@ -107,7 +107,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Preference> GetPreferenceByNameAsync(string name,
+        public async Task<List<Preference>> GetPreferenceByNamesAsync(List<string> names,
             CancellationToken cancellationToken = default)
         {
             if (typeof(T) != typeof(Preference))
@@ -116,36 +116,23 @@ namespace PromoCodeFactory.DataAccess.Repositories
             }
 
             return await _context.Preferences
-                .FirstOrDefaultAsync(p => p.Name == name, cancellationToken);
+                    .Where(x=> names.Contains(x.Name))
+                    .Distinct()
+                    .ToListAsync (cancellationToken);
         }
         
-        public async Task UpdateCustomerAsync(Customer customer, CancellationToken cancellationToken = default)
+        public async Task UpdatePrefernceInCustomerAsync(Customer customer, CancellationToken cancellationToken = default)
         {
-            var existingCustomer = _context.Customers
-                .Include(c => c.CustomerPreferences)
-                .Single(c => c.Id == customer.Id);
-
-            if (existingCustomer == null)
-            {
-                throw new Exception("Customer not found");
-            }
+           
+           var existingCustomer = GetCustomerByIdAsync(customer.Id, cancellationToken).Result;
+           
+            var newPrefences = customer.CustomerPreferences.Select(x => x.Preference).ToList();
             
-            var newPreferences = new List<CustomerPreference>();
+            await _context.CustomerPreferences.Where (x => x.CustomerId == customer.Id)
+                .ForEachAsync(x => _context.CustomerPreferences.Remove(x), cancellationToken);
             
-            if (customer.CustomerPreferences != null)
-            {
-                foreach (var preference in customer.CustomerPreferences)
-                {
-                    newPreferences.Add(preference);
-                }
-            }
-            // Обновляем данные Customer
-            existingCustomer.FirstName = customer.FirstName;
-            existingCustomer.LastName = customer.LastName;
-            existingCustomer.Email = customer.Email;
-            existingCustomer.CustomerPreferences = newPreferences;
+            await _context. SaveChangesAsync(cancellationToken);
             
-            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

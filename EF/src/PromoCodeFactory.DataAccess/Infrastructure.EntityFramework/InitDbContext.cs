@@ -27,6 +27,7 @@ namespace PromoCodeFactory.DataAccess.Infrastructure.EntityFramework
             modelBuilder.Entity<Customer>().HasData(FakeDataFactory.Customers);
             modelBuilder.Entity<Customer>().HasData(FakeDataFactory.Customers);
         }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

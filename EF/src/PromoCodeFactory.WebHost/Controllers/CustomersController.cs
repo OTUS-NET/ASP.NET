@@ -94,10 +94,11 @@ namespace PromoCodeFactory.WebHost.Controllers
                     CustomerPreferences = new List<CustomerPreference>(),
 
                 };
-                foreach (var name in request.PreferenceNames)
-                {
-                    var preference = await _preferenceRepository.GetPreferenceByNameAsync(name);
-                    if (preference != null)
+                
+                 var preferences = await _preferenceRepository.GetPreferenceByNamesAsync(request.PreferenceNames);
+                 foreach (var preference in preferences) 
+                 {
+                     if (preference != null)
                     {
                         var custPref = new CustomerPreference()
                         {
@@ -126,7 +127,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             try
             {
-                var customer = await _customerRepository.GetByIdAsync(id, HttpContext.RequestAborted);
+                var customer = await _customerRepository.GetCustomerByIdAsync(id, HttpContext.RequestAborted);
                 if (customer == null)
                 {
                     return NotFound();
@@ -136,25 +137,24 @@ namespace PromoCodeFactory.WebHost.Controllers
                 customer.FirstName = request.FirstName;
                 customer.LastName = request.LastName;
                 customer.CustomerPreferences = new List<CustomerPreference>();
-                //участок копипасты из CreateCustomerAsync
-                foreach (var name in request.PreferenceNames)
-                {
-                    var preference = await _preferenceRepository.GetPreferenceByNameAsync(name);
-                    if (preference != null)
+                
+                    var preferences = await _preferenceRepository.GetPreferenceByNamesAsync(request.PreferenceNames);
+                    foreach (var preference in preferences)
                     {
-                        var custPref = new CustomerPreference()
+                        if (preference != null)
                         {
-                            Customer = customer,
-                            CustomerId = customer.Id,
-                            Preference = preference,
-                            PreferenceId = preference.Id
-                        };
-                        customer.CustomerPreferences.Add(custPref);
+                            var custPref = new CustomerPreference()
+                            {
+                                Customer = customer,
+                                CustomerId = customer.Id,
+                                Preference = preference,
+                                PreferenceId = preference.Id
+                            };
+                            customer.CustomerPreferences.Add(custPref);
+                        }
                     }
-                }
-
-
-                await _customerRepository.UpdateCustomerAsync(customer, HttpContext.RequestAborted);
+                    
+                    await _customerRepository.UpdatePrefernceInCustomerAsync(customer, HttpContext.RequestAborted);
 
                 return NoContent();
             }
