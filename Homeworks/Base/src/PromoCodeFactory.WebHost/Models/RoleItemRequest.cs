@@ -2,7 +2,7 @@
 
 namespace PromoCodeFactory.WebHost.Models;
 
-public sealed class RoleItemResponse
+public sealed class RoleItemRequest
 {
     public Guid Id { get; set; }
 
