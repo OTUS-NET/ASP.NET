@@ -44,17 +44,103 @@ namespace PromoCodeFactory.WebHost.Controllers
         }
 
         /// <summary>
-        /// Получить данные сотрудника по Id
+        /// Добавить сотрудника
         /// </summary>
+        /// <param name="emp"></param>
         /// <returns></returns>
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        [HttpPost("add")]
+        public async Task<ActionResult<EmployeeResponse>> AddEmployeeAsync(Employee emp)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            var employee = await _employeeRepository.AddAsync(emp);
 
             if (employee == null)
                 return NotFound();
 
+            var employeeModel = new EmployeeResponse()
+            {
+                Id = employee.Id,
+                Email = employee.Email,
+                Roles = employee.Roles.Select(x => new RoleItemResponse()
+                {
+                    Name = x.Name,
+                    Description = x.Description
+                }).ToList(),
+                FullName = employee.FullName,
+                AppliedPromocodesCount = employee.AppliedPromocodesCount
+            };
+
+            return employeeModel;
+        }
+
+        /// <summary>
+        /// Получить данные сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("get")]
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        {
+            var employee = await _employeeRepository.GetAsync(id);
+
+            if (employee == null)
+                return NotFound();
+
+            var employeeModel = new EmployeeResponse()
+            {
+                Id = employee.Id,
+                Email = employee.Email,
+                Roles = employee.Roles.Select(x => new RoleItemResponse()
+                {
+                    Name = x.Name,
+                    Description = x.Description
+                }).ToList(),
+                FullName = employee.FullName,
+                AppliedPromocodesCount = employee.AppliedPromocodesCount
+            };
+
+            return employeeModel;
+        }
+
+        /// <summary>
+        /// Обновить данные сотрудника
+        /// </summary>
+        /// <param name="emp"></param>
+        /// <returns></returns>
+        [HttpPost("upd")]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Employee emp)
+        {
+            var employee = await _employeeRepository.UpdateAsync(emp);
+
+            if (employee == null)
+                return NotFound();
+
+            var employeeModel = new EmployeeResponse()
+            {
+                Id = employee.Id,
+                Email = employee.Email,
+                Roles = employee.Roles.Select(x => new RoleItemResponse()
+                {
+                    Name = x.Name,
+                    Description = x.Description
+                }).ToList(),
+                FullName = employee.FullName,
+                AppliedPromocodesCount = employee.AppliedPromocodesCount
+            };
+
+            return employeeModel;
+        }
+
+        /// <summary>
+        /// Удалить данные сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("del")]
+        public async Task<ActionResult<EmployeeResponse>> DeleteEmployeeByIdAsync(Guid id)
+        {
+            var employee = await _employeeRepository.DeleteAsync(id);
+
+            if (employee == null)
+                return NotFound();
+            
             var employeeModel = new EmployeeResponse()
             {
                 Id = employee.Id,
