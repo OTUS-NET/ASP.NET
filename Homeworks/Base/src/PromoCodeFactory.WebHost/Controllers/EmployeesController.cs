@@ -148,5 +148,28 @@ namespace PromoCodeFactory.WebHost.Controllers
                 AppliedPromocodesCount = newEmployee.AppliedPromocodesCount
             });
         }
+        
+        /// <summary>
+        /// Удаление сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployeeAsync(string id)
+        {
+            // Проверка формата Guid
+            if (!Guid.TryParse(id, out var employeeId))
+            {
+                return BadRequest(new { Error = "Некорректный формат идентификатора." });
+            }
+
+            var employee = await _employeeRepository.GetByIdAsync(employeeId);
+            if (employee == null)
+            {
+                return NotFound(new { Error = "Сотрудник не найден." });
+            }
+
+            await _employeeRepository.DeleteAsync(employeeId);
+            return NoContent();
+        }
     }
 }
