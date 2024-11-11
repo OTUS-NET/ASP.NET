@@ -44,5 +44,19 @@ namespace PromoCodeFactory.DataAccess.Repositories
             _data.Remove(entity);
             return Task.FromResult(true);
         }
+        
+        public Task<T> UpdateAsync(T entity)
+        {
+            var existingEntity = _data.FirstOrDefault(x => x.Id == entity.Id);
+            if (existingEntity == null)
+            {
+                return Task.FromResult<T>(null);
+            }
+
+            _data.Remove(existingEntity);
+            _data.Add(entity);
+
+            return Task.FromResult(entity);
+        }
     }
 }

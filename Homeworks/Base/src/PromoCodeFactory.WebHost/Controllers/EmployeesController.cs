@@ -171,5 +171,66 @@ namespace PromoCodeFactory.WebHost.Controllers
             await _employeeRepository.DeleteAsync(employeeId);
             return NoContent();
         }
+        
+        /// <summary>
+        /// Обновление сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateEmployeeAsync(Guid id, EmployeeUpdateRequest request)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            if (employee == null)
+            {
+                return NotFound(new { Error = "Сотрудник не найден" });
+            }
+
+            var emailAttribute = new EmailAddressAttribute();
+            if (!emailAttribute.IsValid(request.Email))
+            {
+                return BadRequest(new { Error = "Некорректный формат id ролей" });
+            }
+
+            var validRoleIds = new List<Guid>();
+            var invalidRoleIds = new List<string>();
+
+            foreach (var roleId in request.RoleIdList)
+            {
+                if (Guid.TryParse(roleId.ToString(), out var validGuid))
+                {
+                    validRoleIds.Add(validGuid);
+                }
+                else
+                {
+                    invalidRoleIds.Add(roleId);
+                }
+            }
+
+            if (invalidRoleIds.Any())
+            {
+                return BadRequest(new { Error = $"Некорректный формат id ролей" });
+            }
+
+            // Получаем роли из базы по валидным Id
+            var roles = await _rolesRepository.GetAllAsync();
+            var employeeRoles = roles.Where(role => validRoleIds.Contains(role.Id)).ToList();
+
+            // Проверка существования ролей
+            var missingRoleIds = validRoleIds.Except(employeeRoles.Select(r => r.Id)).ToList();
+            if (missingRoleIds.Any())
+            {
+                return BadRequest(new { Error = $"Роли не найдены для id" });
+            }
+
+            // Обновляем поля сотрудника
+            employee.FirstName = request.FirstName;
+            employee.LastName = request.LastName;
+            employee.Email = request.Email;
+            employee.Roles = employeeRoles;
+
+            await _employeeRepository.UpdateAsync(employee);
+
+            return NoContent();
+        }
     }
 }
