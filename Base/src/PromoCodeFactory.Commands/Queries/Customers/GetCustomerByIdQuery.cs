@@ -20,14 +20,10 @@ public class GetCustomerByIdQueryHandler(PromoCodesDbContext dbContext)
     public async Task<CustomerResponseDto> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
     {
         var customer = await _dbContext.Customers
-            .AsNoTracking()
-            .Include(x => x.CustomerPreferences)
-            .SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
-
-        if (customer is null)
-        {
-            throw new NotFoundException("Customer not found");
-        }
+                           .AsNoTracking()
+                           .Include(x => x.CustomerPreferences)
+                           .SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
+                       ?? throw new NotFoundException("Customer not found");
 
         return customer.MapToCustomerResponseDto();
     }

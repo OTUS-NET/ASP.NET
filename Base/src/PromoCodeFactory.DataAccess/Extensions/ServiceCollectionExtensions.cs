@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PromoCodeFactory.DataAccess.Seeding;
 
 namespace PromoCodeFactory.DataAccess.Extensions;
 
@@ -19,6 +20,8 @@ public static class ServiceCollectionExtensions
         var serviceProvider = services.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<PromoCodesDbContext>();
+
+        // dbContext.Database.EnsureDeleted();
         
         dbContext.Database.Migrate();
         
