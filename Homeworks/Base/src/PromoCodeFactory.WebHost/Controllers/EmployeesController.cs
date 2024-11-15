@@ -18,10 +18,11 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IRepository<Employee> _employeeRepository;
-
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        private readonly IRepository<Role> _rolesRepository;
+        public EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> rolesRepository)
         {
             _employeeRepository = employeeRepository;
+            _rolesRepository = rolesRepository;
         }
 
         /// <summary>
@@ -47,27 +48,44 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Добавить сотрудника
         /// </summary>
-        /// <param name="emp"></param>
+        /// <param name="employee"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<EmployeeResponse>> AddEmployeeAsync(Employee emp)
+        public async Task<ActionResult<EmployeeResponse>> AddEmployeeAsync(EmployeeModel employee)
         {
-            var employee = await _employeeRepository.AddAsync(emp);
+            var rols = await _rolesRepository.GetAllAsync();
+            var roles = rols.ToList();
+            var emp= new Employee()
+            {
+                FirstName= employee.FirstName,
+                LastName = employee.LastName,
+                Email = employee.Email,
+                Roles = employee.Roles.Select(x => new Role()
+                {
+                    Id= roles.FirstOrDefault(r => r.Name == x.Name).Id,
+                    Name = x.Name,
+                    Description = x.Description
+                }).ToList(),
+                AppliedPromocodesCount = employee.AppliedPromocodesCount
+            };
+            
+            //TODO: Validate all roles correct
+            var newEmployee = await _employeeRepository.AddAsync(emp);
 
-            if (employee == null)
-                return NotFound();
+            if (newEmployee == null)
+                return NoContent();
 
             var employeeModel = new EmployeeResponse()
             {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
+                Id = newEmployee.Id,
+                Email = newEmployee.Email,
+                Roles = newEmployee.Roles.Select(x => new RoleItemResponse()
                 {
                     Name = x.Name,
                     Description = x.Description
                 }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
+                FullName = newEmployee.FullName,
+                AppliedPromocodesCount = newEmployee.AppliedPromocodesCount
             };
 
             return employeeModel;
@@ -104,27 +122,49 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Обновить данные сотрудника
         /// </summary>
-        /// <param name="emp"></param>
+        /// <param name="employee"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Employee emp)
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(EmployeeModel employee)
         {
-            var employee = await _employeeRepository.UpdateAsync(emp);
 
-            if (employee == null)
+            if ((employee.Id == null) || (employee.Id == Guid.Empty))
+                return NotFound();
+
+            var rols = await _rolesRepository.GetAllAsync();
+            var roles = rols.ToList();
+
+            var emp = new Employee()
+            {
+                Id= employee.Id.Value,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Email = employee.Email,
+                Roles = employee.Roles.Select(x => new Role()
+                {
+                    Id = roles.FirstOrDefault(r => r.Name == x.Name).Id,
+                    Name = x.Name,
+                    Description = x.Description
+                }).ToList(),
+                AppliedPromocodesCount = employee.AppliedPromocodesCount
+            };
+
+            var updatedEmployee = await _employeeRepository.UpdateAsync(emp);
+
+            if (updatedEmployee == null)
                 return NotFound();
 
             var employeeModel = new EmployeeResponse()
             {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
+                Id = updatedEmployee.Id,
+                Email = updatedEmployee.Email,
+                Roles = updatedEmployee.Roles.Select(x => new RoleItemResponse()
                 {
                     Name = x.Name,
                     Description = x.Description
                 }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
+                FullName = updatedEmployee.FullName,
+                AppliedPromocodesCount = updatedEmployee.AppliedPromocodesCount
             };
 
             return employeeModel;

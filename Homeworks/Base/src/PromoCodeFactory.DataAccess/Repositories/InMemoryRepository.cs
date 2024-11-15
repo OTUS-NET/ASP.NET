@@ -23,7 +23,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
         public Task<T> AddAsync(T entity)
         {
             entity.Id = Guid.NewGuid();
-            Data.Append(entity);
+            Data=Data.Append(entity);
             return Task.FromResult(entity);
         }
 
@@ -37,7 +37,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
             var existed = Data.FirstOrDefault(x => x.Id == entity.Id);
             if (existed == null) return Task.FromResult(existed);
             Data = Data.Where(i => i.Id != entity.Id).AsEnumerable();
-            Data.Append(entity);
+            Data= Data.Append(entity);
             return Task.FromResult(entity);
         }
 

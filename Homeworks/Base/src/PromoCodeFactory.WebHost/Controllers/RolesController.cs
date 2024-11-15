@@ -34,7 +34,6 @@ namespace PromoCodeFactory.WebHost.Controllers
             var rolesModelList = roles.Select(x =>
                 new RoleItemResponse()
                 {
-                    Id = x.Id,
                     Name = x.Name,
                     Description = x.Description
                 }).ToList();
