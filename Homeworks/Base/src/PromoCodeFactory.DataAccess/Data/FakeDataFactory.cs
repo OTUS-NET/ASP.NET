@@ -5,6 +5,21 @@ using PromoCodeFactory.Core.Domain.Administration;
 
 namespace PromoCodeFactory.DataAccess.Data
 {
+    //public class A
+    //{
+    //    public void a()
+    //    {
+    //        var a = new List<int>()
+    //        {
+    //            1,2,3
+    //        };
+
+
+    //        a.Add(1);
+    //        a.Add(2);
+    //        a.Add(3);
+    //    }
+    //}
     public static class FakeDataFactory
     {
         public static IList<Employee> Employees => new List<Employee>()
@@ -19,7 +34,8 @@ namespace PromoCodeFactory.DataAccess.Data
                 {
                     Roles.FirstOrDefault(x => x.Name == "Admin")  
                 },
-                AppliedPromocodesCount = 5
+                AppliedPromocodesCount = 5,
+                IsDeleted = false
             },
             new Employee()
             {
@@ -31,7 +47,8 @@ namespace PromoCodeFactory.DataAccess.Data
                 {
                     Roles.FirstOrDefault(x => x.Name == "PartnerManager")  
                 },
-                AppliedPromocodesCount = 10
+                AppliedPromocodesCount = 10,
+                IsDeleted = false
             },
         };
 
@@ -42,12 +59,14 @@ namespace PromoCodeFactory.DataAccess.Data
                 Id = Guid.Parse("53729686-a368-4eeb-8bfa-cc69b6050d02"),
                 Name = "Admin",
                 Description = "Администратор",
+                IsDeleted = false
             },
             new Role()
             {
                 Id = Guid.Parse("b0ae7aac-5493-45cd-ad16-87426a5e7665"),
                 Name = "PartnerManager",
-                Description = "Партнерский менеджер"
+                Description = "Партнерский менеджер",
+                IsDeleted = false
             }
         };
     }
