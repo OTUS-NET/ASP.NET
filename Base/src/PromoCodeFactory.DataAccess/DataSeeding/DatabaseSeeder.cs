@@ -2,7 +2,7 @@
 using PromoCodeFactory.Core.Administration;
 using PromoCodeFactory.Core.PromoCodeManagement;
 
-namespace PromoCodeFactory.DataAccess.Seeding;
+namespace PromoCodeFactory.DataAccess.DataSeeding;
 
 public static class DatabaseSeeder
 {

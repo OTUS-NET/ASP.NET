@@ -2,8 +2,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PromoCodeFactory.Core.Administration;
+using PromoCodeFactory.DataAccess.DataSeeding;
 using PromoCodeFactory.DataAccess.Extensions;
-using PromoCodeFactory.DataAccess.Seeding;
 
 namespace PromoCodeFactory.DataAccess.Configuration;
 
