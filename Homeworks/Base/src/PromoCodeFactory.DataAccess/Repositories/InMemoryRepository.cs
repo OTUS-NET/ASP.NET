@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
@@ -16,25 +17,29 @@ namespace PromoCodeFactory.DataAccess.Repositories
             _data = data.ToList();
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult<IEnumerable<T>>(_data);
         }
 
-        public Task<T> GetByIdAsync(Guid id)
+        public Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(_data.FirstOrDefault(x => x.Id == id));
         }
 
-        public Task<T> AddAsync(T entity)
+        public Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             entity.Id = Guid.NewGuid();
             _data.Add(entity);
             return Task.FromResult(entity);
         }
-        
-        public Task<bool> DeleteAsync(Guid id)
+
+        public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var entity = _data.FirstOrDefault(x => x.Id == id);
             if (entity == null)
             {
@@ -44,9 +49,10 @@ namespace PromoCodeFactory.DataAccess.Repositories
             _data.Remove(entity);
             return Task.FromResult(true);
         }
-        
-        public Task<T> UpdateAsync(T entity)
+
+        public Task<T> UpdateAsync(T entity, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var existingEntity = _data.FirstOrDefault(x => x.Id == entity.Id);
             if (existingEntity == null)
             {
