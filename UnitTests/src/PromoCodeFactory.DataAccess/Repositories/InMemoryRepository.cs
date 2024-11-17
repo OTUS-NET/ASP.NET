@@ -17,11 +17,8 @@ namespace PromoCodeFactory.DataAccess.Repositories
         {
             Data = data;
         }
-        
-        public Task<IEnumerable<T>> GetAllAsync()
-        {
-            return Task.FromResult(Data.AsEnumerable());
-        }
+
+        public Task<IEnumerable<T>> AllAsync => Task.FromResult(Data.AsEnumerable());
 
         public Task<T> GetByIdAsync(Guid id)
         {

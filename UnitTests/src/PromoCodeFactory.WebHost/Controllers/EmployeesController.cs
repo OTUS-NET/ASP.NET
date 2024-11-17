@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Responses;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -14,8 +16,7 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class EmployeesController
-        : ControllerBase
+    public class EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository, IActionResultTypeMapper mapper) : ControllerBase
     {
         private readonly IRepository<Employee> _employeeRepository;
 
@@ -31,7 +32,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet]
         public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            var employees = await _employeeRepository.AllAsync;
 
             var employeesModelList = employees.Select(x => 
                 new EmployeeShortResponse()

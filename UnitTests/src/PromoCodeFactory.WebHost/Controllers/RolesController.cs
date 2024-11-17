@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Responses;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -29,7 +29,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet]
         public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync()
         {
-            var roles = await _rolesRepository.GetAllAsync();
+            var roles = await _rolesRepository.AllAsync;
 
             var rolesModelList = roles.Select(x => 
                 new RoleItemResponse()

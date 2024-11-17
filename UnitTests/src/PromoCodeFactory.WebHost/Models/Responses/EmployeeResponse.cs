@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using PromoCodeFactory.Core.Domain.Administration;
 
-namespace PromoCodeFactory.WebHost.Models
+namespace PromoCodeFactory.WebHost.Models.Responses
 {
     public class EmployeeResponse
     {

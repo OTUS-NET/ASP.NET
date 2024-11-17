@@ -7,11 +7,13 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         : BaseEntity
     {
         public string Name { get; set; }
-
+        //Promo codes qnty 
         public int NumberIssuedPromoCodes  { get; set; }
-
         public bool IsActive { get; set; }
-
-        public virtual ICollection<PartnerPromoCodeLimit> PartnerLimits { get; set; }
+        /// <summary>
+        /// Previous
+        /// </summary>
+        //public virtual ICollection<PartnerPromoCodeLimit> PartnerLimits { get; set; }
+        public virtual IList<PartnerPromoCodeLimit> PartnerLimits { get; set; }
     }
 }
