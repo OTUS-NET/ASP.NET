@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Domain.Administration;
@@ -11,12 +12,12 @@ namespace PromoCodeFactory.Core.Abstractions.Repositories
     {
         Task<IEnumerable<T>> GetAllAsync();
 
-        Task<T> GetByIdAsync(Guid id);
+        Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<IEnumerable<T>> DeleteByIdAsync(Guid id);
+        Task<bool> DeleteByIdAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<IEnumerable<T>> CreateAsync(IEnumerable<T> empl);
+        Task<IEnumerable<T>> CreateAsync(IEnumerable<T> empl, CancellationToken cancellationToken);
 
-        Task<T> ReplaceAsync(IEnumerable<T> empl, Guid id);
+        Task<T> ReplaceAsync(IEnumerable<T> empl, Guid id, CancellationToken cancellationToken);
     }
 }

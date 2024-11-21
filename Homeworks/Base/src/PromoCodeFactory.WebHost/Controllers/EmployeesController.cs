@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+
+
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -58,7 +62,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            var employee = await _employeeRepository.GetByIdAsync(id, HttpContext.RequestAborted);
 
             if (employee == null)
                 return NotFound();
@@ -84,19 +88,16 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        public async Task<List<EmployeeShortResponse>> DeleteEmployeeAsync(Guid id)
+        public async Task<dynamic> DeleteEmployeeAsync(Guid id)
         {
-            var employees = await _employeeRepository.DeleteByIdAsync(id);
+            var result = await _employeeRepository.DeleteByIdAsync(id, HttpContext.RequestAborted);
 
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
+            var status = new Dictionary<string, bool>()
+            {
+                {"Status", result}
+            };
 
-            return employeesModelList;
+            return status;
 
         }
 
@@ -108,38 +109,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         public async Task<List<EmployeeShortResponse>> CreateEmployeeAsync([FromBody] EmployeeCreateDto employeeData)
         {
 
-            var role = await _roleRepository.GetByIdAsync(employeeData.RoleId);
-
-            var empl = new Employee()
-            {
-                //Id = Guid.Parse("451533d5-d8d5-4a11-9c7b-eb9f14e1a320"),
-                Id = Guid.NewGuid(),
-                Email = employeeData.Email,
-                FirstName = employeeData.FirstName,
-                LastName = employeeData.LastName,
-                Roles = new List<Role>()
-                       {
-                        role
-                        },
-                AppliedPromocodesCount = 0
-            };
-
-
-            var emplList = new List<Employee>() { empl };
-            var employees = await _employeeRepository.CreateAsync(emplList);
-
-
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
-
-            return employeesModelList;
+            return await CreateEmplAsync(employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
 
         }
+
 
         /// <summary>
         /// Изменить данные сотрудника
@@ -148,15 +121,19 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpPut("{id:guid}")] 
         public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, [FromBody] EmployeeCreateDto employeeData)
         {
-            
-            var employee = await _employeeRepository.GetByIdAsync(id);
+           return await UpdateEmplAsync(id, employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
+        }
+
+        private async Task<ActionResult<EmployeeResponse>> UpdateEmplAsync(Guid id, EmployeeCreateDto employeeData, IRepository<Role> roleRepository, IRepository<Employee> employeeRepository, CancellationToken cancellationToken = default)
+        {
+            var employee = await employeeRepository.GetByIdAsync(id, cancellationToken);
 
             if (employee == null)
                 return NotFound();
             else
             {
 
-                var role = await _roleRepository.GetByIdAsync(employeeData.RoleId);
+                var role = await roleRepository.GetByIdAsync(employeeData.RoleId, cancellationToken);
 
                 if (role == null)
                     return NotFound();
@@ -169,7 +146,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                     employee.Roles = new List<Role>()
                        {role};
 
-                    var newEmployee = await _employeeRepository.ReplaceAsync(new List<Employee>() { employee }, employee.Id);
+                    var newEmployee = await _employeeRepository.ReplaceAsync(new List<Employee>() { employee }, employee.Id, cancellationToken);
 
                     if (newEmployee != null)
                     {
@@ -194,9 +171,41 @@ namespace PromoCodeFactory.WebHost.Controllers
 
                 }
             }
-
         }
 
+        private async Task<List<EmployeeShortResponse>> CreateEmplAsync(EmployeeCreateDto employeeData, IRepository<Role> roleRepository, IRepository<Employee> employeeRepository, CancellationToken cancellationToken = default)
+        {
+            var role = await roleRepository.GetByIdAsync(employeeData.RoleId, cancellationToken);
+
+            var empl = new Employee()
+            {
+                Id = Guid.NewGuid(),
+                Email = employeeData.Email,
+                FirstName = employeeData.FirstName,
+                LastName = employeeData.LastName,
+                Roles = new List<Role>()
+                       {
+                        role
+                        },
+                AppliedPromocodesCount = 0
+            };
+
+
+            var emplList = new List<Employee>() { empl };
+            var employees = await employeeRepository.CreateAsync(emplList, cancellationToken);
+
+
+            var employeesModelList = employees.Select(x =>
+                new EmployeeShortResponse()
+                {
+                    Id = x.Id,
+                    Email = x.Email,
+                    FullName = x.FullName,
+                }).ToList();
+
+            return employeesModelList;
+
+        }
 
 
     }

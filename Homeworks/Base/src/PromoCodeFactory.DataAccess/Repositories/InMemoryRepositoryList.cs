@@ -1,21 +1,19 @@
-﻿using System;
+﻿using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain;
-using PromoCodeFactory.Core.Domain.Administration;
-
-
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {
-    public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
+    public  class InMemoryRepositoryList<T> : IRepository<T> where T : BaseEntity
     {
-        protected IEnumerable<T> Data { get; set; }
+        protected List<T> Data {  get; set; }
 
-        public InMemoryRepository(IEnumerable<T> data)
+        public InMemoryRepositoryList(List<T> data) 
         {
             Data = data;
         }
@@ -32,7 +30,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public Task<bool> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var empl = Data.FirstOrDefault(x => x.Id == id);
+            var empl = Data.FirstOrDefault(x => (x.Id == id) && (x.IsDeleted == false));
 
             if (empl != null)
             {
@@ -42,29 +40,30 @@ namespace PromoCodeFactory.DataAccess.Repositories
             }
             else
                 return Task.FromResult(false);
-
-         }
+        }
 
         public Task<IEnumerable<T>> CreateAsync(IEnumerable<T> empl, CancellationToken cancellationToken)
         {
 
-            Data = Data.Concat(empl);
-
-
+             Data.AddRange(empl.ToList());
+                
             return Task.FromResult(Data.Where(x => x.IsDeleted == false));
         }
 
         public Task<T> ReplaceAsync(IEnumerable<T> empl, Guid id, CancellationToken cancellationToken)
         {
-            //var empl = Data.FirstOrDefault(x => x.Id == empl.id);
-
+   
             if (empl != null)
             {
-                Data = Data.Where(x => x.Id != id);
-                Data = Data.Concat(empl);
+                int index = Data.FindIndex(x => x.Id == id);
+                if (index == -1)
+                    Data[index] = empl.FirstOrDefault();
             }
-            
+
             return Task.FromResult(Data.FirstOrDefault(x => (x.Id == id) && (x.IsDeleted == false)));
         }
+
+
+
     }
 }
