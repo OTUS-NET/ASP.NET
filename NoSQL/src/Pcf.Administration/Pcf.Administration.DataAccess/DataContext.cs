@@ -14,7 +14,7 @@ namespace Pcf.Administration.DataAccess
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         {
-            // TEST
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
