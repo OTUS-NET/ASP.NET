@@ -339,3 +339,4 @@ ASALocalRun/
 .localhistory/
 
 .vscode/
+/NoSQL/src/Pcf.Administration/Pcf.Administration.Core/Properties/launchSettings.json
