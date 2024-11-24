@@ -8,7 +8,6 @@ namespace DirectoryOfPreferences.Application.Implementations.Mapping
     {
         public PreferenceMapping()
         {
-            CreateMap<CreatePreferenceModel, Preference>();
             CreateMap<Preference, PreferenceModel>();
         }
     }

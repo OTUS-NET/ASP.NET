@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryOfPreferences.Infrastructure.EntityFramework
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+    public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
     {
         public DbSet<Preference> Preferences { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

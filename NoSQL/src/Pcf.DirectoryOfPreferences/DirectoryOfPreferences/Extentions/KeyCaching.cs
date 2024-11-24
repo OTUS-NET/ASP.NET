@@ -1,4 +1,4 @@
-﻿namespace DirectoryOfPreferences.Infrastructure.Extentions
+﻿namespace DirectoryOfPreferences.Extentions
 {
     public static class KeyCaching
     {

@@ -3,8 +3,7 @@ using DirectoryOfPreferences.Application.Implementations;
 using DirectoryOfPreferences.Domain.Abstractions;
 using DirectoryOfPreferences.Domain.Entity;
 using DirectoryOfPreferences.Infrastructure.EntityFramework;
-using DirectoryOfPreferences.Infrastructure.Settings;
-using DirectoryOfPreferences.Repositories.Implementations.EntityFramework;
+using DirectoryOfPreferences.Infrastructure.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryOfPreferences
@@ -23,9 +22,9 @@ namespace DirectoryOfPreferences
         }
         public static IServiceCollection AddApplicationDataContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<DataContext>(options =>
             {
-                options.UseNpgsql(configuration.GetConnectionString("Postgres"),
+                options.UseNpgsql(configuration.GetConnectionString("PromocodeFactoryDirectoryOfPreferencesDb"),
                 optionsBuilder => optionsBuilder.MigrationsAssembly("DirectoryOfPreferences.Infrastructure.EntityFramework"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });

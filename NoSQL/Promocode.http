@@ -1,6 +1,6 @@
 @urlPartners = http://localhost:8095
 @urlCustomers = http://localhost:8093
-@urlPreferences = http://localhost:8096
+@urlPreferences = http://localhost:5000
 
 ### get preferences customers
 GET {{urlCustomers}}/api/v1/Preferences HTTP/1.1

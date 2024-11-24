@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace DirectoryOfPreferences.Infrastructure
+namespace DirectoryOfPreferences
 {
     public static class MigrationsManager
     {

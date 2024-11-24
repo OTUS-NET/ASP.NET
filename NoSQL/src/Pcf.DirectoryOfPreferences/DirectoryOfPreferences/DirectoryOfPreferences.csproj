@@ -10,7 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -21,10 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DirectoryOfPreferences.Repositories.Implementations\DirectoryOfPreferences.Repositories.Implementations.csproj" />
     <ProjectReference Include="..\DirectoryOfPreferences.Application.Abstractions\DirectoryOfPreferences.Application.Abstractions.csproj" />
     <ProjectReference Include="..\DirectoryOfPreferences.Application.Implementations\DirectoryOfPreferences.Application.Implementations.csproj" />
     <ProjectReference Include="..\DirectoryOfPreferences.Application.Models\DirectoryOfPreferences.Application.Models.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Domain.Abstractions\DirectoryOfPreferences.Domain.Abstractions.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Infrastructure.EntityFramework\DirectoryOfPreferences.Infrastructure.EntityFramework.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Infrastructure.Repositories.Implementations\DirectoryOfPreferences.Infrastructure.Repositories.csproj" />
   </ItemGroup>
 
 </Project>

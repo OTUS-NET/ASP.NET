@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DirectoryOfPreferences.Application.Abstractions;
 using DirectoryOfPreferences.Application.Models.Preference;
-using DirectoryOfPreferences.Infrastructure.Extentions;
+using DirectoryOfPreferences.Extentions;
 using DirectoryOfPreferences.Model.Request;
 using DirectoryOfPreferences.Model.Response;
 using Microsoft.AspNetCore.Mvc;
