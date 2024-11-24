@@ -43,7 +43,12 @@ namespace Pcf.ReceivingFromPartner.WebHost
             {
                 c.BaseAddress = new Uri(Configuration["IntegrationSettings:GivingToCustomerApiUrl"]);
             });
-            
+
+            services.AddHttpClient<IPreferenceGateway, PreferenceGateway>(c =>
+            {
+                c.BaseAddress = new Uri(Configuration["IntegrationSettings:DirectoryOfPreferencesApiUrl"]);
+            });
+
             services.AddHttpClient<IAdministrationGateway,AdministrationGateway>(c =>
             {
                 c.BaseAddress = new Uri(Configuration["IntegrationSettings:AdministrationApiUrl"]);
