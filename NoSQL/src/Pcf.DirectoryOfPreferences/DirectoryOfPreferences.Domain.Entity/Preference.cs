@@ -4,7 +4,7 @@ namespace DirectoryOfPreferences.Domain.Entity
 {
     public class Preference : Entity<Guid>
     {
-        public required string Name { get; init; }
+        public string Name { get; set; }
         public Preference(Guid id, string name) : base(id)
         {
             Name = name;

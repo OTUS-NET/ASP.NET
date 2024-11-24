@@ -1,18 +1,27 @@
-﻿using DirectoryOfPreferences.Application.Abstractions;
+﻿using AutoMapper;
+using DirectoryOfPreferences.Application.Abstractions;
+using DirectoryOfPreferences.Application.Abstractions.Exceptions;
+using DirectoryOfPreferences.Application.Implementations.Base;
 using DirectoryOfPreferences.Application.Models.Preference;
+using DirectoryOfPreferences.Domain.Abstractions;
+using DirectoryOfPreferences.Domain.Entity;
 
 namespace DirectoryOfPreferences.Application.Implementations
 {
-    public class PreferenceService : IPreferenceService
+    public class PreferenceService(IRepository<Preference, Guid> preferenceRepository, Mapper mapper) : BaseService, IPreferenceService
     {
         public async Task<PreferenceModel> AddPreferenceAsync(CreatePreferenceModel preferenceInfo, CancellationToken token = default)
         {
-            throw new NotImplementedException();
+            Preference preference = new Preference(preferenceInfo.Name);
+            preference = await preferenceRepository.AddAsync(preference, token)
+                ?? throw new BadRequestException(FormatBadRequestErrorMessage(preference.Id, nameof(Preference)));
+            return mapper.Map<PreferenceModel>(preference);
         }
 
         public async Task<IEnumerable<PreferenceModel>> GetAllPreferenceAsync(CancellationToken token = default)
         {
-            return new List<PreferenceModel>() { new PreferenceModel() {Id = Guid.NewGuid(),Name = "Theatre" } };
+            var preferences = (await preferenceRepository.GetAllAsync(cancellationToken: token));
+            return preferences.Select(mapper.Map<PreferenceModel>);
         }
     }
 }

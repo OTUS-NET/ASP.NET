@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DirectoryOfPreferences.Application.Abstractions\DirectoryOfPreferences.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Domain.Abstractions\DirectoryOfPreferences.Domain.Abstractions.csproj" />
     <ProjectReference Include="..\DirectoryOfPreferences.Domain.Entity\DirectoryOfPreferences.Domain.Entity.csproj" />
   </ItemGroup>
 

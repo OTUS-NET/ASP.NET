@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DirectoryOfPreferences.Domain.Abstractions\DirectoryOfPreferences.Domain.Abstractions.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Infrastructure.EntityFramework\DirectoryOfPreferences.Infrastructure.EntityFramework.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,11 @@
 ﻿using DirectoryOfPreferences.Domain.Abstractions;
+using DirectoryOfPreferences.Domain.Entity.Base;
+using DirectoryOfPreferences.Infrastructure.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Linq;
 
-namespace DirectoryOfPreferences.Infrastructure.Repositories.Implementations.EntityFramework
+namespace DirectoryOfPreferences.Repositories.Implementations.EntityFramework
 {
     public class EFRepository<TEntity, TId>(ApplicationDbContext context) : IRepository<TEntity, TId>
         where TEntity : Entity<TId>

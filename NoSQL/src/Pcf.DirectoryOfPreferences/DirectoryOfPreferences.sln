@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryOfPreferences.Doma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryOfPreferences.Infrastructure.EntityFramework", "DirectoryOfPreferences.Infrastructure.EntityFramework\DirectoryOfPreferences.Infrastructure.EntityFramework.csproj", "{C2A9D98A-7FBC-4F86-905F-3B8096491893}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryOfPreferences.Infrastructure.Repositories.Implementations", "DirectoryOfPreferences.Infrastructure.Repositories.Implementations\DirectoryOfPreferences.Infrastructure.Repositories.Implementations.csproj", "{79189EFB-A82C-4855-84A0-E9F16BFA2E2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryOfPreferences.Repositories.Implementations", "..\DirectoryOfPreferences.Repositories.Implementations\DirectoryOfPreferences.Repositories.Implementations.csproj", "{B5A5FAA6-6634-4BBB-9523-497493C018E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,10 +69,10 @@ Global
 		{C2A9D98A-7FBC-4F86-905F-3B8096491893}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2A9D98A-7FBC-4F86-905F-3B8096491893}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2A9D98A-7FBC-4F86-905F-3B8096491893}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79189EFB-A82C-4855-84A0-E9F16BFA2E2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79189EFB-A82C-4855-84A0-E9F16BFA2E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79189EFB-A82C-4855-84A0-E9F16BFA2E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79189EFB-A82C-4855-84A0-E9F16BFA2E2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5A5FAA6-6634-4BBB-9523-497493C018E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A5FAA6-6634-4BBB-9523-497493C018E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A5FAA6-6634-4BBB-9523-497493C018E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A5FAA6-6634-4BBB-9523-497493C018E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +85,6 @@ Global
 		{1905557F-C978-4510-B8DE-3514A114BAC5} = {6265FF37-9CF5-4A74-A35B-ED62C328F934}
 		{85F1AE1F-0092-4C2B-AEFF-994DEF185981} = {6265FF37-9CF5-4A74-A35B-ED62C328F934}
 		{C2A9D98A-7FBC-4F86-905F-3B8096491893} = {E0CD5929-A3FE-4450-845F-3DF8748FEC60}
-		{79189EFB-A82C-4855-84A0-E9F16BFA2E2D} = {E0CD5929-A3FE-4450-845F-3DF8748FEC60}
+		{B5A5FAA6-6634-4BBB-9523-497493C018E8} = {E0CD5929-A3FE-4450-845F-3DF8748FEC60}
 	EndGlobalSection
 EndGlobal

@@ -1,10 +1,14 @@
 using DirectoryOfPreferences;
 using DirectoryOfPreferences.Application.Implementations.Mapping;
+using DirectoryOfPreferences.Infrastructure.EntityFramework;
+using DirectoryOfPreferences.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddMvcOptions(x => x.SuppressAsyncSuffixInActionNames = false);
 
+builder.Services.AddApplicationDataContext(builder.Configuration);
+builder.Services.AddRepository();
 builder.Services.AddServices();
 builder.Services.AddAutoMapper(typeof(Program), typeof(PreferenceMapping));
 
@@ -36,9 +40,8 @@ app.UseSwaggerUi(x =>
 });
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.MapControllers();
+app.MigrateDatabase<ApplicationDbContext>();
 
 app.Run();

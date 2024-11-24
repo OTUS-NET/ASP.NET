@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DirectoryOfPreferences.Application.Abstractions;
+using DirectoryOfPreferences.Application.Models.Preference;
 using DirectoryOfPreferences.Infrastructure.Extentions;
+using DirectoryOfPreferences.Model.Request;
 using DirectoryOfPreferences.Model.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -45,9 +47,28 @@ namespace DirectoryOfPreferences.Controllers
             return preferences;
         }
 
-        public async Task<PreferenceResponse> AddPreferencesAsync() 
+        /// <summary>
+        /// Добавить новое предпочтение в справочник.
+        /// </summary>
+        /// <param name="preference"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<PreferenceResponse> AddPreferencesAsync(PreferenceRequest preference) 
         {
-            
+            var result = await preferenceService.AddPreferenceAsync(mapper.Map<CreatePreferenceModel>(preference), HttpContext.RequestAborted);
+            await distributedCache.RemoveAsync(KeyCaching.PreferencesKey(), HttpContext.RequestAborted);
+           
+            var preferences = (await preferenceService.GetAllPreferenceAsync(HttpContext.RequestAborted)).Select(mapper.Map<PreferenceResponse>);
+
+            await distributedCache.SetStringAsync(
+                key: KeyCaching.PreferencesKey(),
+                value: JsonSerializer.Serialize(preferences),
+                options: new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromHours(1)
+                });
+
+            return mapper.Map<PreferenceResponse>(result);
         }
     }
 }
