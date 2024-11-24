@@ -1,5 +1,6 @@
 using DirectoryOfPreferences;
 using DirectoryOfPreferences.Application.Implementations.Mapping;
+using DirectoryOfPreferences.ExceptionHandling;
 using DirectoryOfPreferences.Infrastructure.EntityFramework;
 using FluentValidation.AspNetCore;
 
@@ -47,5 +48,6 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.MapControllers();
 app.MigrateDatabase<DataContext>();
+app.UseErrorHandler();
 
 app.Run();
