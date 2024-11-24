@@ -1,0 +1,12 @@
+@urlPartners = http://localhost:8095
+@urlCustomers = http://localhost:8093
+
+### get preferences customers
+GET {{urlCustomers}}/api/v1/Preferences HTTP/1.1
+Accept: : application/json
+
+### get preferences partners
+GET {{urlPartners}}/api/v1/Preferences HTTP/1.1
+Accept: : application/json
+
+
