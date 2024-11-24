@@ -10,6 +10,7 @@ using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Data;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Integration;
+using System;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Pcf.GivingToCustomer.WebHost
@@ -39,6 +40,12 @@ namespace Pcf.GivingToCustomer.WebHost
                 x.UseSnakeCaseNamingConvention();
                 x.UseLazyLoadingProxies();
             });
+
+            services.AddHttpClient<IPreferenceGateway, PreferenceGateway>(c =>
+            {
+                c.BaseAddress = new Uri(Configuration["IntegrationSettings:DirectoryOfPreferencesApiUrl"]);
+            });
+
 
             services.AddOpenApiDocument(options =>
             {
