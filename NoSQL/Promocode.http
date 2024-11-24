@@ -14,4 +14,12 @@ Accept: : application/json
 {{urlPreferences}}/api/v1/Preferences
 Accept: : application/json
 
+### post add preference
 
+POST {{urlPreferences}}/api/v1/Preferences HTTP/1.1
+accept: application/json
+content-Type: application/json
+
+{
+  "name": "Концерт"
+}

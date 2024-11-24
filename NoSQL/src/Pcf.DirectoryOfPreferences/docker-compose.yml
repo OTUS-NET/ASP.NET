@@ -1,6 +1,9 @@
 networks:
   caching-network:
     driver: bridge
+    
+volumes:
+  preference_data:
 
 services:
   directoryofpreferences:
@@ -12,10 +15,12 @@ services:
     restart: always
     depends_on:
       - redis
+      - preference_db
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:5000
       ConnectionStrings:Redis: redis:6379,ssl=False,abortConnect=False
+      ConnectionStrings:Postgres: "Host=preference_db;Port=5432;Database=Preference;UserId=postgres;Password=admin6"
     ports:
       - 5000:5000
     networks:
@@ -29,5 +34,20 @@ services:
       - 6379:6379
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - caching-network
+  
+  preference_db:
+    image: postgres
+    container_name: preference_db
+    restart: always
+    environment:    
+      POSTGRES_DB: Preference
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin6
+    volumes:
+      - 'preference_data:/var/lib/postgresql/data'
+    ports:
+      - '5436:5432'
     networks:
       - caching-network

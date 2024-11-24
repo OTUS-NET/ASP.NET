@@ -8,7 +8,7 @@ using DirectoryOfPreferences.Domain.Entity;
 
 namespace DirectoryOfPreferences.Application.Implementations
 {
-    public class PreferenceService(IRepository<Preference, Guid> preferenceRepository, Mapper mapper) : BaseService, IPreferenceService
+    public class PreferenceService(IRepository<Preference, Guid> preferenceRepository, IMapper mapper) : BaseService, IPreferenceService
     {
         public async Task<PreferenceModel> AddPreferenceAsync(CreatePreferenceModel preferenceInfo, CancellationToken token = default)
         {

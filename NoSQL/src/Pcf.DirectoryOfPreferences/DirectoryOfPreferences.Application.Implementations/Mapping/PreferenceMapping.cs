@@ -4,7 +4,7 @@ using DirectoryOfPreferences.Domain.Entity;
 
 namespace DirectoryOfPreferences.Application.Implementations.Mapping
 {
-    public class PreferenceMapping:Profile
+    public class PreferenceMapping : Profile
     {
         public PreferenceMapping()
         {
