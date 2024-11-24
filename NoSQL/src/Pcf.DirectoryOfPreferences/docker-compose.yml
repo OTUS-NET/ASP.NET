@@ -1,0 +1,33 @@
+networks:
+  caching-network:
+    driver: bridge
+
+services:
+  directoryofpreferences:
+    image: ${DOCKER_REGISTRY-}directoryofpreferences
+    build:
+      context: .
+      dockerfile: DirectoryOfPreferences/Dockerfile     
+    container_name: preferences-service
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings:Redis: redis:6379,ssl=False,abortConnect=False
+    ports:
+      - 5000:5000
+    networks:
+      - caching-network
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - caching-network

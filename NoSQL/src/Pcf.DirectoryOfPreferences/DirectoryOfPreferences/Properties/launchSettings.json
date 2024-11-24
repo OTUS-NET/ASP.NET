@@ -2,13 +2,12 @@
   "profiles": {
     "DirectoryOfPreferences.WebHost": {
       "commandName": "Project",
+      "launchUrl": "swagger/index.html",
       "launchBrowser": true,
-      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:8096"
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:8096"
     },
     "IIS Express": {
       "commandName": "IISExpress",
