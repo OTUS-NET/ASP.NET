@@ -1,0 +1,12 @@
+services:
+  #Administration Db
+  promocode-factory-administration-db:
+    image: mongo:4.2.3
+    container_name: promocode-factory-mongo
+    restart: always
+    ports:
+      - 27018:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: promo
+      MONGO_INITDB_ROOT_PASSWORD: factory
+      MONGO_INITDB_DATABASE_NAME: promocode-factory-administration

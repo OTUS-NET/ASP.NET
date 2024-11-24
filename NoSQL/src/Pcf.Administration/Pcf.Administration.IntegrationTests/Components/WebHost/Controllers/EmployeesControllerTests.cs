@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using MongoDB.Bson;
 using Pcf.Administration.Core.Domain.Administration;
 using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.WebHost.Controllers;
@@ -24,7 +25,7 @@ namespace Pcf.Administration.IntegrationTests.Components.WebHost.Controllers
         public async Task GetEmployeeByIdAsync_ExistedEmployee_ExpectedId()
         {
             //Arrange
-            var expectedEmployeeId = Guid.Parse("451533d5-d8d5-4a11-9c7b-eb9f14e1a32f");
+            var expectedEmployeeId = "4882b11520f095be13af10d9";
 
             //Act
             var result = await _employeesController.GetEmployeeByIdAsync(expectedEmployeeId);

@@ -1,20 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Castle.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Pcf.Administration.Core.Abstractions.Repositories;
+using Pcf.Administration.Core.Domain.Administration;
 using Pcf.Administration.DataAccess;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.DataAccess.Repositories;
-using Pcf.Administration.Core.Domain.Administration;
+using System;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Pcf.Administration.WebHost
@@ -32,16 +28,23 @@ namespace Pcf.Administration.WebHost
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions<MongoDbSettings>().Bind(Configuration.GetSection("ConnectionsStrings:MongoDbSettings"));
+
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddScoped<IRepository<Employee>, EmployeeRepository>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
+            services.AddDbContext<DataContext>(opts =>
             {
+                var mongoDbSettings = Configuration.GetSection("ConnectionStrings:MongoDbSettings").Get<MongoDbSettings>();
                 //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
+                //x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
+                opts.UseMongoDB(mongoDbSettings.ConnectionString, mongoDbSettings.DatabaseName);
+                opts.UseSnakeCaseNamingConvention();
+                //opts.UseLazyLoadingProxies();
+
+                opts.LogTo(Console.WriteLine, LogLevel.Debug);
             });
 
             services.AddOpenApiDocument(options =>

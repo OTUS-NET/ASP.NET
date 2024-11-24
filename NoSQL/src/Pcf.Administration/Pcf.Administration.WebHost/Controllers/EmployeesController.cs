@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -49,8 +48,8 @@ namespace Pcf.Administration.WebHost.Controllers
         /// </summary>
         /// <param name="id">Id сотрудника, например <example>451533d5-d8d5-4a11-9c7b-eb9f14e1a32f</example></param>
         /// <returns></returns>
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(string id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
 
@@ -63,7 +62,7 @@ namespace Pcf.Administration.WebHost.Controllers
                 Email = employee.Email,
                 Role = new RoleItemResponse()
                 {
-                    Id = employee.Id,
+                    Id = employee.Role.Id,
                     Name = employee.Role.Name,
                     Description = employee.Role.Description
                 },
@@ -79,9 +78,9 @@ namespace Pcf.Administration.WebHost.Controllers
         /// </summary>
         /// <param name="id">Id сотрудника, например <example>451533d5-d8d5-4a11-9c7b-eb9f14e1a32f</example></param>
         /// <returns></returns>
-        [HttpPost("{id:guid}/appliedPromocodes")]
+        [HttpPost("{id}/appliedPromocodes")]
         
-        public async Task<IActionResult> UpdateAppliedPromocodesAsync(Guid id)
+        public async Task<IActionResult> UpdateAppliedPromocodesAsync(string id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
 

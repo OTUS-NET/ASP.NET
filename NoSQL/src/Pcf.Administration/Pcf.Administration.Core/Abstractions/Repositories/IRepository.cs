@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Pcf.Administration.Core.Domain;
@@ -12,9 +11,9 @@ namespace Pcf.Administration.Core.Abstractions.Repositories
     {
         Task<IEnumerable<T>> GetAllAsync();
         
-        Task<T> GetByIdAsync(Guid id);
+        Task<T> GetByIdAsync(string id);
         
-        Task<IEnumerable<T>> GetRangeByIdsAsync(List<Guid> ids);
+        Task<IEnumerable<T>> GetRangeByIdsAsync(List<string> ids);
         
         Task<T> GetFirstWhere(Expression<Func<T, bool>> predicate);
         
