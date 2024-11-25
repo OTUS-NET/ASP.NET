@@ -3,7 +3,7 @@
 namespace Pcf.GivingToCustomer.Core.Domain
 {
     public class Customer
-        :BaseEntity
+        : BaseEntity
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -12,8 +12,8 @@ namespace Pcf.GivingToCustomer.Core.Domain
 
         public string Email { get; set; }
 
-        public virtual ICollection<CustomerPreference> Preferences { get; set; }
-        
-        public virtual ICollection<PromoCodeCustomer> PromoCodes { get; set; }
+        public virtual ICollection<Preference> Preferences { get; set; }
+
+        public virtual ICollection<PromoCode> PromoCodes { get; set; }
     }
 }

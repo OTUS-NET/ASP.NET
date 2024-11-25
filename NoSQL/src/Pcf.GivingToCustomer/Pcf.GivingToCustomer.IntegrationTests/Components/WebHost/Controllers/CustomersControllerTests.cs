@@ -32,13 +32,13 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
         public async Task CreateCustomerAsync_CanCreateCustomer_ShouldCreateExpectedCustomer()
         {
             //Arrange 
-            var preferenceId = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c");
+            var preferenceId = "4882b11520f095be13af10d9";
             var request = new CreateOrEditCustomerRequest()
             {
                 Email = "some@mail.ru",
                 FirstName = "Иван",
                 LastName = "Петров",
-                PreferenceIds = new List<Guid>()
+                PreferenceIds = new List<string>()
                 {
                     preferenceId
                 }
@@ -47,7 +47,7 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
             //Act
             var result = await _customersController.CreateCustomerAsync(request);
             var actionResult = result.Result as CreatedAtActionResult;
-            var id = (Guid)actionResult.Value;
+            var id = (string)actionResult.Value;
             
             //Assert
             var actual = await _customerRepository.GetByIdAsync(id);
@@ -58,7 +58,7 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
             actual.Preferences.Should()
                 .ContainSingle()
                 .And
-                .Contain(x => x.PreferenceId == preferenceId);
+                .Contain(x => x.Id == preferenceId);
         }
     }
 }

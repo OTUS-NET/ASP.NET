@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
 
@@ -28,14 +27,14 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
             return entities;
         }
 
-        public async Task<T> GetByIdAsync(Guid id)
+        public async Task<T> GetByIdAsync(string id)
         {
             var entity = await _dataContext.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
 
             return entity;
         }
 
-        public async Task<IEnumerable<T>> GetRangeByIdsAsync(List<Guid> ids)
+        public async Task<IEnumerable<T>> GetRangeByIdsAsync(List<string> ids)
         {
             var entities = await _dataContext.Set<T>().Where(x => ids.Contains(x.Id)).ToListAsync();
             return entities;

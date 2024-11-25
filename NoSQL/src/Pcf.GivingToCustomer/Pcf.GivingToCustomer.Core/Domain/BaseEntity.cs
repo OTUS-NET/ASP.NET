@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace Pcf.GivingToCustomer.Core.Domain
+namespace Pcf.GivingToCustomer.Core.Domain;
+
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        public Guid Id { get; set; }
-    }
+    [BsonId]
+    [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+    public string Id { get; set; }
 }

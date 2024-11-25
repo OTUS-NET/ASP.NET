@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Pcf.GivingToCustomer.Core.Domain;
 
 namespace Pcf.GivingToCustomer.IntegrationTests.Data
@@ -10,17 +9,17 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Data
         {
             new Preference()
             {
-                Id = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c"),
+                Id = "4882b11520f095be13af10d9",
                 Name = "Театр",
             },
             new Preference()
             {
-                Id = Guid.Parse("c4bda62e-fc74-4256-a956-4760b3858cbd"),
+                Id = "4882b11520f095be13af10d8",
                 Name = "Семья",
             },
             new Preference()
             {
-                Id = Guid.Parse("76324c47-68d2-472d-abb8-33cfa8cc0c84"),
+                Id = "4882b11520f095be13af10d7",
                 Name = "Дети",
             }
         };
@@ -29,7 +28,7 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Data
         {
             get
             {
-                var customerId = Guid.Parse("a6c8c6b1-4349-45b0-ab31-244740aaf0f0");
+                string customerId = "4882b11520f095be13af10d4";
                 var customers = new List<Customer>()
                 {
                     new Customer()
@@ -38,18 +37,10 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Data
                         Email = "ivan_sergeev@mail.ru",
                         FirstName = "Иван",
                         LastName = "Петров",
-                        Preferences = new List<CustomerPreference>()
+                        Preferences = new List<Preference>()
                         {
-                            new CustomerPreference()
-                            {
-                                CustomerId = customerId,
-                                PreferenceId = Guid.Parse("76324c47-68d2-472d-abb8-33cfa8cc0c84")
-                            },
-                            new CustomerPreference()
-                            {
-                                CustomerId = customerId,
-                                PreferenceId = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c")
-                            }
+                            Preferences[0],
+                            Preferences[1],
                         }
                     }
                 };

@@ -7,7 +7,7 @@ namespace Pcf.GivingToCustomer.WebHost.Models
 {
     public class CustomerResponse
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -27,17 +27,17 @@ namespace Pcf.GivingToCustomer.WebHost.Models
             LastName = customer.LastName;
             Preferences = customer.Preferences.Select(x => new PreferenceResponse()
             {
-                Id = x.PreferenceId,
-                Name = x.Preference.Name
+                Id = x.Id,
+                Name = x.Name
             }).ToList();
             PromoCodes = customer.PromoCodes.Select(x => new PromoCodeShortResponse()
                 {
-                    Id = x.PromoCode.Id,
-                    Code = x.PromoCode.Code,
-                    BeginDate = x.PromoCode.BeginDate.ToString("yyyy-MM-dd"),
-                    EndDate = x.PromoCode.EndDate.ToString("yyyy-MM-dd"),
-                    PartnerId = x.PromoCode.PartnerId,
-                    ServiceInfo = x.PromoCode.ServiceInfo
+                    Id = x.Id,
+                    Code = x.Code,
+                    BeginDate = x.BeginDate.ToString("yyyy-MM-dd"),
+                    EndDate = x.EndDate.ToString("yyyy-MM-dd"),
+                    PartnerId = x.PartnerId,
+                    ServiceInfo = x.ServiceInfo
                 }).ToList();
         }
     }

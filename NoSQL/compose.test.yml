@@ -9,4 +9,4 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: promo
       MONGO_INITDB_ROOT_PASSWORD: factory
-      MONGO_INITDB_DATABASE_NAME: promocode-factory-administration
+      MONGO_INITDB_DATABASE_NAME: promocode-factory-to-customer

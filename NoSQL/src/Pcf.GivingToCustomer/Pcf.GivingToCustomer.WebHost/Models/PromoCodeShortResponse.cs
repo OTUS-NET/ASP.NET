@@ -4,7 +4,7 @@ namespace Pcf.GivingToCustomer.WebHost.Models
 {
     public class PromoCodeShortResponse
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         
         public string Code { get; set; }
 
@@ -14,6 +14,6 @@ namespace Pcf.GivingToCustomer.WebHost.Models
 
         public string EndDate { get; set; }
 
-        public Guid PartnerId { get; set; }
+        public string PartnerId { get; set; }
     }
 }

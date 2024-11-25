@@ -1,41 +1,42 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 using Pcf.GivingToCustomer.Core.Domain;
-using Pcf.GivingToCustomer.DataAccess.Data;
 
-namespace Pcf.GivingToCustomer.DataAccess
+namespace Pcf.GivingToCustomer.DataAccess;
+
+public class DataContext
+    : DbContext
 {
-    public class DataContext
-        : DbContext
+    public DbSet<PromoCode> PromoCodes { get; set; }
+
+    public DbSet<Customer> Customers { get; set; }
+
+    public DbSet<Preference> Preferences { get; set; }
+
+    public DataContext()
     {
-        public DbSet<PromoCode> PromoCodes { get; set; }
 
-        public DbSet<Customer> Customers { get; set; }
-        
-        public DbSet<Preference> Preferences { get; set; }
+    }
 
-        public DataContext()
+    public DataContext(DbContextOptions<DataContext> options)
+        : base(options)
+    {
+
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        //modelBuilder.Entity<CustomerPreference>()
+        //.HasKey(bc => bc.Id);
+        modelBuilder.Entity<Customer>(builder =>
         {
-            
-        }
-        
-        public DataContext(DbContextOptions<DataContext> options)
-            : base(options)
-        {
-
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<CustomerPreference>()
-                .HasKey(bc => new {bc.CustomerId, bc.PreferenceId});
-            modelBuilder.Entity<CustomerPreference>()
-                .HasOne(bc => bc.Customer)
-                .WithMany(b => b.Preferences)
-                .HasForeignKey(bc => bc.CustomerId);  
-            modelBuilder.Entity<CustomerPreference>()
-                .HasOne(bc => bc.Preference)
-                .WithMany()
-                .HasForeignKey(bc => bc.PreferenceId); 
-        }
+            builder.HasMany(b => b.Preferences)
+            .WithOne()
+            .HasForeignKey(c => c.Id);
+            builder.HasMany(b => b.PromoCodes)
+            .WithOne()
+            .HasForeignKey(c => c.Id);
+        });
     }
 }

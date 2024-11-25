@@ -14,9 +14,9 @@
 
     <ItemGroup>
       <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
       <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
     </ItemGroup>

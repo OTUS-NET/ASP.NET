@@ -6,13 +6,13 @@ namespace Pcf.GivingToCustomer.WebHost.Models
     {
         public string ServiceInfo { get; set; }
 
-        public Guid PartnerId { get; set; }
+        public string PartnerId { get; set; }
 
-        public Guid PromoCodeId { get; set; }
+        public string PromoCodeId { get; set; }
         
         public string PromoCode { get; set; }
 
-        public Guid PreferenceId { get; set; }
+        public string PreferenceId { get; set; }
 
         public string BeginDate { get; set; }
 

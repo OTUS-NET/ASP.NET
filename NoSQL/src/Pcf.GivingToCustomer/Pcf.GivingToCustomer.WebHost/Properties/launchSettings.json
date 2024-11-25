@@ -1,13 +1,15 @@
-﻿{
+{
   "profiles": {
     "PromocodeFactory.WebHost": {
       "commandName": "Project",
-      "launchUrl": "swagger/index.html",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:8093",
+      "launchUrl": "swagger/index.html",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__MongoDbSettings__ConnectionString": "mongodb://promo:factory@localhost:27018",
+        "ConnectionStrings__MongoDbSettings__DatabaseName": "promocode-factory-to-customer"
+      },
+      "applicationUrl": "http://localhost:8093"
     }
   }
 }
