@@ -29,14 +29,14 @@ public class DataContext
         base.OnModelCreating(modelBuilder);
         //modelBuilder.Entity<CustomerPreference>()
         //.HasKey(bc => bc.Id);
-        modelBuilder.Entity<Customer>(builder =>
-        {
-            builder.HasMany(b => b.Preferences)
-            .WithOne()
-            .HasForeignKey(c => c.Id);
-            builder.HasMany(b => b.PromoCodes)
-            .WithOne()
-            .HasForeignKey(c => c.Id);
-        });
+        //modelBuilder.Entity<Customer>(builder =>
+        //{
+        //    builder.HasMany(b => b.Preferences)
+        //    .WithOne()
+        //    .HasForeignKey(c => c.Id);
+        //    builder.HasMany(b => b.PromoCodes)
+        //    .WithOne()
+        //    .HasForeignKey(c => c.Id);
+        //});
     }
 }

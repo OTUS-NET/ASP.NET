@@ -70,7 +70,7 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
             //  Получаем клиентов с этим предпочтением:
             var customers = await _customersRepository
                 .GetWhere(d => d.Preferences.Any(x =>
-                    x.Id == preference.Id));
+                    x == preference.Name));
 
             PromoCode promoCode = PromoCodeMapper.MapFromModel(request, preference, customers);
 

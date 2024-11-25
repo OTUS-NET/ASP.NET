@@ -20,6 +20,7 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
     {
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<Preference> _preferenceRepository;
+        private readonly IRepository<PromoCode> _promocodeRepository;
 
         public CustomersController(IRepository<Customer> customerRepository, 
             IRepository<Preference> preferenceRepository)
@@ -57,8 +58,10 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         public async Task<ActionResult<CustomerResponse>> GetCustomerAsync(string id)
         {
             var customer =  await _customerRepository.GetByIdAsync(id);
+            var preferences = await _preferenceRepository.GetRangeByIdsAsync(customer.Preferences?.ToList());
+            var promoCodes = await _promocodeRepository.GetRangeByIdsAsync(customer.PromoCodes?.ToList());
 
-            var response = new CustomerResponse(customer);
+            var response = new CustomerResponse(customer, preferences, promoCodes);
 
             return Ok(response);
         }

@@ -12,7 +12,7 @@ public static class FakeDataFactory
     {
         get
         {
-            var customerId = ObjectId.GenerateNewId(DateTime.Now).ToString();
+            var customerId = ObjectId.GenerateNewId(DateTime.Now+TimeSpan.FromSeconds(1)).ToString();
             var customers = new List<Customer>()
             {
                 new Customer()
@@ -21,10 +21,10 @@ public static class FakeDataFactory
                     Email = "ivan_sergeev@mail.ru",
                     FirstName = "Иван",
                     LastName = "Петров",
-                    Preferences = new List<Preference>()
+                    Preferences = new List<string>()
                     {
-                        Preferences.FirstOrDefault(p => p.Name == "Театр"),
-                        Preferences.FirstOrDefault(p => p.Name == "Дети")
+                       Preferences.FirstOrDefault(p => p.Name == "Театр").Id,
+                       Preferences.FirstOrDefault(p => p.Name == "Дети").Id      
                     }
                 }
             };

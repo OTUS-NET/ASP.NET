@@ -12,8 +12,8 @@ namespace Pcf.GivingToCustomer.Core.Domain
 
         public string Email { get; set; }
 
-        public virtual ICollection<Preference> Preferences { get; set; }
+        public virtual ICollection<string> Preferences { get; set; }
 
-        public virtual ICollection<PromoCode> PromoCodes { get; set; }
+        public virtual ICollection<string> PromoCodes { get; set; }
     }
 }
