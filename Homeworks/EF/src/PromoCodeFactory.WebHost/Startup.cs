@@ -26,6 +26,8 @@ namespace PromoCodeFactory.WebHost
             services.AddScoped(typeof(IRepository<Customer>), (x) =>
                 new InMemoryRepository<Customer>(FakeDataFactory.Customers));
 
+            services.AddDbContext<DatabaseContext>(optionsBuilder => optionsBuilder.UseLazuLoadingProxies().UseSqlLite(connectionString);
+
             services.AddOpenApiDocument(options =>
             {
                 options.Title = "PromoCode Factory API Doc";
