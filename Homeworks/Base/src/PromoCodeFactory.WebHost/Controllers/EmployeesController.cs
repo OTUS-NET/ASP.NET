@@ -31,8 +31,6 @@ namespace PromoCodeFactory.WebHost.Controllers
             _employeeRepository = employeeRepository;
             _roleRepository = roleRepository;
 
-            //
-
         }
 
         /// <summary>
@@ -88,16 +86,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        public async Task<dynamic> DeleteEmployeeAsync(Guid id)
+        public async Task<IActionResult> DeleteEmployeeAsync(Guid id)
         {
             var result = await _employeeRepository.DeleteByIdAsync(id, HttpContext.RequestAborted);
 
-            var status = new Dictionary<string, bool>()
-            {
-                {"Status", result}
-            };
-
-            return status;
+            return Ok(result);
 
         }
 
@@ -106,7 +99,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<List<EmployeeShortResponse>> CreateEmployeeAsync([FromBody] EmployeeCreateDto employeeData)
+        public async Task<List<EmployeeShortResponse>> CreateEmployeeAsync(EmployeeCreateDto employeeData)
         {
 
             return await CreateEmplAsync(employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);

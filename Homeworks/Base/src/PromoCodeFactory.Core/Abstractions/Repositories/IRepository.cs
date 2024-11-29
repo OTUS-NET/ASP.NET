@@ -12,12 +12,12 @@ namespace PromoCodeFactory.Core.Abstractions.Repositories
     {
         Task<IEnumerable<T>> GetAllAsync();
 
-        Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
         Task<bool> DeleteByIdAsync(Guid id, CancellationToken cancellationToken);
 
         Task<IEnumerable<T>> CreateAsync(IEnumerable<T> empl, CancellationToken cancellationToken);
 
-        Task<T> ReplaceAsync(IEnumerable<T> empl, Guid id, CancellationToken cancellationToken);
+        Task<T?> ReplaceAsync(IEnumerable<T> empl, Guid id, CancellationToken cancellationToken);
     }
 }

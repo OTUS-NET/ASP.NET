@@ -20,17 +20,17 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public Task<IEnumerable<T>> GetAllAsync()
         {
-            return Task.FromResult(Data.Where(x => x.IsDeleted == false));
+            return Task.FromResult(Data.Where(x => !x.IsDeleted));
         }
 
-        public Task<T> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+        public Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return Task.FromResult(Data.FirstOrDefault(x => (x.Id == id) && (x.IsDeleted == false)));
+            return Task.FromResult(Data.Find(x => x.Id == id && !x.IsDeleted));
         }
 
         public Task<bool> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var empl = Data.FirstOrDefault(x => (x.Id == id) && (x.IsDeleted == false));
+             var empl = Data.Find(x => x.Id == id && !x.IsDeleted);
 
             if (empl != null)
             {
@@ -47,10 +47,10 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
              Data.AddRange(empl.ToList());
                 
-            return Task.FromResult(Data.Where(x => x.IsDeleted == false));
+            return Task.FromResult(Data.Where(x => !x.IsDeleted));
         }
 
-        public Task<T> ReplaceAsync(IEnumerable<T> empl, Guid id, CancellationToken cancellationToken)
+        public Task<T?> ReplaceAsync(IEnumerable<T> empl, Guid id, CancellationToken cancellationToken)
         {
    
             if (empl != null)
@@ -60,7 +60,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
                     Data[index] = empl.FirstOrDefault();
             }
 
-            return Task.FromResult(Data.FirstOrDefault(x => (x.Id == id) && (x.IsDeleted == false)));
+            return Task.FromResult(Data.Find(x => x.Id == id && !x.IsDeleted));
         }
 
 
