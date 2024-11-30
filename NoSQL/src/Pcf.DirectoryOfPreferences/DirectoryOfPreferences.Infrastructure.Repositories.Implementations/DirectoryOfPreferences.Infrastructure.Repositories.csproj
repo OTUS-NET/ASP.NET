@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DirectoryOfPreferences.Domain.Abstractions\DirectoryOfPreferences.Domain.Abstractions.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Domain.Entity\DirectoryOfPreferences.Domain.Entity.csproj" />
+    <ProjectReference Include="..\DirectoryOfPreferences.Infrastructure.EntityFramework\DirectoryOfPreferences.Infrastructure.EntityFramework.csproj" />
+  </ItemGroup>
+
+</Project>

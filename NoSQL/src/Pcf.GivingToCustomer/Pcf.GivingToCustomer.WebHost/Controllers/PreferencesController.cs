@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
+using Pcf.GivingToCustomer.WebHost.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
-using Pcf.GivingToCustomer.Core.Domain;
-using Pcf.GivingToCustomer.WebHost.Models;
 
 namespace Pcf.GivingToCustomer.WebHost.Controllers
 {
@@ -14,15 +12,9 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PreferencesController
+    public class PreferencesController(IPreferenceGateway preferenceGateway)
         : ControllerBase
-    {
-        private readonly IRepository<Preference> _preferencesRepository;
-
-        public PreferencesController(IRepository<Preference> preferencesRepository)
-        {
-            _preferencesRepository = preferencesRepository;
-        }
+    {      
         
         /// <summary>
         /// Получить список предпочтений
@@ -31,7 +23,7 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         [HttpGet]
         public async Task<ActionResult<List<PreferenceResponse>>> GetPreferencesAsync()
         {
-            var preferences = await _preferencesRepository.GetAllAsync();
+            var preferences = await preferenceGateway.GetPreferences();
 
             var response = preferences.Select(x => new PreferenceResponse()
             {

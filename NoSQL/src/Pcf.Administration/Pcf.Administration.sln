@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.Administration.WebHost", "Pcf.Administration.WebHost\Pcf.Administration.WebHost.csproj", "{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.Administration.DataAccess", "Pcf.Administration.DataAccess\Pcf.Administration.DataAccess.csproj", "{D7E675A3-9872-47D6-B906-797B7B866534}"
@@ -24,5 +27,8 @@ Global
 		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65FEF446-C247-4EA6-B83B-A38E6B062878}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

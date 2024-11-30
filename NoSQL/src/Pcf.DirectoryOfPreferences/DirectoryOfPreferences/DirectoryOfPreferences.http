@@ -1,0 +1,6 @@
+@DirectoryOfPreferences_HostAddress = http://localhost:5068
+
+GET {{DirectoryOfPreferences_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
