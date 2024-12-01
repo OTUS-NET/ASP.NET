@@ -57,7 +57,9 @@ namespace PromoCodeFactory.DataAccess.Repositories
             {
                 int index = Data.FindIndex(x => x.Id == id);
                 if (index == -1)
+                {
                     Data[index] = empl.FirstOrDefault();
+                }
             }
 
             return Task.FromResult(Data.Find(x => x.Id == id && !x.IsDeleted));

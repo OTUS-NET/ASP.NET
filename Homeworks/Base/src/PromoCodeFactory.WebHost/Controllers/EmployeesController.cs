@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Utils;
 
 
 
@@ -25,11 +23,13 @@ namespace PromoCodeFactory.WebHost.Controllers
     {
         private readonly IRepository<Employee> _employeeRepository;
         private readonly IRepository<Role> _roleRepository;
+        private readonly IUtil _util;
 
-        public EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository)
+        public EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository, IUtil util)
         {
             _employeeRepository = employeeRepository;
             _roleRepository = roleRepository;
+            _util = util; 
 
         }
 
@@ -65,21 +65,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (employee == null)
                 return NotFound();
 
-            var employeeModel = new EmployeeResponse()
-            {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description,
-                    Id = x.Id
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
-
-            return employeeModel;
+            return _util.MapEmployeeToEmployeeResponse(employee);
         }
         /// <summary>
         /// Удалить сотрудника по Id
@@ -101,8 +87,8 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpPost]
         public async Task<List<EmployeeShortResponse>> CreateEmployeeAsync(EmployeeCreateDto employeeData)
         {
-
-            return await CreateEmplAsync(employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
+            //return await CreateEmplAsync(employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
+            return await _util.CreateEmplAsync(employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
 
         }
 
@@ -114,91 +100,14 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpPut("{id:guid}")] 
         public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(Guid id, [FromBody] EmployeeCreateDto employeeData)
         {
-           return await UpdateEmplAsync(id, employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
-        }
+            var result = await _util.UpdateEmplAsync(id, employeeData, _roleRepository, _employeeRepository, HttpContext.RequestAborted);
 
-        private async Task<ActionResult<EmployeeResponse>> UpdateEmplAsync(Guid id, EmployeeCreateDto employeeData, IRepository<Role> roleRepository, IRepository<Employee> employeeRepository, CancellationToken cancellationToken = default)
-        {
-            var employee = await employeeRepository.GetByIdAsync(id, cancellationToken);
-
-            if (employee == null)
+            if (result == null)
                 return NotFound();
             else
-            {
-
-                var role = await roleRepository.GetByIdAsync(employeeData.RoleId, cancellationToken);
-
-                if (role == null)
-                    return NotFound();
-                else
-                {
-
-                    employee.FirstName = employeeData.FirstName;
-                    employee.LastName = employeeData.LastName;
-                    employee.Email = employeeData.Email;
-                    employee.Roles = new List<Role>()
-                       {role};
-
-                    var newEmployee = await _employeeRepository.ReplaceAsync(new List<Employee>() { employee }, employee.Id, cancellationToken);
-
-                    if (newEmployee != null)
-                    {
-                        var employeeModel = new EmployeeResponse()
-                        {
-                            Id = newEmployee.Id,
-                            Email = newEmployee.Email,
-                            Roles = newEmployee.Roles.Select(x => new RoleItemResponse()
-                            {
-                                Name = x.Name,
-                                Description = x.Description,
-                                Id = x.Id
-                            }).ToList(),
-                            FullName = newEmployee.FullName,
-                            AppliedPromocodesCount = newEmployee.AppliedPromocodesCount
-                        };
-
-                        return employeeModel;
-                    }
-                    else
-                        return NotFound();
-
-                }
-            }
+                return result;
         }
 
-        private async Task<List<EmployeeShortResponse>> CreateEmplAsync(EmployeeCreateDto employeeData, IRepository<Role> roleRepository, IRepository<Employee> employeeRepository, CancellationToken cancellationToken = default)
-        {
-            var role = await roleRepository.GetByIdAsync(employeeData.RoleId, cancellationToken);
-
-            var empl = new Employee()
-            {
-                Id = Guid.NewGuid(),
-                Email = employeeData.Email,
-                FirstName = employeeData.FirstName,
-                LastName = employeeData.LastName,
-                Roles = new List<Role>()
-                       {
-                        role
-                        },
-                AppliedPromocodesCount = 0
-            };
-
-
-            var emplList = new List<Employee>() { empl };
-            var employees = await employeeRepository.CreateAsync(emplList, cancellationToken);
-
-
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
-
-            return employeesModelList;
-
-        }
 
 
     }
