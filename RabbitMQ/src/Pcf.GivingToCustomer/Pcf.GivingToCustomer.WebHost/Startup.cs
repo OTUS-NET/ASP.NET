@@ -12,6 +12,9 @@ using Pcf.GivingToCustomer.DataAccess.Data;
 using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Integration;
+using MassTransit;
+using Pcf.GivingToCustomer.WebHost.Consumers;
+using Pcf.GivingToCustomer.WebHost.Settings;
 
 namespace Pcf.GivingToCustomer.WebHost
 {
@@ -47,6 +50,25 @@ namespace Pcf.GivingToCustomer.WebHost
             {
                 options.Title = "PromoCode Factory Giving To Customer API Doc";
                 options.Version = "1.0";
+            });
+
+            //MassTransit
+            services.AddMassTransit(configurator =>
+            {
+                configurator.SetKebabCaseEndpointNameFormatter();
+                configurator.AddConsumer<PromoCodeGivingToCustomerConsumer>();
+                configurator.UsingRabbitMq((context, configurator) =>
+                {
+                    var rmqSettings = Configuration.Get<ApplicationSettings>()!.RmqSettings;
+                    configurator.Host(rmqSettings.Host,
+                                rmqSettings.VHost,
+                                h =>
+                                {
+                                    h.Username(rmqSettings.Login);
+                                    h.Password(rmqSettings.Password);
+                                });
+                    configurator.ConfigureEndpoints(context);
+                });
             });
         }
 

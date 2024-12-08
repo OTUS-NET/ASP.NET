@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.WebHost", "Pcf.ReceivingFromPartner.WebHost\Pcf.ReceivingFromPartner.WebHost.csproj", "{C086AC72-ADC7-432C-99D8-A8D60A0B44CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.DataAccess", "Pcf.ReceivingFromPartner.DataAccess\Pcf.ReceivingFromPartner.DataAccess.csproj", "{D7E675A3-9872-47D6-B906-797B7B866534}"
@@ -9,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.UnitTests", "Pcf.ReceivingFromPartner.UnitTests\Pcf.ReceivingFromPartner.UnitTests.csproj", "{28FDE1D4-2524-4494-9791-A903FD1B90D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.Integration", "Pcf.ReceivingFromPartner.Integration\Pcf.ReceivingFromPartner.Integration.csproj", "{444DC130-7BC4-40C4-9579-4F55DE29CCE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.Message", "Pcf.ReceivingFromPartner.Message\Pcf.ReceivingFromPartner.Message.csproj", "{F72A5C4E-693C-4D22-B1FA-4ECC9EFCDF45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +41,12 @@ Global
 		{444DC130-7BC4-40C4-9579-4F55DE29CCE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{444DC130-7BC4-40C4-9579-4F55DE29CCE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{444DC130-7BC4-40C4-9579-4F55DE29CCE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F72A5C4E-693C-4D22-B1FA-4ECC9EFCDF45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F72A5C4E-693C-4D22-B1FA-4ECC9EFCDF45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F72A5C4E-693C-4D22-B1FA-4ECC9EFCDF45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F72A5C4E-693C-4D22-B1FA-4ECC9EFCDF45}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

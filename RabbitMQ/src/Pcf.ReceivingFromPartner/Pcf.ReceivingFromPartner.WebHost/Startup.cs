@@ -12,6 +12,8 @@ using Pcf.ReceivingFromPartner.DataAccess;
 using Pcf.ReceivingFromPartner.DataAccess.Repositories;
 using Pcf.ReceivingFromPartner.DataAccess.Data;
 using Pcf.ReceivingFromPartner.Integration;
+using MassTransit;
+using Pcf.ReceivingFromPartner.WebHost.Settings;
 
 namespace Pcf.ReceivingFromPartner.WebHost
 {
@@ -58,6 +60,24 @@ namespace Pcf.ReceivingFromPartner.WebHost
             {
                 options.Title = "PromoCode Factory Receiving From Partner API Doc";
                 options.Version = "1.0";
+            });
+
+
+            services.AddMassTransit(configurator =>            
+            {
+                configurator.SetKebabCaseEndpointNameFormatter();
+                configurator.UsingRabbitMq((context, cfg) =>
+                {
+                    var rmqSettings = Configuration.Get<ApplicationSettings>()!.RmqSettings;
+                    cfg.Host(rmqSettings.Host,
+                                rmqSettings.VHost,
+                                h =>
+                                {
+                                    h.Username(rmqSettings.Login);
+                                    h.Password(rmqSettings.Password);
+                                });
+                    cfg.ConfigureEndpoints(context);
+                });
             });
         }
 
