@@ -10,6 +10,11 @@ using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using System;
+using MassTransit;
+using Pcf.Administration.WebHost.Settings;
+using Pcf.Administration.WebHost.Consumers;
+using MassTransit.RabbitMqTransport;
+using static MassTransit.Logging.DiagnosticHeaders.Messaging;
 
 namespace Pcf.Administration.WebHost
 {
@@ -44,6 +49,26 @@ namespace Pcf.Administration.WebHost
             {
                 options.Title = "PromoCode Factory Administration API Doc";
                 options.Version = "1.0";
+            });
+
+
+            //MassTransit
+            services.AddMassTransit(configurator =>
+            {
+                configurator.SetKebabCaseEndpointNameFormatter();
+                configurator.AddConsumer<PromoCodeAdministrationEventConsumer>();
+                configurator.UsingRabbitMq((context, configurator) =>
+                {
+                    var rmqSettings = Configuration.Get<ApplicationSettings>()!.RmqSettings;
+                    configurator.Host(rmqSettings.Host,
+                                rmqSettings.VHost,
+                                h =>
+                                {
+                                    h.Username(rmqSettings.Login);
+                                    h.Password(rmqSettings.Password);
+                                });
+                    configurator.ConfigureEndpoints(context);
+                });
             });
         }
 

@@ -14,11 +14,20 @@
 
     <ItemGroup>
       <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
+      <PackageReference Include="MassTransit" Version="8.3.3" />
+      <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
       <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Pcf.ReceivingFromPartner.Message">
+        <HintPath>..\..\Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.Message\bin\Debug\net8.0\Pcf.ReceivingFromPartner.Message.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
