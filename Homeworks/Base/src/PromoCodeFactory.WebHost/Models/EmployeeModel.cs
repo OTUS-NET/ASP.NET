@@ -8,15 +8,15 @@ namespace PromoCodeFactory.WebHost.Models
     {
         public Guid? Id { get; set; }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public required string FirstName { get; set; }
+        public required string LastName { get; set; }
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public string Email { get; set; }
+        public required string Email { get; set; }
 
-        public List<RoleModel> Roles { get; set; }
+        public required List<RoleModel> Roles { get; set; }
 
-        public int AppliedPromocodesCount { get; set; }
+        public required int AppliedPromocodesCount { get; set; }
     }
 }

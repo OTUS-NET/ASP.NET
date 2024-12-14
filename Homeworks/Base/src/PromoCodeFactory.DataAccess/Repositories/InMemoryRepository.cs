@@ -8,14 +8,14 @@ namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T>: IRepository<T> where T: BaseEntity
     {
-        protected IEnumerable<T> Data { get; set; }
+        protected IList<T> Data { get; set; }
 
-        public InMemoryRepository(IEnumerable<T> data)
+        public InMemoryRepository(IList<T> data)
         {
             Data = data;
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public Task<IList<T>> GetAllAsync()
         {
             return Task.FromResult(Data);
         }
@@ -23,7 +23,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
         public Task<T> AddAsync(T entity)
         {
             entity.Id = Guid.NewGuid();
-            Data=Data.Append(entity);
+            Data.Add(entity);
             return Task.FromResult(entity);
         }
 
@@ -36,15 +36,15 @@ namespace PromoCodeFactory.DataAccess.Repositories
         {
             var existed = Data.FirstOrDefault(x => x.Id == entity.Id);
             if (existed == null) return Task.FromResult(existed);
-            Data = Data.Where(i => i.Id != entity.Id).AsEnumerable();
-            Data= Data.Append(entity);
+            Data.Remove(existed);
+            Data.Add(entity);
             return Task.FromResult(entity);
         }
 
         public Task<T> DeleteAsync(Guid id)
         {
             var existed = Data.FirstOrDefault(x => x.Id == id);
-            Data = Data.Where(i => i.Id != id).AsEnumerable();
+            if (existed!=null) Data.Remove(existed);
             return Task.FromResult(existed);
         }
 

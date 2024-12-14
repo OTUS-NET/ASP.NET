@@ -7,6 +7,7 @@ using PromoCodeFactory.WebHost.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PromoCodeFactory.WebHost.Controllers
@@ -29,9 +30,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Получить данные всех сотрудников
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync(CancellationToken cancellationToken)
         {
             var employees = await _employeeRepository.GetAllAsync();
 
@@ -43,20 +45,15 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Добавить сотрудника
         /// </summary>
-        /// <param name="employee"></param>
+        /// <param name="emp"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<EmployeeResponse>> AddEmployeeAsync(EmployeeModel emp)
+        public async Task<ActionResult<EmployeeResponse>> AddEmployeeAsync(EmployeeModel emp, CancellationToken cancellationToken)
         {
             var roles = (await _rolesRepository.GetAllAsync()).ToDictionary(r=>r.Name, r=>r.Id);
 
             var employee = emp.Adapt<Employee>();
-            foreach (var role in employee.Roles)
-            {
-                role.Id = roles.GetValueOrDefault(role.Name);
-            }
-
-            //TODO: Validate all roles correct
             var newEmployee = await _employeeRepository.AddAsync(employee);
 
             if (newEmployee == null)
@@ -70,9 +67,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Получить данные сотрудника
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             var employee = await _employeeRepository.GetAsync(id);
 
@@ -87,22 +86,17 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Обновить данные сотрудника
         /// </summary>
-        /// <param name="employee"></param>
+        /// <param name="emp"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(EmployeeModel emp)
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeAsync(EmployeeModel emp, CancellationToken cancellationToken)
         {
 
             if ((emp.Id == null) || (emp.Id == Guid.Empty))
                 return NotFound();
 
-            var roles = (await _rolesRepository.GetAllAsync()).ToDictionary(r => r.Name, r => r.Id);
-
             var employee = emp.Adapt<Employee>();
-            foreach (var role in employee.Roles)
-            {
-                role.Id = roles.GetValueOrDefault(role.Name);
-            }
 
             var updatedEmployee = await _employeeRepository.UpdateAsync(employee);
 
@@ -119,9 +113,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <param name="patch"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPatch]
-        public async Task<ActionResult<EmployeeResponse>> PatchEmployeeAsync(Guid id, JsonPatchDocument<Employee> patch)
+        public async Task<ActionResult<EmployeeResponse>> PatchEmployeeAsync(Guid id, JsonPatchDocument<Employee> patch, CancellationToken cancellationToken)
         {
             var employee = await _employeeRepository.GetAsync(id);
 
@@ -140,9 +135,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Удалить сотрудника
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult> DeleteEmployeeByIdAsync(Guid id)
+        public async Task<ActionResult> DeleteEmployeeByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             var employee = await _employeeRepository.DeleteAsync(id);
 
