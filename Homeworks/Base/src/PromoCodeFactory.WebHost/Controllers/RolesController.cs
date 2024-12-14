@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
@@ -25,16 +26,16 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Получить все доступные роли сотрудников
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<RoleItemResponse>> GetRolesAsync()
+        public async Task<List<RoleItemResponse>> GetRolesAsync(CancellationToken cancellationToken)
         {
             var roles = await _rolesRepository.GetAllAsync();
 
             var rolesModelList = roles.Select(x =>
                 new RoleItemResponse()
                 {
-                    Id = x.Id,
                     Name = x.Name,
                     Description = x.Description
                 }).ToList();
