@@ -1,4 +1,4 @@
-namespace PromoCodeFactory.Contracts.Customers;
+namespace PromoCodeFactory.Contracts.Preferences;
 
 public record PreferenceResponseDto
 {

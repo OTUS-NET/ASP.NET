@@ -5,18 +5,16 @@ using PromoCodeFactory.DataAccess;
 
 namespace PromoCodeFactory.Commands.Queries.Employees;
 
-public class GetAllEmployeesQuery : IRequest<List<EmployeeShortResponse>>
-{
-}
+public class GetAllEmployeesQuery : IRequest<List<EmployeeShortResponse>>;
 
 public class GetAllEmployeeQueryHandler(PromoCodesDbContext dbContext)
     : IRequestHandler<GetAllEmployeesQuery, List<EmployeeShortResponse>>
 {
     private readonly PromoCodesDbContext _dbContext = dbContext;
 
-    public async Task<List<EmployeeShortResponse>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
+    public Task<List<EmployeeShortResponse>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
     {
-        var employees = await _dbContext.Employees
+        return _dbContext.Employees
             .AsNoTracking()
             .Select(x => new EmployeeShortResponse
             {
@@ -25,7 +23,5 @@ public class GetAllEmployeeQueryHandler(PromoCodesDbContext dbContext)
                 FullName = x.FullName,
             })
             .ToListAsync(cancellationToken);
-
-        return employees;
     }
 }
