@@ -16,12 +16,10 @@ public static class BaseEntityConfigurationExtensions
             .HasColumnName("created_at")
             .HasConversion<DateTime>()
             .IsRequired()
-            .HasDefaultValue(DateTime.UtcNow);
-        
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         builder.Property(x => x.UpdatedAtUtc)
             .HasColumnName("updated_at")
-            .HasConversion<DateTime>()
-            .IsRequired()
-            .HasDefaultValue(DateTime.UtcNow);
+            .HasConversion<DateTime>();
     }
 }

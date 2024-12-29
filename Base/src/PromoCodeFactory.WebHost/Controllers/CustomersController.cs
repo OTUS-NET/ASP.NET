@@ -73,4 +73,16 @@ public class CustomersController(IMediator mediator) : ControllerBase
             Id = id,
         });
     }
+
+    /// <summary>
+    /// Добавить предпочтение
+    /// </summary>
+    [HttpPost("preferences")]
+    public Task AddPreference([FromBody] CustomerPreferenceDto data)
+    {
+        return _mediator.Send(new AddCustomerPreferenceCommand
+        {
+            Data = data,
+        });
+    }
 }

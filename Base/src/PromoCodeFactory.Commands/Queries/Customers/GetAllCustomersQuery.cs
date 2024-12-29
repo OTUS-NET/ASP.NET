@@ -20,7 +20,8 @@ public class GetAllCustomersQueryHandler(PromoCodesDbContext dbContext)
         var customers = await _dbContext.Customers
             .AsNoTracking()
             .Include(x => x.CustomerPreferences)
-            .ToListAsync(cancellationToken: cancellationToken);
+            .ThenInclude(x => x.Preference)
+            .ToListAsync(cancellationToken);
 
         return customers.Select(x => x.MapToCustomerResponseDto());
     }

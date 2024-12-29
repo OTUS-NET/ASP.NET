@@ -1,4 +1,5 @@
 using PromoCodeFactory.Contracts.Customers;
+using PromoCodeFactory.Contracts.Preferences;
 using PromoCodeFactory.Core.PromoCodeManagement;
 
 namespace PromoCodeFactory.Common.Extensions;

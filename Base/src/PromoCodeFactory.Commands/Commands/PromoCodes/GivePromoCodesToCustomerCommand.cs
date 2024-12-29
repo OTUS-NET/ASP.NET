@@ -25,6 +25,11 @@ public class GivePromoCodesToCustomerCommandHandler(PromoCodesDbContext dbContex
             throw new ArgumentException("Preference not found");
         }
 
+        var partnerManager = await _dbContext.Employees
+                                 .Include(x => x.Role)
+                                 .FirstOrDefaultAsync(x => x.Role.Name == request.Data.PartnerName, cancellationToken)
+                             ?? throw new ArgumentException("Partner manager not found");
+
         var eligibleCustomers = await _dbContext.Customers
             .Include(c => c.CustomerPreferences)
             .Where(c => c.CustomerPreferences.Any(cp => cp.PreferenceId == request.Data.PreferenceId))
@@ -43,9 +48,10 @@ public class GivePromoCodesToCustomerCommandHandler(PromoCodesDbContext dbContex
                      ServiceInfo = request.Data.ServiceInfo,
                      BeginDate = request.Data.BeginDate,
                      EndDate = request.Data.EndDate,
-                     PartnerName = request.Data.PartnerName,
+                     PartnerName = partnerManager.FullName,
                      PreferenceId = request.Data.PreferenceId,
-                     CustomerId = customer.Id
+                     CustomerId = customer.Id,
+                     PartnerManagerId = partnerManager.Id,
                  }))
         {
             _dbContext.PromoCodes.Add(promoCode);
