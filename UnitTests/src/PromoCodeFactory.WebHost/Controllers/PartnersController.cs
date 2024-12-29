@@ -55,13 +55,16 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             var partner = await _partnersRepository.GetByIdAsync(id);
 
-            if (partner == null)
-                return NotFound();
+            if (partner is null)
+                return NotFound("Partner not found");
             
             var limit = partner.PartnerLimits
                 .FirstOrDefault(x => x.Id == limitId);
+            
+            if (limit is null)
+                return NotFound("Limit not found");
 
-            var response = new PartnerPromoCodeLimitResponse()
+            var response = new PartnerPromoCodeLimitResponse
             {
                 Id = limit.Id,
                 PartnerId = limit.PartnerId,
