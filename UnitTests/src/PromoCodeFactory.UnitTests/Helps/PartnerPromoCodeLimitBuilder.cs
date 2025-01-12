@@ -18,8 +18,10 @@ namespace PromoCodeFactory.UnitTests.Helps
             currentDate.AddDays(new Random().Next(100));
             var result = new SetPartnerPromoCodeLimitRequest()
             {
+
                 EndDate = currentDate,
                 Limit = new Random().Next(100)
+
             };
             return result;
         }
