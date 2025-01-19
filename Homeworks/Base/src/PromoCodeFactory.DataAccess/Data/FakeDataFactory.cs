@@ -7,48 +7,62 @@ namespace PromoCodeFactory.DataAccess.Data
 {
     public static class FakeDataFactory
     {
-        public static IList<Employee> Employees => new List<Employee>()
+        public static IDictionary<Guid, Employee> Employees => new Dictionary<Guid, Employee>()
         {
-            new Employee()
             {
-                Id = Guid.Parse("451533d5-d8d5-4a11-9c7b-eb9f14e1a32f"),
-                Email = "owner@somemail.ru",
-                FirstName = "Иван",
-                LastName = "Сергеев",
-                Roles = new List<Role>()
+                Guid.Parse("451533d5-d8d5-4a11-9c7b-eb9f14e1a32f"),
+                new Employee()
                 {
-                    Roles.FirstOrDefault(x => x.Name == "Admin")  
-                },
-                AppliedPromocodesCount = 5
+                    Id = Guid.Parse("451533d5-d8d5-4a11-9c7b-eb9f14e1a32f"),
+                    Email = "owner@somemail.ru",
+                    FirstName = "Иван",
+                    LastName = "Сергеев",
+                    Roles = new List<Guid>()
+                    {
+                        Roles.Values.FirstOrDefault(x => x.Name == "Admin").Id
+                    },
+                    AppliedPromocodesCount = 5
+                }
             },
-            new Employee()
             {
-                Id = Guid.Parse("f766e2bf-340a-46ea-bff3-f1700b435895"),
-                Email = "andreev@somemail.ru",
-                FirstName = "Петр",
-                LastName = "Андреев",
-                Roles = new List<Role>()
+                Guid.Parse("f766e2bf-340a-46ea-bff3-f1700b435895"),
+                new Employee()
                 {
-                    Roles.FirstOrDefault(x => x.Name == "PartnerManager")  
-                },
-                AppliedPromocodesCount = 10
-            },
+                    Id = Guid.Parse("f766e2bf-340a-46ea-bff3-f1700b435895"),
+                    Email = "andreev@somemail.ru",
+                    FirstName = "Петр",
+                    LastName = "Андреев",
+                    Roles = new List<Guid>()
+                    {
+                        Roles.Values.FirstOrDefault(x => x.Name == "PartnerManager").Id
+                    },
+                    AppliedPromocodesCount = 10
+                }
+            }
+            
         };
 
-        public static IList<Role> Roles => new List<Role>()
+        public static IDictionary<Guid, Role> Roles => new Dictionary<Guid, Role>()
         {
-            new Role()
             {
-                Id = Guid.Parse("53729686-a368-4eeb-8bfa-cc69b6050d02"),
-                Name = "Admin",
-                Description = "Администратор",
+                Guid.Parse("53729686-a368-4eeb-8bfa-cc69b6050d02"),
+                new Role()
+                {
+                    Id = Guid.Parse("53729686-a368-4eeb-8bfa-cc69b6050d02"),
+                    Name = "Admin",
+                    Description = "Администратор",
+                }   
             },
-            new Role()
             {
-                Id = Guid.Parse("b0ae7aac-5493-45cd-ad16-87426a5e7665"),
-                Name = "PartnerManager",
-                Description = "Партнерский менеджер"
+                Guid.Parse("b0ae7aac-5493-45cd-ad16-87426a5e7665"),
+                new Role()
+                {
+                    Id = Guid.Parse("b0ae7aac-5493-45cd-ad16-87426a5e7665"),
+                    Name = "PartnerManager",
+                    Description = "Партнерский менеджер"
+                }
             }
+            
         };
     }
 }

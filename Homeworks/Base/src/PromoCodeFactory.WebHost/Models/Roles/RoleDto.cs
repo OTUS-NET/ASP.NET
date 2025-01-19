@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace PromoCodeFactory.WebHost.Models
+namespace PromoCodeFactory.WebHost.Models.Roles
 {
-    public class RoleItemResponse
+    public class RoleDto
     {
         public Guid Id { get; set; }
 
