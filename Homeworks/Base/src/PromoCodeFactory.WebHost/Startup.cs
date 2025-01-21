@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PromoCodeFactory.Core.Abstractions.Entities;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Helpers;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
 
@@ -14,10 +16,18 @@ namespace PromoCodeFactory.WebHost
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(typeof(IRepository<Employee>), (x) => 
-                new InMemoryRepository<Employee>(FakeDataFactory.Employees));
-            services.AddSingleton(typeof(IRepository<Role>), (x) => 
-                new InMemoryRepository<Role>(FakeDataFactory.Roles));
+
+            services.AddSingleton<IEntityHepler<Employee>, EmployeeHepler>();
+
+            services.AddSingleton(
+                typeof(IRepository<Employee>), 
+                (x) => new InMemoryRepository<Employee>(
+                    FakeDataFactory.Employees, 
+                    x.GetRequiredService<IEntityHepler<Employee>>()));
+
+            services.AddSingleton(
+                typeof(IRepository<Role>), 
+                (x) => new InMemoryRepository<Role>(FakeDataFactory.Roles));
 
             services.AddOpenApiDocument(options =>
             {
