@@ -229,7 +229,7 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             if (!await _employeeRepository.DeleteAsync(id))
             {
-                return Problem("An error occurred while creating the employee.");
+                return Problem("Возникла ошибка при удалении сотрудника");
             }
 
             return Ok();
