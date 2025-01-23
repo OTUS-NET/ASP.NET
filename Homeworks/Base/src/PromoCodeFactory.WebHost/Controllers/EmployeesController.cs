@@ -37,14 +37,13 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet]
         public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
         {
-            var employees = await _employeeRepository.GetAllAsync();
-
-            var employeesModelList = 
-                employees
+            var entities = await _employeeRepository.GetAllAsync();
+            var response = 
+                entities
                 .Select(x => x.ToShortResponse())
                 .ToList();
 
-            return employeesModelList;
+            return response;
         }
 
         /// <summary>
@@ -59,14 +58,14 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             try
             {
-                var employee = await _employeeRepository.GetByIdAsync(id);
-                if (employee == default)
+                var entity = await _employeeRepository.GetByIdAsync(id);
+                if (entity == default)
                 {
                     return NotFound();
                 }
 
-                var entity = employee.ToResponse();
-                return Ok(entity);
+                var response = entity.ToResponse();
+                return Ok(response);
             }
             catch
             {
@@ -82,7 +81,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateEmployeeIdAsync(CreateEmployeeRequest item)
+        public async Task<IActionResult> CreateEmployeeIdAsync(CreateEmployeeRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -91,20 +90,16 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             try
             {
-                var roles = GetRoles(item.RoleIds);
-
-                var employee = item.ToEntity(roles);
-
-                var entity = await _employeeRepository.CreateAsync(employee);
-
-                if (entity == null)
+                var roles = GetRoles(request.RoleIds);
+                var entity = request.ToEntity(roles);
+                var created = await _employeeRepository.CreateAsync(entity);
+                if (created == null)
                 {
                     return Problem("Возникла ошибка при добавлении сотрудника.");
                 }
 
-                var employeeModel = entity.ToResponse();
-
-                return Created(nameof(GetEmployeeByIdAsync), employeeModel);
+                var response = created.ToResponse();
+                return Created(nameof(GetEmployeeByIdAsync), response);
             }
             catch (Exception ex)
             {
@@ -121,7 +116,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Edit(EditEmployeeRequest item)
+        public async Task<IActionResult> Edit(EditEmployeeRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -130,18 +125,15 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             try
             {
-                if (await _employeeRepository.GetByIdAsync(item.Id) == default)
+                if (await _employeeRepository.GetByIdAsync(request.Id) == default)
                 {
                     return NotFound();
                 }
 
-                var roles = GetRoles(item.RoleIds);
-
-                var employee = item.ToEntity(roles);
-
-                var entity = await _employeeRepository.UpdateAsync(employee);
-                
-                if (entity == null)
+                var roles = GetRoles(request.RoleIds);
+                var entity = request.ToEntity(roles);
+                var updated = await _employeeRepository.UpdateAsync(entity);
+                if (updated == null)
                 {
                     return Problem("Возникла ошибка при изменении данных сотрудника.");
                 }
@@ -164,8 +156,8 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteEmployeeAsync(Guid id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-            if (employee == default)
+            var entity = await _employeeRepository.GetByIdAsync(id);
+            if (entity == default)
             {
                 return NotFound();
             }
