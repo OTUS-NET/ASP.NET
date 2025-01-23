@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Extensions;
 using PromoCodeFactory.WebHost.Models;
 using System;
 using System.Collections.Generic;
@@ -38,13 +39,10 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             var employees = await _employeeRepository.GetAllAsync();
 
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
+            var employeesModelList = 
+                employees
+                .Select(x => x.ToShortResponse())
+                .ToList();
 
             return employeesModelList;
         }
@@ -62,24 +60,13 @@ namespace PromoCodeFactory.WebHost.Controllers
             try
             {
                 var employee = await _employeeRepository.GetByIdAsync(id);
-                if (employee == null)
-                    return NotFound();
-
-                var employeeModel = new EmployeeResponse()
+                if (employee == default)
                 {
-                    Id = employee.Id,
-                    Email = employee.Email,
-                    Roles = employee.Roles.Select(x => new RoleItemResponse()
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Description = x.Description
-                    }).ToList(),
-                    FullName = employee.FullName,
-                    AppliedPromocodesCount = employee.AppliedPromocodesCount
-                };
+                    return NotFound();
+                }
 
-                return Ok(employeeModel);
+                var entity = employee.ToResponse();
+                return Ok(entity);
             }
             catch
             {
@@ -104,42 +91,22 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             try
             {
-                var roles = 
-                    _roleRepository
-                    .GetAllAsync()?.Result?
-                    .Where(x => item.RoleIds.Contains(x.Id))
-                    .Select(x => new Role()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList();
+                var roles = GetRoles(item.RoleIds);
 
-                var employee = new Employee()
-                {
-                    FirstName = item.Firstname,
-                    LastName = item.Lastname,
-                    Email = item.Email,
-                    Roles = roles,
-                    AppliedPromocodesCount = item.AppliedPromocodesCount
-                };
+                var employee = item.ToEntity(roles);
 
                 var entity = await _employeeRepository.CreateAsync(employee);
 
                 if (entity == null)
                 {
-                    return Problem("Failed to create employee.");
+                    return Problem("Возникла ошибка при добавлении сотрудника.");
                 }
 
                 var employeeModel = new EmployeeResponse()
                 {
                     Id = entity.Id,
                     Email = entity.Email,
-                    Roles = entity.Roles?.Select(x => new RoleItemResponse()
-                    {
-                        Name = x.Name,
-                        Description = x.Description
-                    }).ToList(),
+                    Roles = entity.Roles?.Select(x => x.ToResponse()).ToList(),
                     FullName = entity.FullName,
                     AppliedPromocodesCount = entity.AppliedPromocodesCount
                 };
@@ -175,26 +142,9 @@ namespace PromoCodeFactory.WebHost.Controllers
                     return NotFound();
                 }
 
-                var roles =
-                    _roleRepository
-                    .GetAllAsync()?.Result?
-                    .Where(x => item.RoleIds.Contains(x.Id))
-                    .Select(x => new Role()
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Description = x.Description
-                    }).ToList();
+                var roles = GetRoles(item.RoleIds);
 
-                var employee = new Employee()
-                {
-                    Id = item.Id,
-                    FirstName = item.Firstname,
-                    LastName = item.Lastname,
-                    Email = item.Email,
-                    Roles = roles,
-                    AppliedPromocodesCount = item.AppliedPromocodesCount
-                };
+                var employee = item.ToEntity(roles);
 
                 var entity = await _employeeRepository.UpdateAsync(employee);
                 
@@ -216,13 +166,13 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteEmployeeAsync(Guid id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
-            if (employee == null)
+            if (employee == default)
             {
                 return NotFound();
             }
@@ -232,7 +182,15 @@ namespace PromoCodeFactory.WebHost.Controllers
                 return Problem("Возникла ошибка при удалении сотрудника");
             }
 
-            return Ok();
+            return NoContent();
+        }
+
+        private List<Role> GetRoles(IEnumerable<Guid> ids)
+        {
+            return _roleRepository
+                .GetAllAsync()?.Result?
+                .Where(x => ids.Contains(x.Id))
+                .ToList();
         }
     }
 }

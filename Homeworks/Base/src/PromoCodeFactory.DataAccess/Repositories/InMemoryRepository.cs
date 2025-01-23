@@ -10,7 +10,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T>: IRepository<T> where T: BaseEntity
     {
-        protected IEnumerable<T> Data { get; set; }
+        protected List<T> Data { get; set; }
         protected IEntityHepler<T> EntityHepler { get; set; }
 
         public InMemoryRepository(
@@ -23,37 +23,30 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
         public InMemoryRepository(IEnumerable<T> data)
         {
-            Data = data;
+            Data = data?.ToList() ?? new();
         }
 
         public Task<IEnumerable<T>> GetAllAsync()
         {
-            Data.ToList();
-            return Task.FromResult(Data);
+            return Task.FromResult(Data.AsEnumerable());
         }
 
         public Task<T> GetByIdAsync(Guid id)
         {
-            Data.ToList();
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
         }
 
         public Task<T> CreateAsync(T item)
         {
             item.Id = Guid.NewGuid();
-            Data = Data.Append(item);
+            Data.Add(item);
             return Task.FromResult(item);
         }
 
         public Task<T> UpdateAsync(T item)
         {
-            if (EntityHepler == null)
-            {
-                throw new MissingMethodException();
-            }
-
             var actual = Data.FirstOrDefault(x => x.Id == item.Id);
-            EntityHepler.UpdateEntity(actual, item);
+            actual = EntityHepler?.UpdateEntity(actual, item);
             return Task.FromResult(actual);
         }
 
@@ -63,9 +56,7 @@ namespace PromoCodeFactory.DataAccess.Repositories
 
             if (item != default)
             {
-                var list = Data.ToList();
-                var isOk = list.Remove(item);
-                Data = list;
+                var isOk = Data.Remove(item);
                 return await Task.FromResult(isOk);
             }
 
