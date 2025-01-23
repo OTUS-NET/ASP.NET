@@ -102,14 +102,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                     return Problem("Возникла ошибка при добавлении сотрудника.");
                 }
 
-                var employeeModel = new EmployeeResponse()
-                {
-                    Id = entity.Id,
-                    Email = entity.Email,
-                    Roles = entity.Roles?.Select(x => x.ToResponse()).ToList(),
-                    FullName = entity.FullName,
-                    AppliedPromocodesCount = entity.AppliedPromocodesCount
-                };
+                var employeeModel = entity.ToResponse();
 
                 return Created(nameof(GetEmployeeByIdAsync), employeeModel);
             }
