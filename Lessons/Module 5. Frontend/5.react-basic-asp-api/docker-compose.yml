@@ -1,0 +1,19 @@
+﻿services:
+  react-asp-basic-api:  # Название сервиса
+    image: react-asp-api # Имя образа
+    build:
+      context: .
+      dockerfile: AspApiBasic/Dockerfile
+    ports:
+      - "5687:5687" # Пробрасываем порты 5687 контейнера на порт 5687 хоста
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production # Устанавливаем переменную окружения ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - .:/src
+  react-asp-basic-client:
+    image: react-asp-client
+    build:
+      context: .
+      dockerfile: react-client-basic/Dockerfile
+    ports:
+      - "5272:5272" # Пробрасываем порты 5272 контейнера на порт 5272 хоста

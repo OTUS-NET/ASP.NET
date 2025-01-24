@@ -1,0 +1,9 @@
+.line{
+    transition: width 0.5s ease-in-out;
+    height: 2px;
+    background: blue;
+}
+
+.fancyButton{
+    color:blue;
+}

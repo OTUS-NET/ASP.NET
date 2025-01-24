@@ -1,0 +1,31 @@
+<h1 className="read-the-docs">
+        Добро пожаловать в React!
+</h1>
+<AlertButtonComponent />
+
+Функциональные/классовые компоненты
+<ClassComponent/>
+<FuncComponent/>
+
+JSX/TSX
+<JsxComponent name="JSX Component"/>
+<TsxComponent name="TSX Component"/>
+
+Props
+<ScalarPropComponent scalarProp={42}/>
+<ChildComponent>
+  Привет, Children ReactNode!
+</ChildComponent>
+
+<ArrayPropComponent arrayProp={[1, 2, 3]}/>
+<ObjectPropComponent objectProp={{ name: "John", age: 30 }}/>
+
+Обработчик нажатия inline
+<button onClick={() => setCount(count + 1)}>
+  Счетчик: {count}
+</button>
+
+Валидация через propTypes
+<h2>Используем валидацию в JSX с prop-types</h2>
+<ValidationPropsComponent value="Hello, World!" />  {/* passing a string as the value prop */}
+<ValidationPropsComponent value={10} />  {/* passing a number as the value prop */}
