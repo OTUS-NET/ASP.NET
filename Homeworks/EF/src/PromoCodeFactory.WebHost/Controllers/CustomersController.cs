@@ -1,10 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.WebHost.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
+    //TODO:
+    //Promocodes controller ( 7)
+    //Удалить промокоды при удалении клиента
+    //GivePromocodesToCustomersWithPreferenceAsync
+    //должен сохранять новый промокод в базе данных и находить клиентов с переданным предпочтением и добавлять им данный промокод.GetPromocodesAsync - здесь даты передаются строками, чтобы не было проблем с часовыми поясами
+
     /// <summary>
     /// Клиенты
     /// </summary>
@@ -13,39 +24,206 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class CustomersController
         : ControllerBase
     {
+
+        private IRepository<Customer> _customerRepository;
+        private IRepository<Preference> _preferenceRepository;
+        public CustomersController
+            (
+            IRepository<Customer> customerRepository,
+            IRepository<Preference> preferenceRepository
+            ) 
+        {
+            _customerRepository = customerRepository;
+            _preferenceRepository = preferenceRepository;
+        }
+
+        /// <summary>
+        /// Получить список кратких описаний всех клиентов
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public Task<ActionResult<CustomerShortResponse>> GetCustomersAsync()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<CustomerShortResponse>>> GetCustomersAsync()
         {
-            //TODO: Добавить получение списка клиентов
-            throw new NotImplementedException();
+            var dbResult = await _customerRepository.GetAllAsync();
+
+            var result = dbResult.Select(x => new CustomerShortResponse()
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                Email = x.Email,
+                Id = x.Id
+            });
+
+            return Ok(result);
         }
 
+        /// <summary>
+        /// Получить клиента по Id
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
-        public Task<ActionResult<CustomerResponse>> GetCustomerAsync(Guid id)
+        [ProducesResponseType<CustomerResponse>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<ActionResult<CustomerResponse>> GetCustomerAsync(Guid id)
         {
-            //TODO: Добавить получение клиента вместе с выданными ему промомкодами
-            throw new NotImplementedException();
+            //Добавить получение клиента вместе с выданными ему промомкодами
+            var dbResult = await _customerRepository.GetByIdAsync(id);
+
+            if (dbResult == null)
+                return NotFound();
+
+            //Тут только конверсия
+            var response = new CustomerResponse()
+            {
+                FirstName = dbResult.FirstName,
+                LastName = dbResult.LastName,
+                Email = dbResult.Email,
+                Id = dbResult.Id
+            };
+            response.PromoCodes = new List<PromoCodeShortResponse>(
+                dbResult.Promocodes.Select(
+                    x => new PromoCodeShortResponse() 
+                    {
+                        Code = x.Code,
+                        Id = x.Id,
+                        ServiceInfo = x.ServiceInfo,
+                        BeginDate = x.BeginDate.ToString(),
+                        EndDate = x.EndDate.ToString(),
+                        PartnerName = x.PartnerName
+                    }));
+
+            response.Preferences = new List<PreferenceResponse>(
+                dbResult.Preferences.Select(
+                    x => new PreferenceResponse()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                    }));
+
+            return Ok(response);
+
         }
 
+        /// <summary>
+        /// Создать клиента
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
-        public Task<IActionResult> CreateCustomerAsync(CreateOrEditCustomerRequest request)
+        [ProducesResponseType<CustomerResponse>(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateCustomerAsync(CreateOrEditCustomerRequest request)
         {
-            //TODO: Добавить создание нового клиента вместе с его предпочтениями
-            throw new NotImplementedException();
+            if (!ValidateCustomerRequest(request))
+                return BadRequest();
+
+            //Добавить создание нового клиента вместе с его предпочтениями
+            var newCustomer = new Customer()
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Preferences = new List<Preference>
+                (
+                    //TODO: валидация существования преференсов
+                    await _preferenceRepository.GetAllAsync(x => request.PreferenceIds.Contains(x.Id))
+                )
+            };
+
+            //Создание
+            var dbResult = await _customerRepository.CreateAsync(newCustomer);
+            if(dbResult == null) return BadRequest();
+
+            //Тут только конверсия
+            var response = new CustomerResponse()
+            {
+                FirstName = dbResult.FirstName,
+                LastName = dbResult.LastName,
+                Email = dbResult.Email,
+                Id = dbResult.Id
+            };
+            response.PromoCodes = new List<PromoCodeShortResponse>(
+                dbResult.Promocodes.Select(
+                    x => new PromoCodeShortResponse()
+                    {
+                        Code = x.Code,
+                        Id = x.Id,
+                        ServiceInfo = x.ServiceInfo,
+                        BeginDate = x.BeginDate.ToString(),
+                        EndDate = x.EndDate.ToString(),
+                        PartnerName = x.PartnerName
+                    }));
+            response.Preferences = new List<PreferenceResponse>(
+                dbResult.Preferences.Select(
+                    x => new PreferenceResponse()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                    }));
+
+            return Created("api/v1/Customers", response);
         }
 
+        /// <summary>
+        /// Редактировать клиента
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpPut("{id}")]
-        public Task<IActionResult> EditCustomersAsync(Guid id, CreateOrEditCustomerRequest request)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> EditCustomersAsync(Guid id, CreateOrEditCustomerRequest request)
         {
-            //TODO: Обновить данные клиента вместе с его предпочтениями
-            throw new NotImplementedException();
+            if (!ValidateCustomerRequest(request))
+                return BadRequest();
+
+            //Добавить создание нового клиента вместе с его предпочтениями
+            var customer = new Customer()
+            {
+                Id = id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Preferences = new List<Preference>
+                (
+                    //TODO: валидация существования преференсов
+                    await _preferenceRepository.GetAllAsync(x => request.PreferenceIds.Contains(x.Id))
+                )
+            };
+
+            var dbResult = await _customerRepository.UpdateAsync(customer);
+            return dbResult != null ? NoContent() : BadRequest();
         }
 
+        /// <summary>
+        /// Удалить клиента
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         [HttpDelete]
-        public Task<IActionResult> DeleteCustomer(Guid id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteCustomerAsync(Guid id)
         {
-            //TODO: Удаление клиента вместе с выданными ему промокодами
-            throw new NotImplementedException();
+            var dbResult = await _customerRepository.DeleteAsync(id);
+            return dbResult == Guid.Empty ? BadRequest() : NoContent();
+        }
+
+        /// <summary>
+        /// Валидация запроса на создание клиента
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private bool ValidateCustomerRequest(CreateOrEditCustomerRequest request)
+        {
+            //TODO
+            //Заглушка
+            return true;
         }
     }
 }

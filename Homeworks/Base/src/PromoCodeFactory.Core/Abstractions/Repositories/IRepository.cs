@@ -11,7 +11,7 @@ namespace PromoCodeFactory.Core.Abstractions.Repositories
         /// Получить все сущности
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(Func<T, bool> condition = null);
 
         /// <summary>
         /// Получить сущность по Id

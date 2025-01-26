@@ -14,7 +14,8 @@ namespace PromoCodeFactory.Core.Domain.Administration
 
         public string Email { get; set; }
 
-        public Role Role { get; set; }
+        public virtual Role Role { get; set; }
+        public Guid RoleId { get; set; } // Обязательное поле для Foreign Key
 
         public int AppliedPromocodesCount { get; set; }
     }
