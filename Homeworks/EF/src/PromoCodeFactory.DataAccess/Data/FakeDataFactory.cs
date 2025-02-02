@@ -16,7 +16,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "owner@somemail.ru",
                 FirstName = "Иван",
                 LastName = "Сергеев",
-                Role = Roles.FirstOrDefault(x => x.Name == "Admin"),
+                RoleId = Roles.FirstOrDefault(x => x.Name == "Admin").Id,
                 AppliedPromocodesCount = 5
             },
             new Employee()
@@ -25,7 +25,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "andreev@somemail.ru",
                 FirstName = "Петр",
                 LastName = "Андреев",
-                Role = Roles.FirstOrDefault(x => x.Name == "PartnerManager"),
+                RoleId = Roles.FirstOrDefault(x => x.Name == "PartnerManager").Id,
                 AppliedPromocodesCount = 10
             },
         };
@@ -78,11 +78,71 @@ namespace PromoCodeFactory.DataAccess.Data
                         Email = "ivan_sergeev@mail.ru",
                         FirstName = "Иван",
                         LastName = "Петров",
-                        //TODO: Добавить предзаполненный список предпочтений
                     }
                 };
 
                 return customers;
+            }
+        }
+
+        public static IEnumerable<CustomerPreference> CustomerPreference
+        {
+            get
+            {
+                var customers = new List<CustomerPreference>()
+                {
+                    new CustomerPreference()
+                    {
+                        PreferenceId = Preferences.First(x => x.Name == "Театр").Id,
+                        CustomerId = Customers.First().Id,
+                    },
+                    new CustomerPreference()
+                    {
+                        PreferenceId = Preferences.First(x => x.Name == "Семья").Id,
+                        CustomerId = Customers.First().Id,
+                    }
+                };
+
+                return customers;
+            }
+        }
+
+        public static IEnumerable<PromoCode> PromoCodes
+        {
+            get
+            {
+                var customer = Customers.First();
+                var partnerManager = Employees.First();
+                var preference1 = Preferences.First(x => x.Name == "Театр");
+                var preference2 = Preferences.First(x => x.Name == "Семья");
+
+                var promoCodes = new List<PromoCode>()
+                {
+                    new PromoCode()
+                    {
+                        Id = Guid.NewGuid(),
+                        Code = "THEATRE",
+                        ServiceInfo = "Скидка на билеты в театр",
+                        BeginDate = DateTime.UtcNow,
+                        EndDate = DateTime.UtcNow.AddDays(30),
+                        PartnerManagerId = partnerManager.Id,
+                        PreferenceId = preference1.Id,
+                        CustomerId = customer.Id
+                    },
+                    new PromoCode()
+                    {
+                        Id = Guid.NewGuid(),
+                        Code = "FAMILY",
+                        ServiceInfo = "Скидка на семейный отдых",
+                        BeginDate = DateTime.UtcNow,
+                        EndDate = DateTime.UtcNow.AddDays(60),
+                        PartnerManagerId = partnerManager.Id,
+                        PreferenceId = preference2.Id,
+                        CustomerId = customer.Id
+                    }
+                };
+
+                return promoCodes;
             }
         }
     }
