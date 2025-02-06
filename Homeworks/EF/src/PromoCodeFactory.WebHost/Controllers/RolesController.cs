@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
@@ -15,9 +17,9 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class RolesController
     {
-        private readonly IRepository<Role> _rolesRepository;
+        private readonly IRepository<Role, Guid> _rolesRepository;
 
-        public RolesController(IRepository<Role> rolesRepository)
+        public RolesController(IRepository<Role, Guid> rolesRepository)
         {
             _rolesRepository = rolesRepository;
         }
@@ -27,9 +29,9 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync()
+        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync(CancellationToken cancellationToken)
         {
-            var roles = await _rolesRepository.GetAllAsync();
+            var roles = await _rolesRepository.GetAllAsync(cancellationToken);
 
             var rolesModelList = roles.Select(x =>
                 new RoleItemResponse()

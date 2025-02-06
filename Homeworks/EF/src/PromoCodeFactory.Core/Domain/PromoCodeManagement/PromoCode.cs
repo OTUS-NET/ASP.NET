@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Runtime;
-using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Domain.Administration;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
-    public class PromoCode
-        : BaseEntity
+    public class PromoCode : BaseEntity
     {
         public string Code { get; set; }
 
@@ -18,8 +15,10 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 
         public string PartnerName { get; set; }
 
+        public Guid PartnerManagerId { get; set; }
         public Employee PartnerManager { get; set; }
 
-        public Preference Preference { get; set; }
+        public Guid PreferenceId { get; set; }
+        public Customer Preference { get; set; }
     }
 }
