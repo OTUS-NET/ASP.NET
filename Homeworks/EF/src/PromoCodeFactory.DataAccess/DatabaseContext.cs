@@ -40,6 +40,7 @@ public class DatabaseContext : DbContext
         modelBuilder.Entity<PromoCode>().Property(pc => pc.ServiceInfo).HasMaxLength(200);
         modelBuilder.Entity<PromoCode>().HasOne(pc => pc.PartnerManager);
         modelBuilder.Entity<PromoCode>().HasOne(pc => pc.Preference);
+        modelBuilder.Entity<PromoCode>().HasOne(pc => pc.Customer);
 
         modelBuilder.Entity<Customer>().Property(c => c.FirstName).HasMaxLength(100);
         modelBuilder.Entity<Customer>().Property(c => c.LastName).HasMaxLength(100);

@@ -1,8 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.Services.Abstractions;
+using PromoCodeFactory.Services.Contracts.PromoCode;
+using PromoCodeFactory.WebHost.Models.PromoCode;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -11,18 +16,29 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PromocodesController
-        : ControllerBase
+    public class PromocodesController : ControllerBase
     {
+        private readonly IPromoCodeService _promoCodeService;
+        private readonly IMapper _mapper;
+
+        public PromocodesController(IPromoCodeService promoCodeService, IMapper mapper)
+        {
+            _promoCodeService = promoCodeService;
+            _mapper = mapper;
+        }
+
         /// <summary>
         /// Получить все промокоды
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public Task<ActionResult<List<PromoCodeShortResponse>>> GetPromocodesAsync()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<PromoCodeShortResponse>>> GetAllAsync(CancellationToken cancellationToken)
         {
-            //TODO: Получить все промокоды 
-            throw new NotImplementedException();
+            var customers = (await _promoCodeService.GetAllAsync(cancellationToken))
+                .Select(c => _mapper.Map<PromoCodeShortResponse>(c)).ToList();
+
+            return Ok(customers);
         }
 
         /// <summary>
@@ -30,10 +46,15 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public Task<IActionResult> GivePromoCodesToCustomersWithPreferenceAsync(GivePromoCodeRequest request)
+        public async Task<IActionResult> GivePromoCodesToCustomersWithPreferenceAsync(
+            [FromBody] GivePromoCodeRequest request,
+            CancellationToken cancellationToken)
         {
-            //TODO: Создать промокод и выдать его клиентам с указанным предпочтением
-            throw new NotImplementedException();
+            var givePromoCodeDto = _mapper.Map<GivePromoCodeDto>(request);
+            if (!await _promoCodeService.GiveToCustomersWithPreferenceAsync(givePromoCodeDto, cancellationToken))
+                return BadRequest($"Error giving PromoCodes to Customers");
+
+            return Ok();
         }
     }
 }

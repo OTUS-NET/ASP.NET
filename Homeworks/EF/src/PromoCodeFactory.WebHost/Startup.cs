@@ -1,14 +1,16 @@
-using System;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.DataAccess;
-using PromoCodeFactory.DataAccess.Repositories;
+using PromoCodeFactory.DataAccess.Repositories.Implementations;
+using PromoCodeFactory.Services.Abstractions;
+using PromoCodeFactory.Services.Implementations;
+using PromoCodeFactory.Services.Repositories.Abstractions;
+using PromoCodeFactory.WebHost.Mapping;
 using PromoCodeFactory.WebHost.Settings;
 
 namespace PromoCodeFactory.WebHost
@@ -28,21 +30,62 @@ namespace PromoCodeFactory.WebHost
         {
             var applicationSettings = _configuration.Get<ApplicationSettings>();
             
-            services.AddControllers();
+            services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 
             services.AddDbContext<DatabaseContext>(options => options.UseSqlite(applicationSettings.ConnectionString));
             
-            services.AddScoped<EfRepository<Role, Guid>>();
-            services.AddScoped<EfRepository<Employee, Guid>>();
-            services.AddScoped<EfRepository<Customer, Guid>>();
-            services.AddScoped<EfRepository<Preference, Guid>>();
-            services.AddScoped<EfRepository<PromoCode, Guid>>();
+            InstallRepositories(services);
+            InstallServices(services);
+            InstallAutomapper(services);
 
             services.AddOpenApiDocument(options =>
             {
                 options.Title = "PromoCode Factory API Doc";
                 options.Version = "1.0";
             });
+        }
+
+        private static void InstallRepositories(IServiceCollection services)
+        {
+            services.AddTransient<ICustomerRepository, CustomerRepository>()
+                .AddTransient<ICustomerUnitOfWork, CustomerUnitOfWork>()
+                .AddTransient<IEmployeeRepository, EmployeeRepository>()
+                .AddTransient<IPreferenceRepository, PreferenceRepository>()
+                .AddTransient<IPromoCodeRepository, PromoCodeRepository>()
+                .AddTransient<IPromoCodeUnitOfWork, PromoCodeUnitOfWork>()
+                .AddTransient<IRoleRepository, RoleRepository>();
+        }
+        
+        private static void InstallServices(IServiceCollection services)
+        {
+            services.AddTransient<ICustomerService, CustomerService>()
+                .AddTransient<IPreferenceService, PreferenceService>()
+                .AddTransient<IPromoCodeService, PromoCodeService>();
+        }
+        
+        private static void InstallAutomapper(IServiceCollection services)
+        {
+            services.AddSingleton<IMapper>(new Mapper(GetMapperConfiguration()));
+        }
+        
+        private static MapperConfiguration GetMapperConfiguration()
+        {
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.AllowNullCollections = true;
+                cfg.AddGlobalIgnore("Item");
+                
+                cfg.AddProfile<CustomerMappingsProfile>();
+                cfg.AddProfile<EmployeeMappingProfile>();
+                cfg.AddProfile<PreferenceMappingsProfile>();
+                cfg.AddProfile<PromoCodeMappingsProfile>();
+                cfg.AddProfile<RoleMappingProfile>();
+                cfg.AddProfile<Services.Implementations.Mapping.CustomerMappingsProfile>();
+                cfg.AddProfile<Services.Implementations.Mapping.PreferenceMappingsProfile>();
+                cfg.AddProfile<Services.Implementations.Mapping.PromoCodeMappingsProfile>();
+            });
+            configuration.AssertConfigurationIsValid();
+            return configuration;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

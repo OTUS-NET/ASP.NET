@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Abstractions;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 
-namespace PromoCodeFactory.DataAccess.Repositories;
+namespace PromoCodeFactory.DataAccess.Repositories.Implementations;
 
 public class EfRepository<T, TPrimaryKey> : IRepository<T, TPrimaryKey> where T : class, IEntity<TPrimaryKey>
 {

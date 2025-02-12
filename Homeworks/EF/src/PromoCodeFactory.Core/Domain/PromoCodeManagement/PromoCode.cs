@@ -19,6 +19,11 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         public Employee PartnerManager { get; set; }
 
         public Guid PreferenceId { get; set; }
-        public Customer Preference { get; set; }
+        
+        public Preference Preference { get; set; }
+
+        public Guid CustomerId { get; set; }
+        
+        public Customer Customer { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
 
-namespace PromoCodeFactory.DataAccess.Repositories
+namespace PromoCodeFactory.DataAccess.Repositories.Implementations
 {
     public class InMemoryRepository<T> : IRepository<T, Guid>
         where T : BaseEntity

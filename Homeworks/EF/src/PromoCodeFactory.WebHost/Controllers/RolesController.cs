@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Role;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
