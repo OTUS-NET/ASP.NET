@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Services.Abstractions;
 using PromoCodeFactory.Services.Contracts.Customer;
 using PromoCodeFactory.WebHost.Models.Customer;
@@ -53,8 +53,9 @@ namespace PromoCodeFactory.WebHost.Controllers
             
             if(customer is null)
                 return NotFound($"No Customer with Id {id} found");
-            
-            return Ok(_mapper.Map<CustomerResponse>(customer));
+
+            var customerResponse = _mapper.Map<CustomerResponse>(customer);
+            return Ok(customerResponse);
         }
 
         /// <summary>
@@ -70,7 +71,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             var createOrEditCustomerDto = _mapper.Map<CreateOrEditCustomerDto>(request);
             var customerDto = await _customerService.CreateAsync(createOrEditCustomerDto, cancellationToken);
             var actionName = nameof(GetAsync);
-            return CreatedAtAction(actionName, customerDto.Id, customerDto);
+            return CreatedAtAction(actionName, new {customerDto!.Id, cancellationToken}, customerDto);
         }
 
         /// <summary>

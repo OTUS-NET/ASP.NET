@@ -22,18 +22,14 @@ public class DatabaseContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         
-        // modelBuilder.Entity<Role>().HasKey(r => r.Id);
-        // modelBuilder.Entity<Employee>().HasKey(e => e.Id);
-        // modelBuilder.Entity<PromoCode>().HasKey(pc => pc.Id);
-        // modelBuilder.Entity<Customer>().HasKey(c => c.Id);
-        // modelBuilder.Entity<Preference>().HasKey(p => p.Id);
-        
         modelBuilder.Entity<Role>().Property(r => r.Name).HasMaxLength(100);
 
         modelBuilder.Entity<Employee>().Property(e => e.FirstName).HasMaxLength(100);
         modelBuilder.Entity<Employee>().Property(e => e.LastName).HasMaxLength(100);
         modelBuilder.Entity<Employee>().Property(e => e.Email).HasMaxLength(100);
-        modelBuilder.Entity<Employee>().HasOne(e => e.Role);
+        modelBuilder.Entity<Employee>().HasOne(e => e.Role)
+            .WithMany(r => r.Employees)
+            .HasForeignKey(e => e.RoleId);
        
         modelBuilder.Entity<PromoCode>().Property(pc => pc.Code).HasMaxLength(20);
         modelBuilder.Entity<PromoCode>().Property(pc => pc.PartnerName).HasMaxLength(100);

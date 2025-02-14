@@ -12,4 +12,5 @@ public interface IEmployeeRepository
 
     Task AddRangeIfNotExistsAsync(IEnumerable<Employee> employees, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<Employee?> GetAsync(Guid id, CancellationToken cancellationToken);
 }

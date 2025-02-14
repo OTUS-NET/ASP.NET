@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Services.Contracts.Employee;
@@ -21,11 +22,16 @@ public class EmployeeRepository : EfRepository<Employee, Guid>, IEmployeeReposit
         bool asNoTracking = false,
         EmployeeFilterDto employeeFilterDto = null)
     {
-        var query = GetAll(asNoTracking);
+        IQueryable<Employee> query = GetAll(asNoTracking);
 
         if (employeeFilterDto?.Names is { Count: > 0 })
         {
-            query = query.Where(c => employeeFilterDto.Names.Contains(c.FullName));
+            var pb = PredicateBuilder.New<Employee>();
+            foreach (var name in employeeFilterDto.Names)
+            {
+                pb = pb.Or(employee => employee.FirstName + " " + employee.LastName == name);
+            }
+            query = query.Where(pb);
         }
 
         return await query.ToListAsync(cancellationToken);

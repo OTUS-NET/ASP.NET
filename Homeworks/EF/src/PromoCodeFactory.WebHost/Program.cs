@@ -3,11 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.DataAccess;
 using PromoCodeFactory.DataAccess.Data;
-using PromoCodeFactory.DataAccess.Repositories.Implementations;
 using PromoCodeFactory.Services.Repositories.Abstractions;
 
 namespace PromoCodeFactory.WebHost

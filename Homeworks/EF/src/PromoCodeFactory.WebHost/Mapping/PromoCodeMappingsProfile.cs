@@ -15,16 +15,13 @@ public class PromoCodeMappingsProfile : Profile
             .ForMember(
                 x => x.BeginDate,
                 opt => opt.MapFrom(
-                    src => DateTime.Parse(src.BeginDate, CultureInfo.InvariantCulture)))
+                    src => DateTime.ParseExact(src.BeginDate, "dd/MM/yyyy", null)))
             .ForMember(
                 x => x.EndDate,
                 opt => opt.MapFrom(
-                    src => DateTime.Parse(src.EndDate, CultureInfo.InvariantCulture)));
+                    src => DateTime.ParseExact(src.EndDate, "dd/MM/yyyy", null)));
         
         CreateMap<PromoCodeShortResponse, PromoCodeShortDto>();
-        CreateMap<List<PromoCodeShortResponse>, List<PromoCodeShortDto>>();
-        
         CreateMap<PromoCodeShortDto, PromoCodeShortResponse>();
-        CreateMap<List<PromoCodeShortDto>, List<PromoCodeShortResponse>>();
     }
 }

@@ -32,7 +32,11 @@ namespace PromoCodeFactory.WebHost
             
             services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlite(applicationSettings.ConnectionString));
+            services.AddDbContext<DatabaseContext>(options =>
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlite(applicationSettings.ConnectionString);
+            });
             
             InstallRepositories(services);
             InstallServices(services);

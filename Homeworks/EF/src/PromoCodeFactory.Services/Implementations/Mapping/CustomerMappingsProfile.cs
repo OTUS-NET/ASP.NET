@@ -12,7 +12,9 @@ public class CustomerMappingsProfile : Profile
         CreateMap<Customer, CustomerDto>();
         CreateMap<CreateOrEditCustomerDto, Customer>()
             .ForMember(c => c.Id, map => map.Ignore())
-            .ForMember(c => c.PromoCodes, map => map.Ignore())
-            .ForMember(c => c.Preferences, map => map.Ignore());
+            .ForMember(c => c.PromoCodes, map => map.MapFrom(
+                v => new List<PromoCode>()))
+            .ForMember(c => c.Preferences, map => map.MapFrom(
+                v => new List<Preference>()));
     }
 }
