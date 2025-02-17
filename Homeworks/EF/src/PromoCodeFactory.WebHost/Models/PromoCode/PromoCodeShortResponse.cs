@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PromoCodeFactory.WebHost.Models
+namespace PromoCodeFactory.WebHost.Models.PromoCode
 {
     public class PromoCodeShortResponse
     {

@@ -1,4 +1,4 @@
-﻿namespace PromoCodeFactory.WebHost.Models
+﻿namespace PromoCodeFactory.WebHost.Models.PromoCode
 {
     public class GivePromoCodeRequest
     {
@@ -9,5 +9,9 @@
         public string PromoCode { get; set; }
 
         public string Preference { get; set; }
+        
+        public string BeginDate { get; set; }
+
+        public string EndDate { get; set; }
     }
 }

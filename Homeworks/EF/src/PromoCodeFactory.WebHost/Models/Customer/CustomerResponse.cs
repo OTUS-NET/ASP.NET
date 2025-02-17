@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using PromoCodeFactory.WebHost.Models.Preference;
+using PromoCodeFactory.WebHost.Models.PromoCode;
 
-namespace PromoCodeFactory.WebHost.Models
+namespace PromoCodeFactory.WebHost.Models.Customer
 {
     public class CustomerResponse
     {
@@ -9,7 +11,7 @@ namespace PromoCodeFactory.WebHost.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        //TODO: Добавить список предпочтений
         public List<PromoCodeShortResponse> PromoCodes { get; set; }
+        public List<PreferenceShortResponse> Preferences { get; set; }
     }
 }

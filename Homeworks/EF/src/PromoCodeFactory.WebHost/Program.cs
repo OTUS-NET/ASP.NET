@@ -1,17 +1,56 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PromoCodeFactory.DataAccess;
+using PromoCodeFactory.DataAccess.Data;
+using PromoCodeFactory.Services.Repositories.Abstractions;
 
 namespace PromoCodeFactory.WebHost
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                //await db.Database.EnsureDeletedAsync();
+                //await db.Database.EnsureCreatedAsync();
+                await db.Database.MigrateAsync();
+                await Seed(scope.ServiceProvider);
+            }
+
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+
+        public static async Task Seed(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            
+            var employeesRepository = scope.ServiceProvider.GetService<IEmployeeRepository>();
+            await employeesRepository.AddRangeIfNotExistsAsync(FakeDataFactory.Employees);
+            await employeesRepository.SaveChangesAsync();
+            
+            var rolesRepository = scope.ServiceProvider.GetService<IRoleRepository>();
+            await rolesRepository.AddRangeIfNotExistsAsync(FakeDataFactory.Roles);
+            await rolesRepository.SaveChangesAsync();
+            
+            var customersRepository = scope.ServiceProvider.GetService<ICustomerRepository>();
+            await customersRepository.AddRangeIfNotExistsAsync(FakeDataFactory.Customers);
+            await customersRepository.SaveChangesAsync();
+            
+            var preferencesRepository = scope.ServiceProvider.GetService<IPreferenceRepository>();
+            await preferencesRepository.AddRangeIfNotExistsAsync(FakeDataFactory.Preferences);
+            await preferencesRepository.SaveChangesAsync();
+        }
     }
 }
