@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromoCodeFactory.DataAccess;
@@ -18,9 +19,9 @@ namespace PromoCodeFactory.WebHost
             using (var scope = host.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                await db.Database.EnsureDeletedAsync();
-                await db.Database.EnsureCreatedAsync();
-                //db.Database.Migrate();
+                //await db.Database.EnsureDeletedAsync();
+                //await db.Database.EnsureCreatedAsync();
+                await db.Database.MigrateAsync();
                 await Seed(scope.ServiceProvider);
             }
 
