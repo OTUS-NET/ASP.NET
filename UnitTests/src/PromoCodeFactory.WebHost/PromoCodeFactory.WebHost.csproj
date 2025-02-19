@@ -4,6 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>$(NoWarn);1591</NoWarn>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,10 +15,20 @@
     <ItemGroup>
       <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
       <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

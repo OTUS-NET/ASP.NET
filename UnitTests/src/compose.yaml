@@ -1,0 +1,30 @@
+﻿version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: promocodefactory_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=promocode_factory_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: .
+      dockerfile: PromoCodeFactory.WebHost/Dockerfile
+    container_name: promocodefactory_web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__PromoCodeFactoryDb=Host=db;Database=promocode_factory_db;Username=postgres;Password=docker;Port=5432
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

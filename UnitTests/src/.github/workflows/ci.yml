@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solutions
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build
+
+      - name: Publish app
+        run: dotnet publish PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj -c Release -o ./publish
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: published-app
+          path: ./publish
