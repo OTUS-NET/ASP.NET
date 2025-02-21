@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pcf.Administration.Core.Domain.Administration;
-using Pcf.Administration.DataAccess.Data;
 
 namespace Pcf.Administration.DataAccess
 {
