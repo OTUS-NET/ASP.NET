@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Services;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -18,10 +19,12 @@ namespace PromoCodeFactory.WebHost.Controllers
         : ControllerBase
     {
         private readonly IRepository<Partner> _partnersRepository;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public PartnersController(IRepository<Partner> partnersRepository)
+        public PartnersController(IRepository<Partner> partnersRepository, IDateTimeProvider dateTimeProvider)
         {
             _partnersRepository = partnersRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         [HttpGet]
@@ -98,7 +101,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                 partner.NumberIssuedPromoCodes = 0;
                 
                 //При установке лимита нужно отключить предыдущий лимит
-                activeLimit.CancelDate = DateTime.Now;
+                activeLimit.CancelDate = _dateTimeProvider.CurrentDateTime;
             }
 
             if (request.Limit <= 0)
@@ -109,7 +112,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                 Limit = request.Limit,
                 Partner = partner,
                 PartnerId = partner.Id,
-                CreateDate = DateTime.Now,
+                CreateDate = _dateTimeProvider.CurrentDateTime,
                 EndDate = request.EndDate
             };
             
@@ -138,7 +141,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             
             if (activeLimit != null)
             {
-                activeLimit.CancelDate = DateTime.Now;
+                activeLimit.CancelDate = _dateTimeProvider.CurrentDateTime;
             }
 
             await _partnersRepository.UpdateAsync(partner);
