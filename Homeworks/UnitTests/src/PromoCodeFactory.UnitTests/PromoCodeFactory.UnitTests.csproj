@@ -27,4 +27,8 @@
       <ProjectReference Include="..\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="WebHost\Services\" />
+    </ItemGroup>
+
 </Project>
