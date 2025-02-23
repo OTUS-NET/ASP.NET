@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.Services.Partners.Abstractions;
 using PromoCodeFactory.Services.Partners.Exceptions;
 using PromoCodeFactory.WebHost.Controllers;
