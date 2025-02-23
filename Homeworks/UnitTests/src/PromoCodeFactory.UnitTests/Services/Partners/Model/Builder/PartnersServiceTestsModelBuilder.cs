@@ -6,34 +6,33 @@ using AutoFixture.AutoMoq;
 using Moq;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
-using PromoCodeFactory.WebHost.Controllers;
-using PromoCodeFactory.WebHost.Models;
-using PromoCodeFactory.WebHost.Services;
-using PromoCodeFactory.WebHost.Services.Date.Abstractions;
+using PromoCodeFactory.Services.Date.Abstractions;
+using PromoCodeFactory.Services.Partners;
+using PromoCodeFactory.Services.Partners.Dto;
 
-namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners.Model.Builder;
+namespace PromoCodeFactory.UnitTests.Services.Partners.Model.Builder;
 
-public class PromoCodeControllerTestsModelBuilder
+public class PartnersServiceTestsModelBuilder
 {
     private readonly IFixture _fixture;
-    private readonly PromoCodeControllerTestsModel _model;
+    private readonly PartnersServiceTestsModel _model;
 
-    public PromoCodeControllerTestsModelBuilder()
+    public PartnersServiceTestsModelBuilder()
     {
         _fixture = new Fixture().Customize(new AutoMoqCustomization());
         _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
             .ForEach(b => _fixture.Behaviors.Remove(b));
         _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
-        _model = new PromoCodeControllerTestsModel();
+        _model = new PartnersServiceTestsModel();
     }
 
-    public static PromoCodeControllerTestsModelBuilder Build()
+    public static PartnersServiceTestsModelBuilder Build()
     {
-        return new PromoCodeControllerTestsModelBuilder();
+        return new PartnersServiceTestsModelBuilder();
     }
 
-    public PromoCodeControllerTestsModelBuilder WithPartner(
+    public PartnersServiceTestsModelBuilder WithPartner(
         bool withActiveLimit = false,
         int numberIssuedPromoCodes = 0,
         bool isActive = true)
@@ -55,27 +54,27 @@ public class PromoCodeControllerTestsModelBuilder
         return this;
     }
 
-    public PromoCodeControllerTestsModelBuilder WithRequest(int limit = 1)
+    public PartnersServiceTestsModelBuilder WithSetPartnerPromoCodeLimitDto(int limit = 1)
     {
-        _model.Request = _fixture.Build<SetPartnerPromoCodeLimitRequest>().
+        _model.SetPartnerPromoCodeLimitDto = _fixture.Build<SetPartnerPromoCodeLimitDto>().
             With(r => r.Limit, limit).
             Create();
         return this;
     }
 
-    public PromoCodeControllerTestsModelBuilder WithDateTimeProviderMock(DateTime dateTime)
+    public PartnersServiceTestsModelBuilder WithDateTimeProviderMock(DateTime dateTime)
     {
         _fixture.Freeze<Mock<IDateTimeProvider>>().Setup(d => d.CurrentDateTime).Returns(dateTime);
         return this;
     }
 
-    public PromoCodeControllerTestsModel Create()
+    public PartnersServiceTestsModel Create()
     {
         _model.PartnersRepositoryMock = _fixture.Freeze<Mock<IRepository<Partner>>>();
         _model.PartnersRepositoryMock.Setup(repo => repo.GetByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(_model.Partner);
 
-        _model.Controller = _fixture.Build<PartnersController>().OmitAutoProperties().Create();
+        _model.Service = _fixture.Build<PartnersService>().OmitAutoProperties().Create();
         
         return _model;
     }

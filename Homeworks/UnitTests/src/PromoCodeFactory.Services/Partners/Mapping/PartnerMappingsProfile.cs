@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
-using PromoCodeFactory.WebHost.Services.Partners.Dto;
+using PromoCodeFactory.Services.Partners.Dto;
 
-namespace PromoCodeFactory.WebHost.Services.Partners.Mapper;
+namespace PromoCodeFactory.Services.Partners.Mapping;
 
 public class PartnerMappingsProfile : Profile
 {
-    protected PartnerMappingsProfile()
+    public PartnerMappingsProfile()
     {
         CreateMap<Partner, PartnerDto>()
             .ForMember(

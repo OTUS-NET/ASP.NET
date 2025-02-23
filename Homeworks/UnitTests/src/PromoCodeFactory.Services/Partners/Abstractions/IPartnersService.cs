@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
-using PromoCodeFactory.WebHost.Services.Partners.Dto;
+﻿using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Services.Partners.Dto;
 
-namespace PromoCodeFactory.WebHost.Services.Partners.Abstractions;
+namespace PromoCodeFactory.Services.Partners.Abstractions;
 
 public interface IPartnersService
 {

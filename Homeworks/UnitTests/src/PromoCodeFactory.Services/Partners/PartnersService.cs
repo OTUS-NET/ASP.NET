@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
-using PromoCodeFactory.WebHost.Services.Date.Abstractions;
-using PromoCodeFactory.WebHost.Services.Partners.Abstractions;
-using PromoCodeFactory.WebHost.Services.Partners.Dto;
-using PromoCodeFactory.WebHost.Services.Partners.Exceptions;
+using PromoCodeFactory.Services.Date.Abstractions;
+using PromoCodeFactory.Services.Partners.Abstractions;
+using PromoCodeFactory.Services.Partners.Dto;
+using PromoCodeFactory.Services.Partners.Exceptions;
 
-namespace PromoCodeFactory.WebHost.Services.Partners;
+namespace PromoCodeFactory.Services.Partners;
 
 public class PartnersService : IPartnersService
 {

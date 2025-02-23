@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Services.Partners.Abstractions;
+using PromoCodeFactory.Services.Partners.Dto;
+using PromoCodeFactory.Services.Partners.Exceptions;
 using PromoCodeFactory.WebHost.Models;
-using PromoCodeFactory.WebHost.Services.Partners.Abstractions;
-using PromoCodeFactory.WebHost.Services.Partners.Dto;
-using PromoCodeFactory.WebHost.Services.Partners.Exceptions;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {

@@ -1,104 +1,82 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using PromoCodeFactory.Core.Domain.PromoCodeManagement;
-using PromoCodeFactory.UnitTests.WebHost.Controllers.Partners.Model.Builder;
+using PromoCodeFactory.Services.Partners.Abstractions;
+using PromoCodeFactory.Services.Partners.Dto;
+using PromoCodeFactory.Services.Partners.Exceptions;
+using PromoCodeFactory.UnitTests.WebHost.Controllers.Partners.Model;
+using PromoCodeFactory.WebHost.Controllers;
+using PromoCodeFactory.WebHost.Models;
 using Xunit;
 
-namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
+namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners;
+
+public class SetPartnerPromoCodeLimitAsyncTests
 {
-    public class SetPartnerPromoCodeLimitAsyncTests
+    [Fact]
+    public async Task SetPartnerPromoCodeLimitAsync_PartnersServiceThrowsPartnerNotFoundException_ReturnsNotFound()
     {
-        [Fact]
-        public async Task SetPartnerPromoCodeLimitAsync_PartnerIsNotFound_ReturnsNotFound()
-        {
-            // Arrange
-            var model = PromoCodeControllerTestsModelBuilder.Build().Create();
+        // Arrange
+        var model = CreateModel(new PartnerNotFoundException());
 
-            // Act
-            var result = await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), null);
+        // Act
+        var result = await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
 
-            // Assert
-            result.Should().BeAssignableTo<NotFoundResult>();
-        }
-
-        [Fact]
-        public async Task SetPartnerPromoCodeLimitAsync_PartnerIsNotActive_ReturnsBadRequest()
-        {
-            // Arrange
-            var model = PromoCodeControllerTestsModelBuilder.Build().WithPartner(isActive: false).Create();
-
-            // Act
-            var result = await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), null);
-
-            // Assert
-            result.Should().BeAssignableTo<BadRequestObjectResult>();
-        }
-
-        [Fact]
-        public async Task SetPartnerPromoCodeLimitAsync_PartnerHasActiveLimit_NumberIssuedPromoCodesShouldBeZero()
-        {
-            // Arrange
-            var model = PromoCodeControllerTestsModelBuilder.Build().WithPartner(
-                    withActiveLimit: true,
-                    numberIssuedPromoCodes: 1).
-                WithRequest().
-                Create();
-
-            // Act
-            await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
-
-            // Assert
-            model.Partner.NumberIssuedPromoCodes.Should().Be(0);
-        }
-
-        [Fact]
-        public async Task SetPartnerPromoCodeLimitAsync_PartnerHasActiveLimit_CancelDateShouldBeCurrentDate()
-        {
-            // Arrange
-            var dateTime = new DateTime();
-            var model = PromoCodeControllerTestsModelBuilder.Build().WithPartner(
-                    withActiveLimit: true,
-                    numberIssuedPromoCodes: 1).
-                WithRequest().
-                WithDateTimeProviderMock(dateTime).
-                Create();
-
-            // Act
-            await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
-
-            // Assert
-            model.ActiveLimit.CancelDate.Should().Be(dateTime);
-        }
-
-        [Fact]
-        public async Task SetPartnerPromoCodeLimitAsync_RequestHasLimitLessOrEqualZero_ReturnsBadRequest()
-        {
-            // Arrange
-            var model = PromoCodeControllerTestsModelBuilder.Build().WithPartner().WithRequest(0).Create();
-            
-            // Act
-            var result = await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
-
-            // Assert
-            result.Should().BeAssignableTo<BadRequestObjectResult>();
-        }
+        // Assert
+        result.Should().BeAssignableTo<NotFoundResult>();
+    }
         
-        [Fact]
-        public async Task SetPartnerPromoCodeLimitAsync_NewLimit_ShouldAddToDatabase()
-        {
-            // Arrange
-            var model = PromoCodeControllerTestsModelBuilder.Build().WithPartner().WithRequest().Create();
-            
-            // Act
-            await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
+    [Fact]
+    public async Task SetPartnerPromoCodeLimitAsync_PartnersServiceThrowsPartnerIsNotActiveException_ReturnsBadRequest()
+    {
+        // Arrange
+        var model = CreateModel(new PartnerIsNotActiveException());
 
-            model.PromoCodeLimitCollectionMock.Verify(
-                c => c.Add(It.IsAny<PartnerPromoCodeLimit>()),
-                Times.Once);
-            model.PartnersRepositoryMock.Verify(r => r.UpdateAsync(model.Partner), Times.Once);
+        // Act
+        var result = await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
+
+        // Assert
+        result.Should().BeAssignableTo<BadRequestObjectResult>();
+    }
+        
+    [Fact]
+    public async Task SetPartnerPromoCodeLimitAsync_PartnersServiceThrowsIncorrectLimitException_ReturnsBadRequest()
+    {
+        // Arrange
+        var model = CreateModel(new IncorrectLimitException());
+
+        // Act
+        var result = await model.Controller.SetPartnerPromoCodeLimitAsync(Guid.NewGuid(), model.Request);
+
+        // Assert
+        result.Should().BeAssignableTo<BadRequestObjectResult>();
+    }
+
+    private static PartnersControllerTestsModel CreateModel(Exception exception = null)
+    {
+        var model = new PartnersControllerTestsModel();
+            
+        var fixture = new Fixture().Customize(new AutoMoqCustomization());
+        fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
+            .ForEach(b => fixture.Behaviors.Remove(b));
+        fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+            
+        if (exception != null)
+        {
+            fixture.Freeze<Mock<IPartnersService>>().Setup(s => s.SetPartnerPromoCodeLimitAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<SetPartnerPromoCodeLimitDto>()))
+                .ThrowsAsync(exception);
         }
+
+        model.Request = fixture.Create<SetPartnerPromoCodeLimitRequest>();
+        model.Controller = fixture.Build<PartnersController>().OmitAutoProperties().Create();
+
+        return model;
     }
 }

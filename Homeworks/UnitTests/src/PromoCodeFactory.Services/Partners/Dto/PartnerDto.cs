@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PromoCodeFactory.WebHost.Services.Partners.Dto;
+﻿namespace PromoCodeFactory.Services.Partners.Dto;
 
 public class PartnerDto
 {

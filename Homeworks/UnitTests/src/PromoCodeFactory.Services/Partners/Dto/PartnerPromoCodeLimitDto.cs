@@ -1,6 +1,6 @@
-﻿using System;
+﻿using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
-namespace PromoCodeFactory.WebHost.Services.Partners.Dto;
+namespace PromoCodeFactory.Services.Partners.Dto;
 
 public class PartnerPromoCodeLimitDto
 {
@@ -8,7 +8,7 @@ public class PartnerPromoCodeLimitDto
 
     public Guid PartnerId { get; set; }
 
-    public virtual Core.Domain.PromoCodeManagement.Partner Partner { get; set; }
+    public virtual Partner Partner { get; set; }
         
     public string CreateDate { get; set; }
 
