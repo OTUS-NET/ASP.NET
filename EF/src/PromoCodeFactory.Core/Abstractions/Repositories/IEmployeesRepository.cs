@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Domain;
 
 namespace PromoCodeFactory.Core.Abstractions.Repositories
 {
