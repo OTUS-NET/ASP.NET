@@ -7,7 +7,7 @@ using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.EntityFramework
 {
-    public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+   public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)   
     {
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Role> Roles { get; set; }

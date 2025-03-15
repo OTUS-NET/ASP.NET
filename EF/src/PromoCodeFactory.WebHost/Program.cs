@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PromoCodeFactory.WebHost.Helpers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using PromoCodeFactory.EntityFramework;
@@ -57,7 +58,7 @@ namespace PromoCodeFactory.WebHost
             app.UseCors();
             app.UseAuthorization();
             app.MapControllers();
-            //app.MigrateDatabase<DataContext>();
+            app.MigrateDatabase<DataContext>();
 
             app.Run();
         }

@@ -1,16 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PromoCodeFactory.Core.Domain.Administration;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace PromoCodeFactory.EntityFramework
+namespace PromoCodeFactory.EntityFramework.Configurations
 {
-    public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+    public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
     {
-        public DbSet<Employee> Employees { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<Preference> Prefirences { get; set; }
-        public DbSet<PromoCode> PromoCodes { get; set; }
-        public DbSet<CustomerPreference> CustomerPreferences { get; set; }
+        public void Configure(EntityTypeBuilder<Customer> builder)
+        {
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.FirstName).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.LastName).HasMaxLength(100);
+            builder.Property(x => x.Email).IsRequired().HasMaxLength(124);
+            builder.HasMany(c => c.PromoCodes)
+                .WithOne(p => p.Owner)
+                .HasForeignKey(o => o.CustomerId);
+            builder.HasMany(c => c.CustomerPreferences)
+                .WithOne(p => p.Customer)
+                .HasForeignKey(p => p.CustomerId);
+        }
     }
 }
