@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Request;
+using PromoCodeFactory.WebHost.Models.Response;
 using System;
 using System.Threading.Tasks;
 
