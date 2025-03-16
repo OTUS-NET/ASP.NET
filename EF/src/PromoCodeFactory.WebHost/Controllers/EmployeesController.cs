@@ -10,6 +10,8 @@ using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
 using PromoCodeFactory.WebHost.Models.Response;
 using Microsoft.AspNetCore.Http.HttpResults;
+using PromoCodeFactory.DataAccess;
+using PromoCodeFactory.Core.Abstractions.Repositories;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -18,7 +20,7 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class EmployeesController(IRepository<Employee, Guid> employeeRepository, IRepository<Role, Guid> roleRepository, IMapper mapper) : ControllerBase
+    public class EmployeesController(IEmployeesRepository employeeRepository, IRepository<Role> roleRepository, IMapper mapper) : ControllerBase
     {
         /// <summary>
         /// Get the data of all employees
