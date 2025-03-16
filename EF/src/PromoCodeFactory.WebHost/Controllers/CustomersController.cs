@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.WebHost.Models.Request;
 using PromoCodeFactory.WebHost.Models.Response;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PromoCodeFactory.WebHost.Controllers
@@ -11,42 +16,89 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class CustomersController
-        : ControllerBase
+    public class CustomerController(ICustomerRepository customerRepository, IMapper mapper) : ControllerBase
     {
+        /// <summary>
+        /// Получить данные всех клиентов
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public Task<ActionResult<CustomerShortResponse>> GetCustomersAsync()
+        [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), 200)]
+        public async Task<IEnumerable<CustomerShortResponse>> GetAll() =>
+            (await customerRepository.GetAllAsync()).Select(mapper.Map<CustomerShortResponse>);
+
+        /// <summary>
+        /// Получить данные клиента по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(CustomerResponse), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<CustomerResponse>> Get(Guid id)
         {
-            //TODO: Добавить получение списка клиентов
-            throw new NotImplementedException();
+            var customer = await customerRepository.GetByIdAsync(id);
+            if (customer == null) return NotFound();
+            else return Ok(mapper.Map<CustomerResponse>(customer));
         }
 
-        [HttpGet("{id}")]
-        public Task<ActionResult<CustomerResponse>> GetCustomerAsync(Guid id)
-        {
-            //TODO: Добавить получение клиента вместе с выданными ему промомкодами
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// Добавить нового клиента, с предпочтениями.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
-        public Task<IActionResult> CreateCustomerAsync(CreateOrEditCustomerRequest request)
+        [ProducesResponseType(typeof(CustomerResponse), 201)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync([FromBody] CreateOrEditCustomerRequest request)
         {
-            //TODO: Добавить создание нового клиента вместе с его предпочтениями
-            throw new NotImplementedException();
+            if (request.PreferenceIds.Count() == 0) return BadRequest("To get coupons, you need to have at least one preference");
+            else
+            {
+                var response = await customerRepository.CreateAsync(mapper.Map<Customer>(request));
+                return CreatedAtAction(nameof(Get), new { id = response.Id }, mapper.Map<CustomerResponse>(response));
+            }
         }
 
-        [HttpPut("{id}")]
-        public Task<IActionResult> EditCustomersAsync(Guid id, CreateOrEditCustomerRequest request)
+        /// <summary>
+        /// Обновить данные клиента.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpPut("{id:guid}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> EditCustomersAsync(Guid id, [FromBody] CreateOrEditCustomerRequest request)
         {
-            //TODO: Обновить данные клиента вместе с его предпочтениями
-            throw new NotImplementedException();
+            if ((await customerRepository.GetByIdAsync(id)) == null) return NotFound("Employee id not found");
+            else if (request.PreferenceIds.Count() == 0) return BadRequest("To get coupons, you need to have at least one preference");
+            else
+            {
+                await customerRepository.UpdateAsync(id, mapper.Map<Customer>(request));
+                return NoContent();
+            }
         }
 
-        [HttpDelete]
-        public Task<IActionResult> DeleteCustomer(Guid id)
+        /// <summary>
+        /// Удалить клиента по Id, вместе с его уникальными промокодами.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id:guid}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteCustomer(Guid id)
         {
-            //TODO: Удаление клиента вместе с выданными ему промокодами
-            throw new NotImplementedException();
+            if ((await customerRepository.GetByIdAsync(id)) == null) return NotFound("Employee id not found");
+            else
+            {
+                await customerRepository.DeleteAsync(id);
+                return NoContent();
+            }
         }
     }
 }
