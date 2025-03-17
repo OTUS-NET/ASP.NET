@@ -25,7 +25,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(typeof(IEnumerable<PreferenceResponse>), 200)]
         public async Task<IEnumerable<PreferenceResponse>> GetPreferenceAsync() =>
             (await preferenceRepository.GetAllAsync()).Select(mapper.Map<PreferenceResponse>);
-
     }
 }
-}
+
+
