@@ -46,13 +46,13 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             var costomer = mapper.Map<CustomerResponse>(await costomerRepository.GetByIdAsync(request.CustomerId));
             var preference = await preferenceRepository.GetByIdAsync(request.PreferenceId);
-            if (costomer == null) return NotFound("The customer with this Id was not found");
-            if ((await employeeRepository.GetByIdAsync(request.EmployeeId)) == null) return NotFound("The employee with this Id was not found");
-            if (preference == null) return NotFound("The preference with this Id was not found");
+            if (costomer == null) return NotFound("The customer with this Id was not found Клиент с таким id не найден");
+            if ((await employeeRepository.GetByIdAsync(request.EmployeeId)) == null) return NotFound("The employee with this Id was not found Работник с таким id не найден");
+            if (preference == null) return NotFound("The preference with this Id was not found Предпочтение с таким id не найдено");
             
             //Проверка наличия продпочтений.
             if (costomer.Preferences.Where(p => p.Name == preference.Name).FirstOrDefault() == null)
-                return BadRequest("The customer does not have such preferences");
+                return BadRequest("The customer does not have such preferences Клиент не имеет такого предпочтения");
 
             var promoCode = mapper.Map<PromoCode>(request);
             promoCode.BeginDate = DateTime.Now.AddDays(request.BeforeStarts);
