@@ -49,6 +49,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (costomer == null) return NotFound("The customer with this Id was not found");
             if ((await employeeRepository.GetByIdAsync(request.EmployeeId)) == null) return NotFound("The employee with this Id was not found");
             if (preference == null) return NotFound("The preference with this Id was not found");
+            
             //Проверка наличия продпочтений.
             if (costomer.Preferences.Where(p => p.Name == preference.Name).FirstOrDefault() == null)
                 return BadRequest("The customer does not have such preferences");
