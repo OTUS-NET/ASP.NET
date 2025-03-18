@@ -32,8 +32,7 @@ namespace PromoCodeFactory.WebHost.Helpers
                 context.AddRange(FakeDataFactory.CustomerPreferences);
                 context.AddRange(FakeDataFactory.PromoCodes);
                 context.SaveChanges();
-            }
-            ;
+            };
         }
     }
 }

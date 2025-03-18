@@ -52,7 +52,8 @@ namespace PromoCodeFactory.WebHost.Controllers
         [ProducesResponseType(400)]
         public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync([FromBody] CreateOrEditCustomerRequest request)
         {
-            if (request.PreferenceIds.Count() == 0) return BadRequest("To get coupons, you need to have at least one preference");
+            if (request.PreferenceIds.Count() == 0) return BadRequest("To get coupons, you need to have at least one preference / " +
+                "Чтобы получить купон надо иметь хоть одно предпочтение");
             else
             {
                 var response = await customerRepository.CreateAsync(mapper.Map<Customer>(request));

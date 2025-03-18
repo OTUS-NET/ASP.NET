@@ -34,14 +34,13 @@ namespace PromoCodeFactory.WebHost
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "EntityFrameworkHomeWork", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "OTUS EF HomeWork", Version = "v2" });
 
                 // generate the XML docs that'll drive the swagger docs
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
-
 
             builder.Services.AddAutoMapper(typeof(Program));
 
@@ -50,8 +49,8 @@ namespace PromoCodeFactory.WebHost
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwaggerUi();
-                app.UseSwaggerUi();
+                app.UseSwagger();
+                app.UseSwaggerUI();                
             }
 
             app.UseRouting();

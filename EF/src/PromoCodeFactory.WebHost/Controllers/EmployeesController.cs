@@ -12,7 +12,6 @@ using PromoCodeFactory.WebHost.Models.Request;
 using PromoCodeFactory.WebHost.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using PromoCodeFactory.DataAccess;
-using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.DataAccess.Repositories;
 
 namespace PromoCodeFactory.WebHost.Controllers
