@@ -8,7 +8,7 @@ using PromoCodeFactory.Core.Domain;
 
 namespace PromoCodeFactory.Core.Abstractions.Repositories
 {
-    public interface IEmployeesRepository : IRepository<Employee>
+    public interface IEmployeesRepository : IRepository<Employee, Guid>
     {
         Task<Employee> UpdateAsync(Guid id, Employee entity);
     }
