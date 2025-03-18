@@ -13,8 +13,11 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 
         public string Email { get; set; }
 
-        public virtual IEnumerable<CustomerPreference> CustomerPreferences { get; set; }
-        public virtual IEnumerable<PromoCode> PromoCodes { get; set; }
+        public virtual List<Preference> Preferences { get; set; }
+
+        public virtual List<PromoCode> PromoCodes { get; set; }
+
+        public virtual List<CustomerPreference> CustomerPreferences { get; set; }
 
     }
 }
