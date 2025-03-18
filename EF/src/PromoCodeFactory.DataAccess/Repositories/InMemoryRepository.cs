@@ -6,51 +6,116 @@ using System.Threading;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Domain.Base;
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {
-    public class InMemoryRepository<T>
-        : IRepository<T> where T : BaseEntity
+    public class InMemoryRepository<TEntity, TId> : IRepository<TEntity, TId>
+        where TEntity : class, IEntity<TId>
+        where TId : struct
     {
-        protected IEnumerable<T> Data { get; set; }
-        protected object lockObj = new object();
+        protected static object lockObj = new object();
+        protected IEnumerable<TEntity> Data { get; set; }
 
-        public InMemoryRepository(IEnumerable<T> data)
+        public InMemoryRepository(IEnumerable<TEntity> data)
         {
-            return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+            Data = data;
         }
 
-        public Task<IEnumerable<T>> GetAllAsync()
+        public Task<IEnumerable<TEntity>> GetAllAsync()
         {
             return Task.FromResult(Data);
         }
 
-        public Task<T> GetByIdAsync(Guid id)
+        public Task<TEntity> GetByIdAsync(TId id)
         {
-            return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+            return Task.FromResult(Data.FirstOrDefault(predicate: x => x.Id.Equals(id)));
         }
 
-        public Task<T> CreateAsync(T entity)
+        public Task<TEntity> CreateAsync(TEntity entity)
         {
-            Monitor.Enter(lockObj);
-
-            entity.Id = Guid.NewGuid();
-            IEnumerable<T> enumerable = Data.Concat(new[] { entity });
-            Data = enumerable;
-
-            Monitor.Exit(lockObj);
+            try
+            {
+                Monitor.Enter(lockObj);
+                IEnumerable<TEntity> enumerable = Data.Concat(new[] { entity });
+                Data = enumerable;
+            }
+            finally { Monitor.Exit(lockObj); }
 
             return Task.FromResult(entity);
         }
-        public Task DeleteAsync(Guid id)
+
+        public Task DeleteAsync(TId id)
         {
-            Monitor.Enter(lockObj);
+            try
+            {
+                Monitor.Enter(lockObj);
+                IEnumerable<TEntity> enumerable = Data.Where(predicate: x => x.Id.Equals(id));
+                Data = enumerable;
+            }
+            finally { Monitor.Exit(lockObj); }
 
-            IEnumerable<T> enumerable = Data.Where(x => x.Id != id);
-            Data = enumerable;
+            return Task.FromResult(Data);
+        }
 
-            Monitor.Exit(lockObj);
-            return Task.FromResult(enumerable);
+        public Task UpdateAsync(TId id, TEntity entity)
+        {
+            try
+            {
+                Monitor.Enter(lockObj);
+                var date = Data.Where(predicate: x => x.Id.Equals(id)).ToList();
+                date.Add(entity);
+                Data = date;
+            }
+            finally { Monitor.Exit(lockObj); }
+            return Task.CompletedTask;
         }
     }
 }
+
+//{
+//    public class InMemoryRepository<T>
+//        : IRepository<T> where T : BaseEntity
+//    {
+//        protected IEnumerable<T> Data { get; set; }
+//        protected object lockObj = new object();
+
+//        public InMemoryRepository(IEnumerable<T> data)
+//        {
+//            return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+//        }
+
+//        public Task<IEnumerable<T>> GetAllAsync()
+//        {
+//            return Task.FromResult(Data);
+//        }
+
+//        public Task<T> GetByIdAsync(Guid id)
+//        {
+//            return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+//        }
+
+//        public Task<T> CreateAsync(T entity)
+//        {
+//            Monitor.Enter(lockObj);
+
+//            entity.Id = Guid.NewGuid();
+//            IEnumerable<T> enumerable = Data.Concat(new[] { entity });
+//            Data = enumerable;
+
+//            Monitor.Exit(lockObj);
+
+//            return Task.FromResult(entity);
+//        }
+//        public Task DeleteAsync(Guid id)
+//        {
+//            Monitor.Enter(lockObj);
+
+//            IEnumerable<T> enumerable = Data.Where(x => x.Id != id);
+//            Data = enumerable;
+
+//            Monitor.Exit(lockObj);
+//            return Task.FromResult(enumerable);
+//        }
+//    }
+//}
