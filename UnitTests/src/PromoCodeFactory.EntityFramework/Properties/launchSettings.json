@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PromoCodeFactory.EntityFramework": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
