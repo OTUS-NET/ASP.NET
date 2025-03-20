@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Domain.Base;
+using PromoCodeFactory.EntityFramework;
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {

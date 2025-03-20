@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.EntityFramework;
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {
-    internal class PartnerRepository : EFRepository<Partner, Guid>, IPartnerRepository
+    public class PartnerRepository : EFRepository<Partner, Guid>, IPartnerRepository
     {
         public PartnerRepository(DataContext context) : base(context)
         {
