@@ -12,6 +12,7 @@ using Xunit;
 using AutoFixture.Xunit2;
 using PromoCodeFactory.WebHost.Helpers;
 using System.Threading.Tasks;
+using PromoCodeFactory.UnitTests.Helpers;
 
 namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
 {

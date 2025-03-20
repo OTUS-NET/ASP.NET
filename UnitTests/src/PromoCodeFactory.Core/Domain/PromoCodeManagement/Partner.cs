@@ -11,6 +11,6 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 
         public bool IsActive { get; set; }
 
-        public virtual ICollection<PartnerPromoCodeLimit> PartnerLimits { get; set; }
+        public virtual IList<PartnerPromoCodeLimit> PartnerLimits { get; set; }
     }
 }

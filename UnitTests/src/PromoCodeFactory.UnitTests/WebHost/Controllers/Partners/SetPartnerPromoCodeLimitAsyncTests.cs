@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Xunit;
 using AutoMapper;
 using PromoCodeFactory.WebHost.Helpers;
+using PromoCodeFactory.UnitTests.Helpers;
 
 namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
 {
@@ -115,5 +116,4 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
                 badResult.Value.Should().BeEquivalentTo(ErrorMessages.LimitMustBeGreaterThanZero());
         }
     }
-}
 }
