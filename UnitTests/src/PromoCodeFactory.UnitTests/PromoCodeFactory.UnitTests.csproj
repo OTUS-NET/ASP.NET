@@ -28,4 +28,8 @@
       <ProjectReference Include="..\PromoCodeFactory.WebHost\PromoCodeFactory.WebHost.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="WebHost\Controllers\Partners\Fixtures\" />
+    </ItemGroup>
+
 </Project>

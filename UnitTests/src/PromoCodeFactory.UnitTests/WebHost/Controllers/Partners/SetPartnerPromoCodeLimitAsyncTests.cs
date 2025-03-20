@@ -1,4 +1,5 @@
 ﻿using AutoFixture;
+using AutoFixture.Xunit2;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using AutoMapper;
-using AutoFixture.Xunit2;
 using PromoCodeFactory.WebHost.Helpers;
 
 namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
@@ -24,8 +24,7 @@ namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners
     public class SetPartnerPromoCodeLimitAsyncTests
     {
         [Theory, AutoMoqData]
-        public async Task SetPartnerPromoCodeLimitAsync_PartnerIsNotFound_ReturnsNotFound(
-            Guid partnerId,
+        public async Task SetPartnerPromoCodeLimitAsync_PartnerIsNotFound_ReturnsNotFound(Guid partnerId,
             SetPartnerPromoCodeLimitRequest limit,
            [Frozen] 
             Mock<IPartnerRepository> partnerRepositoryMock,
