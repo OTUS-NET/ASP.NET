@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using System;
 using System.Collections.Generic;
 
 namespace PromoCodeFactory.Core.Domain.Administration
@@ -17,5 +18,6 @@ namespace PromoCodeFactory.Core.Domain.Administration
         public virtual Role Role { get; set; }
 
         public int AppliedPromocodesCount { get; set; }
+        public virtual IEnumerable<PromoCode> PromoCodes { get; set; }
     }
 }
