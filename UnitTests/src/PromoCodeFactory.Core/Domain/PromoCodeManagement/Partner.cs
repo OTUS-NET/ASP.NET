@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
-    public class Partner
-        : BaseEntity
+    public class Partner : BaseEntity
     {
         public string Name { get; set; }
 
