@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
+<<<<<<< Updated upstream
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
         <PrivateAssets>all</PrivateAssets>
@@ -25,6 +26,14 @@
       </PackageReference>
       <PackageReference Include="NSwag.AspNetCore" Version="14.2.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />
+=======
+      <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+      <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
+>>>>>>> Stashed changes
     </ItemGroup>
 
 </Project>

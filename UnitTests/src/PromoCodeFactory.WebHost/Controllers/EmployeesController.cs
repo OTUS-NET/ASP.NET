@@ -21,6 +21,8 @@ namespace PromoCodeFactory.WebHost.Controllers
 
         /// <summary>
         /// Get the data of all employees
+        /// /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EmployeeShortResponse>), 200)]
         public async Task<IEnumerable<EmployeeShortResponse>> GetEmployeesAsync() =>
@@ -49,9 +51,6 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// Добавить нового сотрудника, с указанием роли
         /// Add a new employee, specifying the role
         ///</summary>
-        /// <param name="id"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(EmployeeResponse), 201)]
         [ProducesResponseType(400)]
