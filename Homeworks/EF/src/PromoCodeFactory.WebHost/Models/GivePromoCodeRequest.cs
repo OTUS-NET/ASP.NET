@@ -9,5 +9,9 @@
         public string PromoCode { get; set; }
 
         public string Preference { get; set; }
+
+        public string BeginDate { get; set; }
+
+        public string EndDate { get; set; }
     }
 }

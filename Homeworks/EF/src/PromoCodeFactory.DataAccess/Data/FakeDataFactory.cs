@@ -51,7 +51,7 @@ namespace PromoCodeFactory.DataAccess.Data
             new Preference()
             {
                 Id = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c"),
-                Name = "Театр",
+                Name = "Машины",
             },
             new Preference()
             {
@@ -61,7 +61,7 @@ namespace PromoCodeFactory.DataAccess.Data
             new Preference()
             {
                 Id = Guid.Parse("76324c47-68d2-472d-abb8-33cfa8cc0c84"),
-                Name = "Дети",
+                Name = "Рыбалка",
             }
         };
 
@@ -78,7 +78,12 @@ namespace PromoCodeFactory.DataAccess.Data
                         Email = "ivan_sergeev@mail.ru",
                         FirstName = "Иван",
                         LastName = "Петров",
-                        //TODO: Добавить предзаполненный список предпочтений
+
+                        Preferences = new List<Preference>()
+                        {
+                            Preferences.FirstOrDefault(x => x.Name == "Театр")!,
+                            Preferences.FirstOrDefault(x => x.Name == "Семья")!,
+                        }
                     }
                 };
 
