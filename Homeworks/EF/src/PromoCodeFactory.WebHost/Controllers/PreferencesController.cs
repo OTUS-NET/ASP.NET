@@ -32,8 +32,8 @@ public class PreferencesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<PreferenceShortResponse>>> GetAllAsync(CancellationToken cancellationToken)
     {
-        var customers = (await _preferenceRepository.GetAllAsync(cancellationToken))
+        var preferences = (await _preferenceRepository.GetAllAsync(cancellationToken))
             .Select(c => _mapper.Map<PreferenceShortResponse>(c)).ToList();
-        return Ok(customers);
+        return Ok(preferences);
     }
 }

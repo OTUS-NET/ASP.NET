@@ -18,7 +18,7 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 
         public string PartnerName { get; set; }
 
-        public Guid PartnerManagerId { get; set; }
+        public Guid? PartnerManagerId { get; set; }
 
         public virtual Employee PartnerManager { get; set; }
 

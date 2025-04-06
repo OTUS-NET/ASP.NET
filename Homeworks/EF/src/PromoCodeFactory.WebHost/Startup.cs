@@ -41,6 +41,8 @@ namespace PromoCodeFactory.WebHost
             //    new InMemoryRepository<Employee>(FakeDataFactory.Employees));
             //services.AddScoped(typeof(IRepository<Role>), (x) =>
             //    new InMemoryRepository<Role>(FakeDataFactory.Roles));
+            
+            services.AddTransient<IRepository<PromoCode>, PromoCodeRepository>();
             services.AddTransient<IRepository<Preference>, PreferenceRepository>();
             services.AddTransient<IRepository<Customer>, CustomerRepository>();
 
