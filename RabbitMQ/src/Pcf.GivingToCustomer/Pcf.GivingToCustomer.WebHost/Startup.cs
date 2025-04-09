@@ -12,6 +12,8 @@ using Pcf.GivingToCustomer.DataAccess.Data;
 using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Integration;
+using RabbitMQ.Client;
+using Pcf.GivingToCustomer.Core.Services;
 
 namespace Pcf.GivingToCustomer.WebHost
 {
@@ -33,6 +35,7 @@ namespace Pcf.GivingToCustomer.WebHost
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
+            services.AddScoped<PromocodeService>();
             services.AddDbContext<DataContext>(x =>
             {
                 //x.UseSqlite("Filename=PromocodeFactoryGivingToCustomerDb.sqlite");
@@ -48,6 +51,12 @@ namespace Pcf.GivingToCustomer.WebHost
                 options.Title = "PromoCode Factory Giving To Customer API Doc";
                 options.Version = "1.0";
             });
+
+            services.AddSingleton(new ConnectionFactory
+            {
+                HostName = Configuration.GetConnectionString("RabbitMQ")
+            });
+            services.AddHostedService<PromocodeEventsReceiver>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

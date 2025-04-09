@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.Administration.DataAcce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.Administration.WebHost", "Pcf.Administration\Pcf.Administration.WebHost\Pcf.Administration.WebHost.csproj", "{F565C384-5170-4915-B3B9-583809F1F75A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.GivingToCustomer.Core", "Pcf.GivingToCustomer\Pcf.GivingToCustomer.Core\Pcf.GivingToCustomer.Core.csproj", "{2030846A-3084-4912-A9CB-46688EAC72E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.GivingToCustomer.Core", "Pcf.GivingToCustomer\Pcf.GivingToCustomer.Core\Pcf.GivingToCustomer.Core.csproj", "{2030846A-3084-4912-A9CB-46688EAC72E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.GivingToCustomer.DataAccess", "Pcf.GivingToCustomer\Pcf.GivingToCustomer.DataAccess\Pcf.GivingToCustomer.DataAccess.csproj", "{20E94F0C-5351-4F49-A9E3-12C8C40120DE}"
 EndProject
@@ -25,17 +25,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.GivingToCustomer.Integr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.GivingToCustomer.WebHost", "Pcf.GivingToCustomer\Pcf.GivingToCustomer.WebHost\Pcf.GivingToCustomer.WebHost.csproj", "{D930308C-760B-48B7-875C-33E80BDB1DA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.Core", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.Core\Pcf.ReceivingFromPartner.Core.csproj", "{A4D75929-E8CA-476B-9657-B63E1066CAAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.ReceivingFromPartner.Core", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.Core\Pcf.ReceivingFromPartner.Core.csproj", "{A4D75929-E8CA-476B-9657-B63E1066CAAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.DataAccess", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.DataAccess\Pcf.ReceivingFromPartner.DataAccess.csproj", "{51BFC6F3-0258-47FE-93AF-744F5B2549D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.ReceivingFromPartner.DataAccess", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.DataAccess\Pcf.ReceivingFromPartner.DataAccess.csproj", "{51BFC6F3-0258-47FE-93AF-744F5B2549D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.Integration", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.Integration\Pcf.ReceivingFromPartner.Integration.csproj", "{BE7469BC-5269-4118-82B5-8BEDB13A8FEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.ReceivingFromPartner.Integration", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.Integration\Pcf.ReceivingFromPartner.Integration.csproj", "{BE7469BC-5269-4118-82B5-8BEDB13A8FEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.UnitTests", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.UnitTests\Pcf.ReceivingFromPartner.UnitTests.csproj", "{9CA552AE-FAAA-40B5-BC89-040F041CA48E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.ReceivingFromPartner.UnitTests", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.UnitTests\Pcf.ReceivingFromPartner.UnitTests.csproj", "{9CA552AE-FAAA-40B5-BC89-040F041CA48E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.ReceivingFromPartner.WebHost", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.WebHost\Pcf.ReceivingFromPartner.WebHost.csproj", "{3C4538FC-B200-4DC1-B278-DE43800B0BE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.ReceivingFromPartner.WebHost", "Pcf.ReceivingFromPartner\Pcf.ReceivingFromPartner.WebHost\Pcf.ReceivingFromPartner.WebHost.csproj", "{3C4538FC-B200-4DC1-B278-DE43800B0BE3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pcf.Administration.IntegrationTests", "Pcf.Administration\Pcf.Administration.IntegrationTests\Pcf.Administration.IntegrationTests.csproj", "{38F1FFB6-5EBF-4EDF-B74E-AF29B0F1ABF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pcf.Shared", "Pcf.Shared", "{AB71B90B-A90E-4F01-9D0C-5B54F994EBA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.Shared.Messaging", "Pcf.Shared.Messaging\Pcf.Shared.Messaging.csproj", "{44951431-2634-449F-9226-512EAA59D996}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +103,10 @@ Global
 		{38F1FFB6-5EBF-4EDF-B74E-AF29B0F1ABF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F1FFB6-5EBF-4EDF-B74E-AF29B0F1ABF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F1FFB6-5EBF-4EDF-B74E-AF29B0F1ABF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44951431-2634-449F-9226-512EAA59D996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44951431-2634-449F-9226-512EAA59D996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44951431-2634-449F-9226-512EAA59D996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44951431-2634-449F-9226-512EAA59D996}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,5 +126,9 @@ Global
 		{9CA552AE-FAAA-40B5-BC89-040F041CA48E} = {45AAAE31-1D5D-400B-ADAA-DE16D7B95BD5}
 		{3C4538FC-B200-4DC1-B278-DE43800B0BE3} = {45AAAE31-1D5D-400B-ADAA-DE16D7B95BD5}
 		{38F1FFB6-5EBF-4EDF-B74E-AF29B0F1ABF7} = {92A39EB2-4342-42A8-A30F-36DB3B5D2C95}
+		{44951431-2634-449F-9226-512EAA59D996} = {AB71B90B-A90E-4F01-9D0C-5B54F994EBA4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CCACA9B3-8359-4437-97BA-62E2E0B3EBA8}
 	EndGlobalSection
 EndGlobal

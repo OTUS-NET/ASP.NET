@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
+using Pcf.GivingToCustomer.Core.Services;
 using Pcf.GivingToCustomer.WebHost.Mappers;
 using Pcf.GivingToCustomer.WebHost.Models;
+using Pcf.Shared.Messaging;
 
 namespace Pcf.GivingToCustomer.WebHost.Controllers
 {
@@ -21,13 +23,15 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         private readonly IRepository<PromoCode> _promoCodesRepository;
         private readonly IRepository<Preference> _preferencesRepository;
         private readonly IRepository<Customer> _customersRepository;
+        private readonly PromocodeService _promocodeService;
 
         public PromocodesController(IRepository<PromoCode> promoCodesRepository,
-            IRepository<Preference> preferencesRepository, IRepository<Customer> customersRepository)
+            IRepository<Preference> preferencesRepository, IRepository<Customer> customersRepository, PromocodeService promocodeService)
         {
             _promoCodesRepository = promoCodesRepository;
             _preferencesRepository = preferencesRepository;
             _customersRepository = customersRepository;
+            _promocodeService = promocodeService;
         }
 
         /// <summary>
@@ -59,6 +63,15 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         [HttpPost]
         public async Task<IActionResult> GivePromoCodesToCustomersWithPreferenceAsync(GivePromoCodeRequest request)
         {
+            var dto = new PromoCodeAppliedEvent()
+            {
+                ServiceInfo = request.ServiceInfo,
+                PartnerId = request.PartnerId,
+                PreferenceId = request.PreferenceId,
+                BeginDate = DateTime.Parse(request.BeginDate),
+                EndDate = DateTime.Parse(request.EndDate)
+            };
+
             //Получаем предпочтение по имени
             var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
 

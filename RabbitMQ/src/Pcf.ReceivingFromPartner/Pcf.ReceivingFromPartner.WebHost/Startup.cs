@@ -12,6 +12,7 @@ using Pcf.ReceivingFromPartner.DataAccess;
 using Pcf.ReceivingFromPartner.DataAccess.Repositories;
 using Pcf.ReceivingFromPartner.DataAccess.Data;
 using Pcf.ReceivingFromPartner.Integration;
+using RabbitMQ.Client;
 
 namespace Pcf.ReceivingFromPartner.WebHost
 {
@@ -59,6 +60,12 @@ namespace Pcf.ReceivingFromPartner.WebHost
                 options.Title = "PromoCode Factory Receiving From Partner API Doc";
                 options.Version = "1.0";
             });
+
+            services.AddSingleton(new ConnectionFactory
+            {
+                HostName = Configuration.GetConnectionString("RabbitMQ")
+            });
+            services.AddScoped<RabbitService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
