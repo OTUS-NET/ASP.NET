@@ -8,11 +8,11 @@ import OutletApp from './OutletApp.tsx'
 import NavigateApp from './NavigateApp.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    {/* <BasicApp /> */}
+  <>
+    <BasicApp />
     {/* <RouteParamsApp /> */}
     {/* <UseNavigateApp /> */}
+    {/* <NavigateApp /> */}
     {/* <OutletApp /> */}
-    <NavigateApp/>
-  </StrictMode>,
+  </>
 )

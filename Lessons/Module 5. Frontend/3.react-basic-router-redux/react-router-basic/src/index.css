@@ -66,3 +66,14 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.block {
+  display: block;
+  width: 100%;
+}
+
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2em;
+}
