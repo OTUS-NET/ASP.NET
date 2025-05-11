@@ -29,7 +29,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 LastName = "Андреев",
                 Roles = new List<Role>()
                 {
-                    Roles.FirstOrDefault(x => x.Name == "PartnerManager")  
+                    Roles.FirstOrDefault(x => x.Name == "PartnerManager")
                 },
                 AppliedPromocodesCount = 10
             },
