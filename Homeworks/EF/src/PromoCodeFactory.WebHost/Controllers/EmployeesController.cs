@@ -33,12 +33,12 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             var employees = await _employeeRepository.GetAllAsync();
 
-            var employeesModelList = employees.Select(x =>
+            var employeesModelList = employees.Select(e =>
                 new EmployeeShortResponse()
                 {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
+                    Id = e.Id,
+                    Email = e.Email,
+                    FullName = e.FullName,
                 }).ToList();
 
             return employeesModelList;
@@ -51,7 +51,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            var employee = await _employeeRepository.GetByIdAsync(id, e => e.Role);
 
             if (employee == null)
                 return NotFound();
@@ -62,6 +62,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                 Email = employee.Email,
                 Role = new RoleItemResponse()
                 {
+                    Id = employee.RoleId,
                     Name = employee.Role.Name,
                     Description = employee.Role.Description
                 },

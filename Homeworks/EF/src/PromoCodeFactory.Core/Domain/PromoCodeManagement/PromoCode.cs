@@ -1,7 +1,5 @@
-﻿using System;
-using System.Runtime;
-using PromoCodeFactory.Core.Domain;
-using PromoCodeFactory.Core.Domain.Administration;
+﻿using PromoCodeFactory.Core.Domain.Administration;
+using System;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
@@ -18,8 +16,14 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 
         public string PartnerName { get; set; }
 
-        public Employee PartnerManager { get; set; }
+        public virtual Employee PartnerManager { get; set; }
 
-        public Preference Preference { get; set; }
+        public Guid PreferenceId { get; set; }
+
+        public virtual Preference Preference { get; set; }
+
+        public Guid CustomerId { get; set; }
+        
+        public virtual Customer Customer { get; set; }
     }
 }
