@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
 
 namespace Pcf.Administration.Core.Domain.Administration
 {
@@ -13,8 +14,7 @@ namespace Pcf.Administration.Core.Domain.Administration
 
         public string Email { get; set; }
 
-        public Guid RoleId { get; set; }
-        public virtual Role Role { get; set; }
+        public ObjectId RoleId { get; set; }
 
         public int AppliedPromocodesCount { get; set; }
     }

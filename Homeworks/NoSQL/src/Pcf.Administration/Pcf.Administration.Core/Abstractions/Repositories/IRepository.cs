@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using Pcf.Administration.Core.Domain;
 
 namespace Pcf.Administration.Core.Abstractions.Repositories
@@ -12,9 +13,9 @@ namespace Pcf.Administration.Core.Abstractions.Repositories
     {
         Task<IEnumerable<T>> GetAllAsync();
         
-        Task<T> GetByIdAsync(Guid id);
+        Task<T> GetByIdAsync(ObjectId id);
         
-        Task<IEnumerable<T>> GetRangeByIdsAsync(List<Guid> ids);
+        Task<IEnumerable<T>> GetRangeByIdsAsync(List<ObjectId> ids);
         
         Task<T> GetFirstWhere(Expression<Func<T, bool>> predicate);
         

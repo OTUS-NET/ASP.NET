@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using Pcf.Administration.WebHost.Models;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using Pcf.Administration.Core.Domain.Administration;
@@ -18,12 +19,14 @@ namespace Pcf.Administration.WebHost.Controllers
         : ControllerBase
     {
         private readonly IRepository<Employee> _employeeRepository;
+        private readonly IRepository<Role> _roleRepository;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository)
         {
             _employeeRepository = employeeRepository;
+            _roleRepository = roleRepository;
         }
-        
+
         /// <summary>
         /// Получить данные всех сотрудников
         /// </summary>
@@ -49,13 +52,15 @@ namespace Pcf.Administration.WebHost.Controllers
         /// </summary>
         /// <param name="id">Id сотрудника, например <example>451533d5-d8d5-4a11-9c7b-eb9f14e1a32f</example></param>
         /// <returns></returns>
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(string id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            var employee = await _employeeRepository.GetByIdAsync(new ObjectId(id));
 
             if (employee == null)
                 return NotFound();
+
+            var role = await _roleRepository.GetByIdAsync(employee.RoleId);
 
             var employeeModel = new EmployeeResponse()
             {
@@ -63,9 +68,9 @@ namespace Pcf.Administration.WebHost.Controllers
                 Email = employee.Email,
                 Role = new RoleItemResponse()
                 {
-                    Id = employee.Id,
-                    Name = employee.Role.Name,
-                    Description = employee.Role.Description
+                    Id = role.Id,
+                    Name = role.Name,
+                    Description = role.Description
                 },
                 FullName = employee.FullName,
                 AppliedPromocodesCount = employee.AppliedPromocodesCount
@@ -79,11 +84,11 @@ namespace Pcf.Administration.WebHost.Controllers
         /// </summary>
         /// <param name="id">Id сотрудника, например <example>451533d5-d8d5-4a11-9c7b-eb9f14e1a32f</example></param>
         /// <returns></returns>
-        [HttpPost("{id:guid}/appliedPromocodes")]
+        [HttpPost("{id}/appliedPromocodes")]
         
-        public async Task<IActionResult> UpdateAppliedPromocodesAsync(Guid id)
+        public async Task<IActionResult> UpdateAppliedPromocodesAsync(string id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
+            var employee = await _employeeRepository.GetByIdAsync(new ObjectId(id));
 
             if (employee == null)
                 return NotFound();

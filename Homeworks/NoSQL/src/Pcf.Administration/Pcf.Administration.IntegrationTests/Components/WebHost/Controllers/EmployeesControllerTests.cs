@@ -1,33 +1,32 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Pcf.Administration.Core.Domain.Administration;
-using Pcf.Administration.DataAccess.Repositories;
+using MongoDB.Bson;
 using Pcf.Administration.WebHost.Controllers;
 using Xunit;
 
 namespace Pcf.Administration.IntegrationTests.Components.WebHost.Controllers
 {
-    [Collection(EfDatabaseCollection.DbCollection)]
-    public class EmployeesControllerTests: IClassFixture<EfDatabaseFixture>
+    [Collection(MongoDatabaseCollection.DbCollection)]
+    public class EmployeesControllerTests: IClassFixture<MongoDatabaseFixture>
     {
-        private EfRepository<Employee> _employeesRepository;
-        private EmployeesController _employeesController;
+        private readonly EmployeesController _employeesController;
 
-        public EmployeesControllerTests(EfDatabaseFixture efDatabaseFixture)
+        public EmployeesControllerTests(MongoDatabaseFixture mongoDatabaseFixture)
         {
-            _employeesRepository = new EfRepository<Employee>(efDatabaseFixture.DbContext);
-            _employeesController = new EmployeesController(_employeesRepository);
+            var employeesRepository = mongoDatabaseFixture.EmployeeRepository;
+            var rolesRepository = mongoDatabaseFixture.RoleRepository;
+
+            _employeesController = new EmployeesController(employeesRepository, rolesRepository);
         }
 
         [Fact]
         public async Task GetEmployeeByIdAsync_ExistedEmployee_ExpectedId()
         {
             //Arrange
-            var expectedEmployeeId = Guid.Parse("451533d5-d8d5-4a11-9c7b-eb9f14e1a32f");
+            var expectedEmployeeId = new ObjectId("000000000000000000000001");
 
             //Act
-            var result = await _employeesController.GetEmployeeByIdAsync(expectedEmployeeId);
+            var result = await _employeesController.GetEmployeeByIdAsync("000000000000000000000001");
 
             //Assert
             result.Value.Id.Should().Be(expectedEmployeeId);
