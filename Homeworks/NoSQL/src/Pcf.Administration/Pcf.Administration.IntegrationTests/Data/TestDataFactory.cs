@@ -34,11 +34,13 @@ namespace Pcf.Administration.IntegrationTests.Data
         {
             new Role()
             {
+                Id = new ObjectId("000000000000000000000001"),
                 Name = "Admin",
                 Description = "Администратор",
             },
             new Role()
             {
+                Id = new ObjectId("000000000000000000000002"),
                 Name = "PartnerManager",
                 Description = "Партнерский менеджер"
             }

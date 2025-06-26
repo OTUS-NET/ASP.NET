@@ -13,13 +13,14 @@ public class MongoTestDbInitializer : IDbInitializer
     public void InitializeDb()
     {
         MongoClient = new MongoClient("mongodb://localhost:27017/");
+        MongoClient.DropDatabase("test_database");
         var mongoDatabase = MongoClient.GetDatabase("test_database");
-            
-        EmployeesCollection = mongoDatabase.GetCollection<Employee>("employees");
-        RolesCollection = mongoDatabase.GetCollection<Role>("roles");
 
-        EmployeesCollection.InsertMany(TestDataFactory.Employees);
+        RolesCollection = mongoDatabase.GetCollection<Role>("roles");
+        EmployeesCollection = mongoDatabase.GetCollection<Employee>("employees");
+
         RolesCollection.InsertMany(TestDataFactory.Roles);
+        EmployeesCollection.InsertMany(TestDataFactory.Employees);
     }
 
     public void CleanDb()
