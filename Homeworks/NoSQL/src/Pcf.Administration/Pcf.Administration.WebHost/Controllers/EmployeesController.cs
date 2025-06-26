@@ -50,7 +50,7 @@ namespace Pcf.Administration.WebHost.Controllers
         /// <summary>
         /// Получить данные сотрудника по id
         /// </summary>
-        /// <param name="id">Id сотрудника, например <example>451533d5-d8d5-4a11-9c7b-eb9f14e1a32f</example></param>
+        /// <param name="id">Id сотрудника, например <example>507f1f77bcf86cd799439011</example></param>
         /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(string id)
@@ -82,7 +82,7 @@ namespace Pcf.Administration.WebHost.Controllers
         /// <summary>
         /// Обновить количество выданных промокодов
         /// </summary>
-        /// <param name="id">Id сотрудника, например <example>451533d5-d8d5-4a11-9c7b-eb9f14e1a32f</example></param>
+        /// <param name="id">Id сотрудника, например <example>507f1f77bcf86cd799439011</example></param>
         /// <returns></returns>
         [HttpPost("{id}/appliedPromocodes")]
         

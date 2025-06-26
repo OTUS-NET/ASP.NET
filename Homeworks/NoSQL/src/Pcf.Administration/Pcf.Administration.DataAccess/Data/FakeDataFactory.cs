@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
 using Pcf.Administration.Core.Domain.Administration;
 
 namespace Pcf.Administration.DataAccess.Data
@@ -11,6 +11,7 @@ namespace Pcf.Administration.DataAccess.Data
         {
             new Employee()
             {
+                Id = new ObjectId("000000000000000000000001"),
                 Email = "owner@somemail.ru",
                 FirstName = "Иван",
                 LastName = "Сергеев",
@@ -19,6 +20,7 @@ namespace Pcf.Administration.DataAccess.Data
             },
             new Employee()
             {
+                Id = new ObjectId("000000000000000000000002"),
                 Email = "andreev@somemail.ru",
                 FirstName = "Петр",
                 LastName = "Андреев",
@@ -31,11 +33,13 @@ namespace Pcf.Administration.DataAccess.Data
         {
             new Role()
             {
+                Id = new ObjectId("000000000000000000000001"),
                 Name = "Admin",
                 Description = "Администратор",
             },
             new Role()
             {
+                Id = new ObjectId("000000000000000000000002"),
                 Name = "PartnerManager",
                 Description = "Партнерский менеджер"
             }
