@@ -10,6 +10,11 @@ using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using System;
+using System.Threading.Tasks;
+using Pcf.Administration.Services.Employees;
+using Pcf.Infrastructure.RabbitMq;
+using Pcf.ReceivingFromPartner.WebHost.Settings;
+using RabbitMQ.Client;
 
 namespace Pcf.Administration.WebHost
 {
@@ -38,6 +43,9 @@ namespace Pcf.Administration.WebHost
                 x.UseLazyLoadingProxies();
             });
 
+            ConfigureRabbitMq(services).Wait();
+            services.AddScoped<IEmployeesService, EmployeesService>();
+
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             services.AddOpenApiDocument(options =>
@@ -48,7 +56,22 @@ namespace Pcf.Administration.WebHost
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbInitializer dbInitializer)
+        private async Task ConfigureRabbitMq(IServiceCollection services)
+        {
+            var rmqSettings = Configuration.Get<ApplicationSettings>().RmqSettings;
+            var connection = await RabbitMqConfiguration.GetRabbitConnection(rmqSettings);
+            
+            var channel = await connection.CreateChannelAsync();
+            
+            services.AddSingleton<IChannel>(_ => channel);
+        }
+
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            IDbInitializer dbInitializer,
+            IEmployeesService employeesService,
+            IChannel channel)
         {
             if (env.IsDevelopment())
             {
@@ -73,7 +96,12 @@ namespace Pcf.Administration.WebHost
             {
                 endpoints.MapControllers();
             });
-
+            
+            employeesService.Register(
+                channel,
+                Configuration["AdministrationExchangeName"]!,
+                Configuration["AdministrationQueue"]!,
+                Configuration["AdministrationRoutingKey"]!);
             dbInitializer.InitializeDb();
         }
     }

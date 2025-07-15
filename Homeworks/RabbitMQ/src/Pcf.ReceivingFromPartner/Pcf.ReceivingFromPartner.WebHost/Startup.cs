@@ -1,10 +1,12 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using Pcf.Infrastructure.RabbitMq;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Repositories;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
@@ -12,6 +14,8 @@ using Pcf.ReceivingFromPartner.DataAccess;
 using Pcf.ReceivingFromPartner.DataAccess.Repositories;
 using Pcf.ReceivingFromPartner.DataAccess.Data;
 using Pcf.ReceivingFromPartner.Integration;
+using Pcf.ReceivingFromPartner.WebHost.Settings;
+using RabbitMQ.Client;
 
 namespace Pcf.ReceivingFromPartner.WebHost
 {
@@ -34,15 +38,7 @@ namespace Pcf.ReceivingFromPartner.WebHost
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
 
-            services.AddHttpClient<IGivingPromoCodeToCustomerGateway, GivingPromoCodeToCustomerGateway>(c =>
-            {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:GivingToCustomerApiUrl"]);
-            });
-
-            services.AddHttpClient<IAdministrationGateway, AdministrationGateway>(c =>
-            {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:AdministrationApiUrl"]);
-            });
+            CreateGateways(services).Wait();
 
             services.AddDbContext<DataContext>(x =>
             {
@@ -59,6 +55,27 @@ namespace Pcf.ReceivingFromPartner.WebHost
                 options.Title = "PromoCode Factory Receiving From Partner API Doc";
                 options.Version = "1.0";
             });
+        }
+
+        private async Task CreateGateways(IServiceCollection services)
+        {
+            var rmqSettings = Configuration.Get<ApplicationSettings>().RmqSettings;
+            var connection = await RabbitMqConfiguration.GetRabbitConnection(rmqSettings);
+            var channel = await connection.CreateChannelAsync();
+            
+            services.AddSingleton<IAdministrationGateway>(s =>
+                new AdministrationGateway(
+                    ExchangeType.Direct,
+                    Configuration["AdministrationExchangeName"], 
+                    Configuration["AdministrationRoutingKey"], 
+                    channel));
+            
+            services.AddSingleton<IGivingPromoCodeToCustomerGateway>(s =>
+                new GivingPromoCodeToCustomerGateway(
+                    ExchangeType.Direct,
+                    Configuration["GivingPromoCodeToCustomerExchangeName"], 
+                    Configuration["GivingPromoCodeToCustomerRoutingKey"], 
+                    channel));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

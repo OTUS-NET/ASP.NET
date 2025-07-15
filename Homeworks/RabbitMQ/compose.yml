@@ -1,4 +1,23 @@
 services:
+  
+  rabbit:
+    image: rabbitmq:3-management
+    restart: always
+    hostname: rabbitmqhost
+    environment:
+      RABBITMQ_DEFAULT_USER: myuser
+      RABBITMQ_DEFAULT_PASS: mypass
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   #Administration Db
   promocode-factory-administration-db:
     image: "postgres:latest"
@@ -19,7 +38,10 @@ services:
     environment:
       - "ConnectionStrings:PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=postgres;Password=docker"          
     depends_on: 
-      - promocode-factory-administration-db
+      promocode-factory-administration-db:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
 
 
   #ReceivingFromPartner Db
@@ -41,10 +63,16 @@ services:
       - "8092:8080"
     environment:
       - "ConnectionStrings:PromocodeFactoryReceivingFromPartnerDb=Host=promocode-factory-receiving-from-partner-db;Database=promocode_factory_receiving_from_partner_db;Username=postgres;Password=docker"
-      - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api"    
-      - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api"       
+      - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api:8080"    
+      - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api:8080"
+      - "RmqSettings:Host=rabbit"
+      - "RmqSettings:Login=myuser"
+      - "RmqSettings:Password=mypass"
     depends_on: 
-      - promocode-factory-receiving-from-partner-db
+      promocode-factory-receiving-from-partner-db:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
   
   #GivingToCustomer Db
   promocode-factory-giving-to-customer-db:
@@ -66,4 +94,15 @@ services:
     environment:
       - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
     depends_on: 
-      - promocode-factory-giving-to-customer-db
+      promocode-factory-giving-to-customer-db:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  default:
+    name: myLocalNetwork # создана извне: docker network create --driver=bridge myLocalNetwork
+    external: true

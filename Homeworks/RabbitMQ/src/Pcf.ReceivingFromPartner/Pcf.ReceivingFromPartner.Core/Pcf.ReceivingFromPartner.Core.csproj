@@ -4,4 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Pcf.Infrastructure.RabbitMq\Pcf.Infrastructure.RabbitMq.csproj" />
+    </ItemGroup>
+
 </Project>

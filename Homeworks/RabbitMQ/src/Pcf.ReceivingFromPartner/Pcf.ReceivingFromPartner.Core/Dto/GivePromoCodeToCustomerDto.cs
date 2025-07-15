@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pcf.ReceivingFromPartner.Integration.Dto
+namespace Pcf.ReceivingFromPartner.Core.Dto
 {
     public class GivePromoCodeToCustomerDto
     {

@@ -1,26 +1,25 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Pcf.Infrastructure.RabbitMq;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
+using Pcf.ReceivingFromPartner.Core.Dto;
+using RabbitMQ.Client;
 
 namespace Pcf.ReceivingFromPartner.Integration
 {
-    public class AdministrationGateway
-        : IAdministrationGateway
+    public class AdministrationGateway : RabbitMqProducer<AdministrationDto>, IAdministrationGateway
     {
-        private readonly HttpClient _httpClient;
-
-        public AdministrationGateway(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        public AdministrationGateway(string exchangeType, string exchangeName, string routingKey, IChannel channel) :
+            base(exchangeType, exchangeName,routingKey, channel) { }
 
         public async Task NotifyAdminAboutPartnerManagerPromoCode(Guid partnerManagerId)
         {
-            var response = await _httpClient.PostAsync($"api/v1/employees/{partnerManagerId}/appliedPromocodes",
-                new StringContent(string.Empty));
+            var message = new AdministrationDto()
+            {
+                PartnerId = partnerManagerId
+            };
 
-            response.EnsureSuccessStatusCode();
+            await Publish(message);
         }
     }
 }
