@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Pcf.Infrastructure.RabbitMq;
+using Infrastructure.RabbitMq;
 using Pcf.ReceivingFromPartner.Core.Domain;
 using Pcf.ReceivingFromPartner.Core.Dto;
 

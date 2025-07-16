@@ -18,32 +18,6 @@ services:
       timeout: 5s
       retries: 5
 
-  #Administration Db
-  promocode-factory-administration-db:
-    image: "postgres:latest"
-    container_name: 'promocode-factory-administration-db'
-    restart: always 
-    ports:
-      - 5433:5432
-    environment: 
-      - POSTGRES_PASSWORD=docker
-
-  #Administration Api
-  promocode-factory-administration-api:
-    build: src/Pcf.Administration/
-    container_name: 'promocode-factory-administration-api'
-    restart: always
-    ports:
-      - "8091:8080"
-    environment:
-      - "ConnectionStrings:PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=postgres;Password=docker"          
-    depends_on: 
-      promocode-factory-administration-db:
-        condition: service_started
-      rabbit:
-        condition: service_healthy
-
-
   #ReceivingFromPartner Db
   promocode-factory-receiving-from-partner-db:
     image: "postgres:latest"
@@ -92,9 +66,40 @@ services:
     ports:
       - "8093:8080"
     environment:
-      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
+      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"
+      - "RmqSettings:Host=rabbit"
+      - "RmqSettings:Login=myuser"
+      - "RmqSettings:Password=mypass"
     depends_on: 
       promocode-factory-giving-to-customer-db:
+        condition: service_started
+      rabbit:
+        condition: service_healthy
+
+  #Administration Db
+  promocode-factory-administration-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-administration-db'
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_PASSWORD=docker
+
+  #Administration Api
+  promocode-factory-administration-api:
+    build: src/Pcf.Administration/
+    container_name: 'promocode-factory-administration-api'
+    restart: always
+    ports:
+      - "8091:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=postgres;Password=docker"
+      - "RmqSettings:Host=rabbit"
+      - "RmqSettings:Login=myuser"
+      - "RmqSettings:Password=mypass"
+    depends_on:
+      promocode-factory-administration-db:
         condition: service_started
       rabbit:
         condition: service_healthy

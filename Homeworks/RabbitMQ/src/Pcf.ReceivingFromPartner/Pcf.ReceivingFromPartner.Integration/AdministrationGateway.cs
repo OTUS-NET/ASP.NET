@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Pcf.Infrastructure.RabbitMq;
+using Infrastructure.RabbitMq;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
 using Pcf.ReceivingFromPartner.Core.Dto;
 using RabbitMQ.Client;

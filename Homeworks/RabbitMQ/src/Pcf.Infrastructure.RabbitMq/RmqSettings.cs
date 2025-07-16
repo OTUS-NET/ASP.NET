@@ -1,4 +1,4 @@
-namespace Pcf.ReceivingFromPartner.WebHost.Settings
+namespace Pcf.Infrastructure.RabbitMq
 {    
     public class RmqSettings
     {

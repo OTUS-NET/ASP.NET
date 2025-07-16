@@ -1,5 +1,4 @@
-﻿using Pcf.ReceivingFromPartner.WebHost.Settings;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 
 namespace Pcf.Infrastructure.RabbitMq;
 

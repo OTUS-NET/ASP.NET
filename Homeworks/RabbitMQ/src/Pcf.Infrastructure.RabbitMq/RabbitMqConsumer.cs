@@ -3,7 +3,7 @@ using RabbitMQ.Client.Events;
 
 namespace Pcf.Infrastructure.RabbitMq;
 
-public abstract class RabbitMqConsumer<TMessage> : IRabbitMqConsumer<TMessage>
+public abstract class RabbitMqConsumer : IRabbitMqConsumer
 {
     public async Task Register(IChannel channel, string exchangeName, string queueName, string routingKey)
     {

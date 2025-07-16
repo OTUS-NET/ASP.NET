@@ -5,6 +5,7 @@ WORKDIR /app
 # Copy the solution file and project files, then restore dependencies
 COPY *.sln .
 COPY */*.csproj ./
+COPY nuget.config .
 RUN for file in $(ls *.csproj); do mkdir -p ${file%.*} && mv $file ${file%.*}; done
 RUN dotnet restore
 

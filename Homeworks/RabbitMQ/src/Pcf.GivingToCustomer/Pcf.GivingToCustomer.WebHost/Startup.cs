@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using Infrastructure.RabbitMq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,9 @@ using Pcf.GivingToCustomer.DataAccess.Data;
 using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Integration;
+using Pcf.GivingToCustomer.WebHost.Services.Promocodes;
+using Pcf.GivingToCustomer.WebHost.Settings;
+using RabbitMQ.Client;
 
 namespace Pcf.GivingToCustomer.WebHost
 {
@@ -40,6 +45,9 @@ namespace Pcf.GivingToCustomer.WebHost
                 x.UseSnakeCaseNamingConvention();
                 x.UseLazyLoadingProxies();
             });
+            
+            ConfigureRabbitMq(services).Wait();
+            services.AddScoped<IPromocodesService, PromocodesService>();
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -49,9 +57,24 @@ namespace Pcf.GivingToCustomer.WebHost
                 options.Version = "1.0";
             });
         }
+        
+        private async Task ConfigureRabbitMq(IServiceCollection services)
+        {
+            var rmqSettings = Configuration.Get<ApplicationSettings>().RmqSettings;
+            var connection = await RabbitMqConfiguration.GetRabbitConnection(rmqSettings);
+            
+            var channel = await connection.CreateChannelAsync();
+            
+            services.AddSingleton<IChannel>(_ => channel);
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbInitializer dbInitializer)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IDbInitializer dbInitializer,
+            IPromocodesService promocodesService,
+            IChannel channel)
         {
             if (env.IsDevelopment())
             {
@@ -76,6 +99,12 @@ namespace Pcf.GivingToCustomer.WebHost
             {
                 endpoints.MapControllers();
             });
+            
+            promocodesService.Register(
+                channel,
+                Configuration["GivingPromoCodeToCustomerExchangeName"]!,
+                Configuration["GivingPromoCodeToCustomerQueue"]!,
+                Configuration["GivingPromoCodeToCustomerRoutingKey"]!);
 
             dbInitializer.InitializeDb();
         }

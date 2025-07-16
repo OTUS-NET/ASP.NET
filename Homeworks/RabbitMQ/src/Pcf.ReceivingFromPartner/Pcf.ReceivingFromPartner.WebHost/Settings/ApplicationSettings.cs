@@ -1,3 +1,5 @@
+using Infrastructure.RabbitMq;
+
 namespace Pcf.ReceivingFromPartner.WebHost.Settings
 {
     public class ApplicationSettings

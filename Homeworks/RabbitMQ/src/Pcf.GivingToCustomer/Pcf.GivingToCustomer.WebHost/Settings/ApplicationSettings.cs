@@ -1,6 +1,6 @@
 using Infrastructure.RabbitMq;
 
-namespace Pcf.Administration.WebHost.Settings
+namespace Pcf.GivingToCustomer.WebHost.Settings
 {
     public class ApplicationSettings
     {

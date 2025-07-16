@@ -11,9 +11,9 @@ using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using System;
 using System.Threading.Tasks;
-using Pcf.Administration.Services.Employees;
-using Pcf.Infrastructure.RabbitMq;
-using Pcf.ReceivingFromPartner.WebHost.Settings;
+using Infrastructure.RabbitMq;
+using Pcf.Administration.WebHost.Services.Employees;
+using Pcf.Administration.WebHost.Settings;
 using RabbitMQ.Client;
 
 namespace Pcf.Administration.WebHost
@@ -102,6 +102,7 @@ namespace Pcf.Administration.WebHost
                 Configuration["AdministrationExchangeName"]!,
                 Configuration["AdministrationQueue"]!,
                 Configuration["AdministrationRoutingKey"]!);
+            
             dbInitializer.InitializeDb();
         }
     }

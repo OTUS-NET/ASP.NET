@@ -1,13 +1,14 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Infrastructure.RabbitMq;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using Pcf.Administration.Core.Domain.Administration;
-using Pcf.Infrastructure.RabbitMq;
 using RabbitMQ.Client.Events;
 
-namespace Pcf.Administration.Services.Employees;
+namespace Pcf.Administration.WebHost.Services.Employees;
 
-public class EmployeesService : RabbitMqConsumer<Employee>, IEmployeesService
+public class EmployeesService : RabbitMqConsumer, IEmployeesService
 {
     private readonly IRepository<Employee> _employeeRepository;
 
@@ -19,9 +20,9 @@ public class EmployeesService : RabbitMqConsumer<Employee>, IEmployeesService
     protected override async Task OnConsumerOnReceivedAsync(object sender, BasicDeliverEventArgs e)
     {
         var body = e.Body;
-        var message = JsonSerializer.Deserialize<EmployeesMessage>(Encoding.UTF8.GetString(body.ToArray()));
+        var message = JsonSerializer.Deserialize<AdministrationDto>(Encoding.UTF8.GetString(body.ToArray()));
         
-        var employee = await _employeeRepository.GetByIdAsync(message!.Id);
+        var employee = await _employeeRepository.GetByIdAsync(message!.PartnerId);
 
         if (employee == null)
             return;
