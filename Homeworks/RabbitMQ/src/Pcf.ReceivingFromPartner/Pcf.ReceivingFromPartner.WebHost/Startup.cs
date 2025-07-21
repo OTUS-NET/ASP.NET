@@ -63,19 +63,28 @@ namespace Pcf.ReceivingFromPartner.WebHost
             var connection = await RabbitMqConfiguration.GetRabbitConnection(rmqSettings);
             var channel = await connection.CreateChannelAsync();
             
-            services.AddSingleton<IAdministrationGateway>(s =>
-                new AdministrationGateway(
+            services.AddSingleton<IAdministrationGateway>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+
+                return new AdministrationGateway(
                     ExchangeType.Direct,
-                    Configuration["AdministrationExchangeName"], 
-                    Configuration["AdministrationRoutingKey"], 
-                    channel));
+                    configuration["AdministrationExchangeName"],
+                    configuration["AdministrationRoutingKey"],
+                    channel
+                );
+            });
             
-            services.AddSingleton<IGivingPromoCodeToCustomerGateway>(s =>
-                new GivingPromoCodeToCustomerGateway(
+            services.AddSingleton<IGivingPromoCodeToCustomerGateway>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                return new GivingPromoCodeToCustomerGateway(
                     ExchangeType.Direct,
-                    Configuration["GivingPromoCodeToCustomerExchangeName"], 
-                    Configuration["GivingPromoCodeToCustomerRoutingKey"], 
-                    channel));
+                    configuration["GivingPromoCodeToCustomerExchangeName"],
+                    configuration["GivingPromoCodeToCustomerRoutingKey"],
+                    channel
+                );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,6 +113,9 @@ namespace Pcf.ReceivingFromPartner.WebHost
             {
                 endpoints.MapControllers();
             });
+
+            app.ApplicationServices.GetRequiredService<IAdministrationGateway>();
+            app.ApplicationServices.GetRequiredService<IGivingPromoCodeToCustomerGateway>();
 
             dbInitializer.InitializeDb();
         }

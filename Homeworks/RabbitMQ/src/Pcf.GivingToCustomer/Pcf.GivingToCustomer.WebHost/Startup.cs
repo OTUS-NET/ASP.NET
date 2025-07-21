@@ -35,7 +35,7 @@ namespace Pcf.GivingToCustomer.WebHost
         {
             services.AddControllers().AddMvcOptions(x =>
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddSingleton(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
             services.AddDbContext<DataContext>(x =>
@@ -47,7 +47,7 @@ namespace Pcf.GivingToCustomer.WebHost
             });
             
             ConfigureRabbitMq(services).Wait();
-            services.AddScoped<IPromocodesService, PromocodesService>();
+            services.AddSingleton<IPromocodesService, PromocodesService>();
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 

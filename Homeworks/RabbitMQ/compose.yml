@@ -107,7 +107,7 @@ services:
 volumes:
   rabbitmq_data:
 
-networks:
-  default:
-    name: myLocalNetwork # создана извне: docker network create --driver=bridge myLocalNetwork
-    external: true
+#networks:
+#  default:
+#    name: myLocalNetwork # создана извне: docker network create --driver=bridge myLocalNetwork
+#    external: true
