@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using PromoCodeFactory.WebHost.Models.RoleItem;
 
-namespace PromoCodeFactory.WebHost.Models
+namespace PromoCodeFactory.WebHost.Models.Employee
 {
     public class EmployeeResponse
     {
