@@ -38,12 +38,14 @@ namespace PromoCodeFactory.DataAccess.Repositories
         public async Task<T> UpdateAsync(T entity)
         {
             var oldEntity = await GetByIdAsync(entity.Id);
+            if (oldEntity == null)
+                throw new Exception($"Entity with id [{entity.Id}] not found");
             
-            if(oldEntity == null)
-                throw new Exception("Entity not found");
+            // здесь должно быть сохранение EF контекста,
             
-            await DeleteAsync(oldEntity);
-            await AddAsync(entity);
+            //await DeleteAsync(oldEntity);
+            //await AddAsync(entity);
+            
             return entity;
         }
 

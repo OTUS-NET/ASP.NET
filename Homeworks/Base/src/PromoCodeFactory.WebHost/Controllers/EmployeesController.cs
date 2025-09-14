@@ -62,10 +62,12 @@ namespace PromoCodeFactory.WebHost.Controllers
                 Email = employee.Email,
                 Roles = employee.Roles?.Select(x => new RoleItemResponse()
                 {
+                    Id = x.Id,
                     Name = x.Name,
                     Description = x.Description
                 }).ToList() ?? [],
-                FullName = employee.FullName,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
                 AppliedPromocodesCount = employee.AppliedPromocodesCount
             };
 
@@ -83,7 +85,8 @@ namespace PromoCodeFactory.WebHost.Controllers
                     Name = x.Name,
                     Description = x.Description
                 }).ToList() ?? [],
-                FullName = employee.FullName,
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
                 AppliedPromocodesCount = employee.AppliedPromocodesCount
             };
         }
@@ -140,14 +143,6 @@ namespace PromoCodeFactory.WebHost.Controllers
         }
     }
 
-    public class EmployeeInformation
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-    }
-    public class EmployeeCreationRequest : EmployeeInformation { }
     
-    public class EmployeeUpdateRequest : EmployeeInformation { }
     
 }

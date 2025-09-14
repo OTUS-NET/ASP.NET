@@ -40,7 +40,8 @@ public class EmployeeApiTests(WebHostFixture factory) : IClassFixture<WebHostFix
         Assert.NotNull(content);
         Assert.NotEqual(Guid.Empty, content.Id);
         Assert.Equal(employeeRequest.Email, content.Email);
-        Assert.Equal($"{employeeRequest.FirstName} {employeeRequest.LastName}", content.FullName);
+        Assert.Equal(employeeRequest.FirstName, content.FirstName);
+        Assert.Equal(employeeRequest.LastName, content.LastName);
     }
     
     [Fact]
@@ -79,7 +80,8 @@ public class EmployeeApiTests(WebHostFixture factory) : IClassFixture<WebHostFix
         Assert.NotNull(fetchedEmployee);
         Assert.Equal(createdEmployee.Id, fetchedEmployee.Id);
         Assert.Equal(createdEmployee.Email, fetchedEmployee.Email);
-        Assert.Equal(createdEmployee.FullName, fetchedEmployee.FullName);
+        Assert.Equal(createdEmployee.FirstName, fetchedEmployee.FirstName);
+        Assert.Equal(createdEmployee.LastName, fetchedEmployee.LastName);
         Assert.Equal(createdEmployee.Roles, fetchedEmployee.Roles);
         Assert.Equal(createdEmployee.AppliedPromocodesCount, fetchedEmployee.AppliedPromocodesCount);
     }
@@ -133,8 +135,10 @@ public class EmployeeApiTests(WebHostFixture factory) : IClassFixture<WebHostFix
         Assert.NotNull(employee);
         Assert.Equal(sourceEmployee.Id, employee.Id);
         Assert.Equal(sourceEmployee.Email, employee.Email);
-        Assert.Equal(sourceEmployee.FullName, employee.FullName);
-        Assert.Equal(sourceEmployee.Roles, employee.Roles);
+        Assert.Equal(sourceEmployee.FirstName, employee.FirstName);
+        Assert.Equal(sourceEmployee.LastName, employee.LastName);
+        Assert.Equal(sourceEmployee.Roles.Count, employee.Roles.Count);
+        Assert.Equivalent(sourceEmployee.Roles, employee.Roles);
     }
     
     [Fact]
@@ -144,6 +148,8 @@ public class EmployeeApiTests(WebHostFixture factory) : IClassFixture<WebHostFix
         Assert.NotNull(sourceEmployee);
 
         sourceEmployee.Email += "+";
+        sourceEmployee.FirstName += "+";
+        sourceEmployee.LastName += "+";
 
         var response = await _client.PutAsJsonAsync($"{factory.ApiRoot}Employees/{sourceEmployee.Id:D}", sourceEmployee);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -151,11 +157,41 @@ public class EmployeeApiTests(WebHostFixture factory) : IClassFixture<WebHostFix
         var updatedEmployee = await response.Content.ReadFromJsonAsync<EmployeeResponse>();
         Assert.NotNull(updatedEmployee);
         Assert.Equal(updatedEmployee.Email, sourceEmployee.Email);
-        // Assert.Equal(createdEmployee.Id, fetchedEmployee.Id);
-        // Assert.Equal(createdEmployee.Email, fetchedEmployee.Email);
-        // Assert.Equal(createdEmployee.FullName, fetchedEmployee.FullName);
-        // Assert.Equal(createdEmployee.Roles, fetchedEmployee.Roles);
-        // Assert.Equal(createdEmployee.AppliedPromocodesCount, fetchedEmployee.AppliedPromocodesCount);
+        Assert.Equal(updatedEmployee.FirstName, sourceEmployee.FirstName);
+        Assert.Equal(updatedEmployee.LastName, sourceEmployee.LastName);
+    }
+    
+    
+    [Fact]
+    public async Task Employee_Delete_Existing_Employee_Returns_OK()
+    {
+        var sourceEmployee = await GetFirstEmployee();
+        Assert.NotNull(sourceEmployee);
+
+        var response = await _client.DeleteAsync($"{factory.ApiRoot}Employees/{sourceEmployee.Id:D}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+    }
+    
+    [Fact]
+    public async Task Employee_Delete_Missing_Employee_Returns_404()
+    {
+        var response = await _client.DeleteAsync($"{factory.ApiRoot}Employees/{Guid.NewGuid():D}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Employee_Delete_Existing_Employee_Removes_Employee()
+    {
+        var sourceEmployee = await GetFirstEmployee();
+        Assert.NotNull(sourceEmployee);
+
+        var response = await _client.DeleteAsync($"{factory.ApiRoot}Employees/{sourceEmployee.Id:D}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        
+        response = await _client.GetAsync($"{factory.ApiRoot}Employees/{sourceEmployee.Id:D}");
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        
     }
     
 }
