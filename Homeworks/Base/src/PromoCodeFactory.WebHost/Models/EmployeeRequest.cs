@@ -1,6 +1,6 @@
 ﻿namespace PromoCodeFactory.WebHost.Models;
 
-public abstract class EmployeeRequest
+public abstract record EmployeeRequest
 {
     public string FirstName { get; init; }
     public string LastName { get; init; }
@@ -10,9 +10,9 @@ public abstract class EmployeeRequest
 /// <summary>
 /// Запрос на создание нового пользователя
 /// </summary>
-public class EmployeeCreationRequest : EmployeeRequest { }
+public record EmployeeCreationRequest : EmployeeRequest;
     
 /// <summary>
 /// Запрос на изменение пользователя
 /// </summary>
-public class EmployeeUpdateRequest : EmployeeRequest { }
+public record EmployeeUpdateRequest : EmployeeRequest;

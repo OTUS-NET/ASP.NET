@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using PromoCodeFactory.DataAccess.Data;
-using PromoCodeFactory.WebHost.Controllers;
 using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Tests;
@@ -82,7 +81,7 @@ public class EmployeeApiTests(WebHostFixture factory) : IClassFixture<WebHostFix
         Assert.Equal(createdEmployee.Email, fetchedEmployee.Email);
         Assert.Equal(createdEmployee.FirstName, fetchedEmployee.FirstName);
         Assert.Equal(createdEmployee.LastName, fetchedEmployee.LastName);
-        Assert.Equal(createdEmployee.Roles, fetchedEmployee.Roles);
+        Assert.Equivalent(createdEmployee.Roles, fetchedEmployee.Roles);
         Assert.Equal(createdEmployee.AppliedPromocodesCount, fetchedEmployee.AppliedPromocodesCount);
     }
     

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
+
 namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T>: IRepository<T> where T: BaseEntity
@@ -41,10 +40,11 @@ namespace PromoCodeFactory.DataAccess.Repositories
             if (oldEntity == null)
                 throw new Exception($"Entity with id [{entity.Id}] not found");
             
-            // здесь должно быть сохранение EF контекста,
+            // stub for in-memory
+            await DeleteAsync(oldEntity);
+            await AddAsync(entity);
             
-            //await DeleteAsync(oldEntity);
-            //await AddAsync(entity);
+            // save changes
             
             return entity;
         }
@@ -52,7 +52,11 @@ namespace PromoCodeFactory.DataAccess.Repositories
         /// <inheritdoc />
         public Task DeleteAsync(T entity)
         {
-            Data.Remove(entity);
+            var storedEntity = Data.FirstOrDefault(x => x.Id == entity.Id);
+            if(storedEntity == null)
+                throw new Exception($"Entity with id [{entity.Id}] not found");
+            
+            Data.Remove(storedEntity);
             return Task.CompletedTask;
         }
     }
