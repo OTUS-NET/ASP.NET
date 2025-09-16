@@ -10,9 +10,9 @@ namespace PromoCodeFactory.DataAccess.Repositories
     {
         protected IList<T> Data { get; set; }
 
-        public InMemoryRepository(IEnumerable<T> data)
+        public InMemoryRepository(IList<T> data)
         {
-            Data = data is IList<T> list ? list : data.ToList();
+            Data = data;
         }
 
         public Task<IList<T>> GetAllAsync()
