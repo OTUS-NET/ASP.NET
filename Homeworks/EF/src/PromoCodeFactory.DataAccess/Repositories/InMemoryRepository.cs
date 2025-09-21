@@ -27,5 +27,20 @@ namespace PromoCodeFactory.DataAccess.Repositories
         {
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
         }
+
+        public Task<T> AddAsync(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> UpdateAsync(T item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> RemoveAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

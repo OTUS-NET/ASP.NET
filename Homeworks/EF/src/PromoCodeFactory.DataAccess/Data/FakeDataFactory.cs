@@ -16,7 +16,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "owner@somemail.ru",
                 FirstName = "Иван",
                 LastName = "Сергеев",
-                Role = Roles.FirstOrDefault(x => x.Name == "Admin"),
+                RoleId = Guid.Parse("53729686-a368-4eeb-8bfa-cc69b6050d02"),
                 AppliedPromocodesCount = 5
             },
             new Employee()
@@ -25,7 +25,7 @@ namespace PromoCodeFactory.DataAccess.Data
                 Email = "andreev@somemail.ru",
                 FirstName = "Петр",
                 LastName = "Андреев",
-                Role = Roles.FirstOrDefault(x => x.Name == "PartnerManager"),
+                RoleId = Guid.Parse("b0ae7aac-5493-45cd-ad16-87426a5e7665"),
                 AppliedPromocodesCount = 10
             },
         };
@@ -78,11 +78,49 @@ namespace PromoCodeFactory.DataAccess.Data
                         Email = "ivan_sergeev@mail.ru",
                         FirstName = "Иван",
                         LastName = "Петров",
-                        //TODO: Добавить предзаполненный список предпочтений
                     }
                 };
 
                 return customers;
+            }
+        }
+        public static IEnumerable<CustomerPreference> CustomerPreferences
+        {
+            get
+            {
+                return new List<CustomerPreference>()
+              {
+                new CustomerPreference
+                {
+                    CustomerId = Customers.First().Id,
+                    PreferenceId = Preferences.First().Id
+                },
+              };
+            }
+        }
+        public static IEnumerable<PromoCode> PromoCodes
+        {
+            get
+            {
+                var customer = Customers.First();
+                var preference = Preferences.First();
+                var partnerManager = Employees.First();
+
+                return new List<PromoCode>()
+                {
+                    new PromoCode()
+                    {
+                        Id = Guid.Parse("d7638f21-6e3d-4c2a-8f7b-8a5c4b6d9e1f"),
+                        Code = "OTUS24",
+                        ServiceInfo = "Скидка на обучение в OTUS",
+                        BeginDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(30),
+                        PartnerName = "OtusShop",
+                        PartnerManagerId = partnerManager.Id,
+                        PreferenceId = preference.Id,
+                        CustomerId = customer.Id,
+                    },
+                };
             }
         }
     }
