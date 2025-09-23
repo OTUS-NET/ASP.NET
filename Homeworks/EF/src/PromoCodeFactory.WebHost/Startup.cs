@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.DataAccess;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
 
@@ -31,6 +33,12 @@ namespace PromoCodeFactory.WebHost
                 options.Title = "PromoCode Factory API Doc";
                 options.Version = "1.0";
             });
+
+            services.AddDbContextFactory<EfContext>(options =>
+            {
+                options.UseSqlite("Data Source=PromoCodeFactory.db");
+            });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
