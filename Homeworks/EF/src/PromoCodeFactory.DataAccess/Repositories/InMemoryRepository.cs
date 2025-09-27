@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.DataAccess.Repositories
 {
@@ -26,6 +27,12 @@ namespace PromoCodeFactory.DataAccess.Repositories
         public Task<T> GetByIdAsync(Guid id)
         {
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+        }
+
+        /// <inheritdoc />
+        public Task AddAsync(Customer customer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

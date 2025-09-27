@@ -1,32 +1,64 @@
-﻿using System.Collections;
+﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.DataAccess.Data;
-using Microsoft.EntityFrameworkCore.Sqlite;
 
 namespace PromoCodeFactory.DataAccess;
 
-public class EfContext : DbContext
+public class EfContext(DbContextOptions<EfContext> options) : DbContext(options)
 {
-    //Employee, Roles, Customer,Preference и PromoCode
-    public DbSet<Employee>  Employees { get; set; }
-    public DbSet<Role>  Roles { get; set; }
-    public DbSet<Customer>  Customers { get; set; }
-    public DbSet<Preference>  Preferences { get; set; }
-    public DbSet<PromoCode>  PromoCodes { get; set; }
-
-    // public EfContext(DbContextOptions<EfContext> options)
+    /// <inheritdoc />
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     // {
+    //     base.OnConfiguring(optionsBuilder);
+    //     
+    //     Database.EnsureDeleted();
+    //     Database.EnsureCreated();
     //     
     // }
 
-    /// <inheritdoc />
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public static void SeedData(DbContext context)
     {
-        optionsBuilder.UseSqlite("Data Source=PromoCodeFactory.db");
-        base.OnConfiguring(optionsBuilder);
+        context.Set<Role>().AddRange(FakeDataFactory.Roles);
+        context.Set<Preference>().AddRange(FakeDataFactory.Preferences);
+        context.SaveChanges();
+        
+        var customers = FakeDataFactory.Customers.ToList();
+        
+        // foreach (var customer in customers)
+        // {
+        //     var prefs = customer.Preferences.ToList();
+        //     customer.Preferences = context.Set<Preference>().Where(x => prefs.Any(z => z.Id == x.Id)).ToList();
+        // }
+        context.Set<Customer>().AddRange(customers);
+        
+        var employees = FakeDataFactory.Employees.ToList();
+        //var roles = context.Set<Role>().ToList();
+        foreach (var employee in employees)
+        {
+            employee.Role = context.Set<Role>().Single(r => r.Id == employee.Role.Id);
+        }
+        context.Set<Employee>().AddRange(employees);
+
+        // var rolesToAdd = FakeDataFactory.Roles
+        //     .Where(x => context.Set<Role>().All(z => z.Id != x.Id))
+        //     .ToList();
+        
+        
+        context.SaveChanges();
     }
+
+
+    //Database.EnsureDeleted();
+    //Database.EnsureCreated();
+
+    // <inheritdoc />
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     optionsBuilder.UseSqlite("Data Source=PromoCodeFactory.db");
+    //     base.OnConfiguring(optionsBuilder);
+    // }
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,20 +72,27 @@ public class EfContext : DbContext
         //Связь Customer и Promocode реализовать через One-To-Many,
         //будем считать, что в данном примере
         //промокод может быть выдан только одному клиенту из базы.
-        
-        //modelBuilder
-        //    .Entity<Employee>()
-            //.HasData(FakeDataFactory.Employees);
 
         modelBuilder
             .Entity<PromoCode>()
             .HasOne(x => x.Preference);
-        
+
         modelBuilder
             .Entity<Employee>()
             .HasOne(x => x.Role)
-            .WithMany();
-        
+            .WithMany(x => x.Employees)
+            ;//.HasForeignKey(x=> x.Role);
+
+        // modelBuilder
+        //     .Entity<Employee>()
+        //     .Property<Guid>("RoleId");
+        //
+        // modelBuilder
+        //     .Entity<Employee>()
+        //     .HasOne(x => x.Role)
+        //     .WithMany()
+        //     .HasForeignKey("RoleId");
+
         modelBuilder
             .Entity<Customer>()
             .HasMany(x => x.Preferences)
@@ -61,20 +100,38 @@ public class EfContext : DbContext
             .UsingEntity(
                 "CustomerPreference",
                 l => l.HasOne(typeof(Customer)).WithMany().HasForeignKey("CustomersId").IsRequired(),
-                r => r.HasOne(typeof(Preference)).WithMany().HasForeignKey("PreferencesId").IsRequired(), 
+                r => r.HasOne(typeof(Preference)).WithMany().HasForeignKey("PreferencesId").IsRequired(),
                 j => j.HasKey("CustomersId", "PreferencesId")
-                )
+            )
             ;
-        
+
         modelBuilder
             .Entity<Customer>()
             .HasMany(x => x.PromoCodes)
             .WithOne(x => x.Customer);
-        
+
+
         // modelBuilder
         //     .Entity<Preference>()
         //     .HasMany(x => x.Id);
-            
+
+
+        // modelBuilder
+        //     .Entity<Role>()
+        //     .HasData(FakeDataFactory.Roles);
+        //
+        // modelBuilder
+        //     .Entity<Preference>()
+        //     .HasData(FakeDataFactory.Preferences);
+        //
+        // modelBuilder
+        //     .Entity<Customer>()
+        //     .HasData(FakeDataFactory.Customers);
+        //
+        // modelBuilder
+        //     .Entity<Employee>()
+        //     .HasData(FakeDataFactory.Employees);
+
         base.OnModelCreating(modelBuilder);
     }
 }

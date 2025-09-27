@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -19,34 +20,53 @@ namespace PromoCodeFactory.WebHost
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddScoped(typeof(IRepository<Employee>), (x) =>
-                new InMemoryRepository<Employee>(FakeDataFactory.Employees));
-            services.AddScoped(typeof(IRepository<Role>), (x) =>
-                new InMemoryRepository<Role>(FakeDataFactory.Roles));
-            services.AddScoped(typeof(IRepository<Preference>), (x) =>
-                new InMemoryRepository<Preference>(FakeDataFactory.Preferences));
-            services.AddScoped(typeof(IRepository<Customer>), (x) =>
-                new InMemoryRepository<Customer>(FakeDataFactory.Customers));
+            
+            // services.AddScoped(typeof(IRepository<Employee>), (x) =>
+            //     new InMemoryRepository<Employee>(FakeDataFactory.Employees));
+            // services.AddScoped(typeof(IRepository<Role>), (x) =>
+            //     new InMemoryRepository<Role>(FakeDataFactory.Roles));
+            // services.AddScoped(typeof(IRepository<Preference>), (x) =>
+            //     new InMemoryRepository<Preference>(FakeDataFactory.Preferences));
+            // services.AddScoped(typeof(IRepository<Customer>), (x) =>
+            //     new InMemoryRepository<Customer>(FakeDataFactory.Customers));
+            
+            
+            services.AddScoped<IRepository<Employee>, EfRepository<Employee>>();
+            services.AddScoped<IRepository<Role>, EfRepository<Role>>();
+            services.AddScoped<IRepository<Preference>, EfRepository<Preference>>();
+            services.AddScoped<IRepository<Customer>, EfRepository<Customer>>();
+            services.AddScoped<IRepository<PromoCode>, EfRepository<PromoCode>>();
 
+            services.AddDbContext<EfContext>(options =>
+            {
+                options
+                    .UseSqlite("Data Source=PromoCodeFactory.db")
+                    .UseSeeding((c,b) => EfContext.SeedData(c))
+                    .UseAsyncSeeding((c,b, t) =>
+                    {
+                        EfContext.SeedData(c);
+                        return Task.CompletedTask;
+                    });
+            });
+            
             services.AddOpenApiDocument(options =>
             {
                 options.Title = "PromoCode Factory API Doc";
                 options.Version = "1.0";
             });
 
-            services.AddDbContextFactory<EfContext>(options =>
-            {
-                options.UseSqlite("Data Source=PromoCodeFactory.db");
-            });
+            
             
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EfContext efContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                efContext.Database.EnsureDeleted();
+                efContext.Database.EnsureCreated();
             }
             else
             {

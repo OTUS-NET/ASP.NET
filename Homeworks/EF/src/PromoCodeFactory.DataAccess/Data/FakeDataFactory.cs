@@ -51,7 +51,7 @@ namespace PromoCodeFactory.DataAccess.Data
             new Preference()
             {
                 Id = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c"),
-                Name = "Театр",
+                Name = "Театр"
             },
             new Preference()
             {
@@ -79,6 +79,7 @@ namespace PromoCodeFactory.DataAccess.Data
                         FirstName = "Иван",
                         LastName = "Петров",
                         //TODO: Добавить предзаполненный список предпочтений
+                        Preferences = Preferences.Where(x => x.Value == "Театр" || x.Value == "Семья")
                     }
                 };
 
