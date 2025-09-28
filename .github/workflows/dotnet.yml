@@ -23,14 +23,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Find solution file
-      run: find . -name "*.sln" -type f
-
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore PromoCodeFactory.sln
 
     - name: Build solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build PromoCodeFactory.sln --configuration Release --no-restore
 
     - name: Run unit tests
-      run: dotnet test --configuration Release --no-build --verbosity normal
+      run: dotnet test PromoCodeFactory.sln --configuration Release --no-build --verbosity normal
