@@ -1,7 +1,7 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: Run Unit Tests
 
 on:
   push:
@@ -10,19 +10,24 @@ on:
     branches: [ "CRUD_branch" ]
 
 jobs:
-  build:
-
+  test:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8.0
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+
     - name: Restore dependencies
-      run: dotnet restore **/*.sln 
-    - name: Build
-      run: dotnet build **/*.sln --no-restore
-    - name: Test
-      run: dotnet test **/*.sln --no-build --verbosity normal
+      run: dotnet restore PromoCodeFactory.sln
+
+    - name: Build solution
+      run: dotnet build PromoCodeFactory.sln --configuration Release --no-restore
+
+    - name: Run unit tests
+      run: dotnet test PromoCodeFactory.sln --configuration Release --no-build --verbosity normal
