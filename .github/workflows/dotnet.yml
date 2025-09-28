@@ -23,6 +23,9 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
+    - name: Debug - List files to find solution
+      run: find . -name "*.sln" -type f
+
     - name: Restore dependencies
       run: dotnet restore PromoCodeFactory.sln
 
