@@ -23,14 +23,9 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Debug - List files to find solution
-      run: find . -name "*.sln" -type f
-
-    - name: Restore dependencies
-      run: dotnet restore PromoCodeFactory.sln
-
-    - name: Build solution
-      run: dotnet build PromoCodeFactory.sln --configuration Release --no-restore
-
-    - name: Run unit tests
-      run: dotnet test PromoCodeFactory.sln --configuration Release --no-build --verbosity normal
+    - name: Run all dotnet commands in solution directory
+      working-directory: ./ASP.NET/Homeworks/UnitTests/src
+      run: |
+        dotnet restore PromoCodeFactory.sln
+        dotnet build PromoCodeFactory.sln --configuration Release --no-restore
+        dotnet test PromoCodeFactory.sln --configuration Release --no-build --verbosity normal
