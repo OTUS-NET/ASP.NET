@@ -23,9 +23,9 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Run all dotnet commands in solution directory
-      working-directory: ./ASP.NET/Homeworks/UnitTests/src
+    - name: Run all dotnet commands
       run: |
+        cd ASP.NET/Homeworks/UnitTests/src
         dotnet restore PromoCodeFactory.sln
         dotnet build PromoCodeFactory.sln --configuration Release --no-restore
         dotnet test PromoCodeFactory.sln --configuration Release --no-build --verbosity normal
