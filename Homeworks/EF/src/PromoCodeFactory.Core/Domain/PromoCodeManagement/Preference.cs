@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
@@ -12,7 +11,7 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         
         [StringLength(150)]
         public string Value { get; set; }
-        
-        public ICollection<Customer> Customers { get; set; }
+
+        public ICollection<Customer> Customers { get; set; } = new List<Customer>();
     }
 }

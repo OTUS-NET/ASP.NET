@@ -24,13 +24,25 @@ namespace PromoCodeFactory.DataAccess.Repositories
             return Task.FromResult(Data);
         }
 
-        public Task<T> GetByIdAsync(Guid id)
+        public Task<T?> GetByIdAsync(Guid id)
         {
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
         }
 
         /// <inheritdoc />
-        public Task AddAsync(Customer customer)
+        public Task<T> AddAsync(T customer)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<T> UpdateAsync(T customer)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task RemoveAsync(T customer)
         {
             throw new NotImplementedException();
         }

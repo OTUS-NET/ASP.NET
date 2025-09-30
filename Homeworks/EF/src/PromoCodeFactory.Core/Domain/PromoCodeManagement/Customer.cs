@@ -6,6 +6,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
+    public class CustomerPreference : BaseEntity
+    {
+        public Guid CustomersId { get; set; }
+        public Guid PreferencesId { get; set; }
+    }
+    
     public class Customer
         : BaseEntity
     {
@@ -21,7 +27,7 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         [StringLength(50)]
         public string Email { get; set; }
 
-        public IEnumerable<Preference> Preferences { get; set; } = [];
-        public IEnumerable<PromoCode> PromoCodes { get; set; } = [];
+        public ICollection<Preference> Preferences { get; set; } = new List<Preference>();
+        public ICollection<PromoCode> PromoCodes { get; set; } = new List<PromoCode>();
     }
 }

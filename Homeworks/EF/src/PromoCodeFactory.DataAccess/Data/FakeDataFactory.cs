@@ -51,17 +51,20 @@ namespace PromoCodeFactory.DataAccess.Data
             new Preference()
             {
                 Id = Guid.Parse("ef7f299f-92d7-459f-896e-078ed53ef99c"),
-                Name = "Театр"
+                Name = "Театр",
+                Value = "theatre"
             },
             new Preference()
             {
                 Id = Guid.Parse("c4bda62e-fc74-4256-a956-4760b3858cbd"),
                 Name = "Семья",
+                Value = "family" 
             },
             new Preference()
             {
                 Id = Guid.Parse("76324c47-68d2-472d-abb8-33cfa8cc0c84"),
                 Name = "Дети",
+                Value = "children"
             }
         };
 
@@ -79,12 +82,45 @@ namespace PromoCodeFactory.DataAccess.Data
                         FirstName = "Иван",
                         LastName = "Петров",
                         //TODO: Добавить предзаполненный список предпочтений
-                        Preferences = Preferences.Where(x => x.Value == "Театр" || x.Value == "Семья")
+                        Preferences = Preferences.Where(x => x.Name == "Театр" || x.Name == "Семья").ToList()
                     }
                 };
 
                 return customers;
             }
         }
+
+        // public static IEnumerable<PromoCode> PromoCodes => new List<PromoCode>([
+        //     new ()
+        //     {
+        //         Id = Guid.NewGuid(),
+        //         Code = "Code-1",
+        //         BeginDate = DateTime.UtcNow,
+        //         EndDate = DateTime.UtcNow.AddDays(10),
+        //         PartnerName = "Partner-1",
+        //         ServiceInfo = "SvcInfo-1"
+        //     },
+        //     new ()
+        //     {
+        //         Id = Guid.NewGuid(),
+        //         Code = "Code-2",
+        //         BeginDate = DateTime.UtcNow,
+        //         EndDate = DateTime.UtcNow.AddDays(10),
+        //         PartnerName = "Partner-2",
+        //         ServiceInfo = "SvcInfo-2"
+        //     },
+        //     new ()
+        //     {
+        //         Id = Guid.NewGuid(),
+        //         Code = "Code-3",
+        //         BeginDate = DateTime.UtcNow,
+        //         EndDate = DateTime.UtcNow.AddDays(10),
+        //         PartnerName = "Partner-3",
+        //         ServiceInfo = "SvcInfo-3"
+        //     }
+        //     
+        // ]);
+        
+
     }
 }
