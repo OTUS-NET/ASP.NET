@@ -10,7 +10,7 @@ public class PreferenceControllerTests(WebHostFixture fixture) : IClassFixture<W
     [Fact]
     public async Task Get_Should_Return_Status_200()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient();
         var response = await client.GetAsync("api/v1/Preferences");
         response.Should().Be200Ok();
     }
@@ -18,7 +18,7 @@ public class PreferenceControllerTests(WebHostFixture fixture) : IClassFixture<W
     [Fact]
     public async Task Get_Should_Return_List_With_One_Customer()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient();
         var response = await client.GetAsync("api/v1/Preferences");
         response.Should().Be200Ok();
 
@@ -31,7 +31,7 @@ public class PreferenceControllerTests(WebHostFixture fixture) : IClassFixture<W
     [Fact]
     public async Task Post_Should_Return_Status_405()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PostAsJsonAsync("api/v1/Preferences", new { Test = "dummy" });
         response.Should().Be405MethodNotAllowed();
     }
@@ -39,7 +39,7 @@ public class PreferenceControllerTests(WebHostFixture fixture) : IClassFixture<W
     [Fact]
     public async Task Put_Should_Return_Status_404()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PutAsJsonAsync($"api/v1/Preferences/{Guid.NewGuid():D}", new { Test = "dummy" });
         response.Should().Be404NotFound();
     }
@@ -48,7 +48,7 @@ public class PreferenceControllerTests(WebHostFixture fixture) : IClassFixture<W
     [Fact]
     public async Task Delete_Should_Return_Status_404()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.DeleteAsync($"api/v1/Preferences/{Guid.NewGuid():D}");
         response.Should().Be404NotFound();
     }

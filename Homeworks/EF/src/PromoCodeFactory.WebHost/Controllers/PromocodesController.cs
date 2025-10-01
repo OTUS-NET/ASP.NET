@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.WebHost.Models;
 
@@ -17,7 +18,10 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class PromocodesController(
         IRepository<PromoCode> codesRepository,
-        IRepository<Preference> preferencesRepository
+        IRepository<Preference> preferencesRepository,
+        IRepository<Customer> customersRepository,
+        IRepository<Employee> employeeRepository
+        
         ) : ControllerBase
     {
         /// <summary>
@@ -52,7 +56,10 @@ namespace PromoCodeFactory.WebHost.Controllers
             
             if (preference == null)
                 return BadRequest("Preference not found");
-                
+
+            // extend IRepo with IPromocodesRepo: FindPrefByName, Findcust
+            
+            var employees = await employeeRepository.GetAllAsync();
             var code = new PromoCode
             {
                 Id = Guid.NewGuid(),
@@ -61,21 +68,13 @@ namespace PromoCodeFactory.WebHost.Controllers
                 Code = request.PromoCode,
                 Preference = preference,
                 
-                //TODO: fix this
                 BeginDate = DateTime.UtcNow, 
-                Customer = null,
-                PartnerManager = null
+                Customers = preference.Customers.ToList(),
+                PartnerManager = employees.Single(x => x.FullName == request.PartnerName)
             };
 
-            code = await codesRepository.AddAsync(code);
-            
-            foreach (var customer in preference.Customers)
-            {
-                customer.PromoCodes.Add(code);
-            }
-            
-            await preferencesRepository.UpdateAsync(preference);
-            return Ok(code);
+            await codesRepository.AddAsync(code);
+            return Ok();
         }
     }
 }

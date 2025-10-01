@@ -77,8 +77,19 @@ public class EfContext(DbContextOptions<EfContext> options) : DbContext(options)
         modelBuilder
             .Entity<Customer>()
             .HasMany(x => x.PromoCodes)
-            .WithOne(x => x.Customer)
-            .OnDelete(DeleteBehavior.Cascade);
+            .WithMany(x => x.Customers)
+            .UsingEntity(
+                nameof(CustomerPromoCode),
+                l => l.HasOne(typeof(Customer)).WithMany().HasForeignKey("CustomersId").IsRequired(),
+                r => r.HasOne(typeof(PromoCode)).WithMany().HasForeignKey("PromoCodesId").IsRequired(),
+                j => j.HasKey("CustomersId", "PromoCodesId")
+            );
+        
+        // modelBuilder
+        //     .Entity<Customer>()
+        //     .HasMany(x => x.PromoCodes)
+        //     .WithOne(x => x.Customer)
+        //     .OnDelete(DeleteBehavior.Cascade);
         
         modelBuilder
             .Entity<Customer>()

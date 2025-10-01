@@ -12,6 +12,12 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         public Guid PreferencesId { get; set; }
     }
     
+    public class CustomerPromoCode : BaseEntity
+    {
+        public Guid CustomersId { get; set; }
+        public Guid PromoCodesId { get; set; }
+    }
+    
     public class Customer
         : BaseEntity
     {

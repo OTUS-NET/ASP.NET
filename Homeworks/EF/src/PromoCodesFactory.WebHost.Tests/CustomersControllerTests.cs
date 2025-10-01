@@ -7,10 +7,12 @@ namespace PromoCodesFactory.WebHost.Tests;
 
 public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<WebHostFixture>
 {
+    
+    
     [Fact]
     public async Task Get_Should_Return_Status_200()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient();
         var response = await client.GetAsync("api/v1/Customers");
         response.Should().Be200Ok();
     }
@@ -18,7 +20,7 @@ public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<Web
     [Fact]
     public async Task Get_Should_Return_List_With_One_Customer()
     {
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient();
         var response = await client.GetAsync("api/v1/Customers");
         response.Should().Be200Ok();
 
@@ -41,7 +43,7 @@ public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<Web
     {
         var fakeCustomer = FakeDataFactory.Customers.First();
         var fakePreference = FakeDataFactory.Preferences.First();
-        var client = new WebHostFixture().CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PostAsJsonAsync("api/v1/Customers", 
             new CreateOrEditCustomerRequest
             {
@@ -69,7 +71,7 @@ public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<Web
     public async Task Post_Should_Return_Status_400_On_Preference_Missing()
     {
         var fakeCustomer = FakeDataFactory.Customers.First();
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PostAsJsonAsync("api/v1/Customers", 
             new CreateOrEditCustomerRequest
             {
@@ -87,7 +89,7 @@ public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<Web
         var fakeCustomer = FakeDataFactory.Customers.First();
         var fakePreference1 = FakeDataFactory.Preferences.First();
         var fakePreference2 = FakeDataFactory.Preferences.First();
-        var client = new WebHostFixture().CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PutAsJsonAsync($"api/v1/Customers/{fakeCustomer.Id:D}", 
             new CreateOrEditCustomerRequest
             {
@@ -116,7 +118,7 @@ public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<Web
     public async Task Put_Should_Return_Status_400_If_Preference_Not_Exists()
     {
         var fakeCustomer = FakeDataFactory.Customers.First();
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PutAsJsonAsync($"api/v1/Customers/{fakeCustomer.Id:D}", 
             new CreateOrEditCustomerRequest
             {
@@ -132,7 +134,7 @@ public class CustomerControllerTests(WebHostFixture fixture) : IClassFixture<Web
     public async Task Put_Should_Return_Status_404_If_Customer_Not_Exists()
     {
         var fakeCustomer = FakeDataFactory.Customers.First();
-        var client = fixture.CreateClient();
+        var client = fixture.GetClient(true);
         var response = await client.PutAsJsonAsync($"api/v1/Customers/{Guid.NewGuid():D}", 
             new CreateOrEditCustomerRequest
             {

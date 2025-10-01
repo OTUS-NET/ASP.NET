@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime;
 using PromoCodeFactory.Core.Domain;
@@ -26,6 +27,6 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 
         public Preference Preference { get; set; }
         
-        public Customer Customer { get; set; }
+        public ICollection<Customer> Customers { get; set; }
     }
 }
