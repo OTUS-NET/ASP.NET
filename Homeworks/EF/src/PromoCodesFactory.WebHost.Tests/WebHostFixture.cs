@@ -20,16 +20,16 @@ public class WebHostFixture : WebApplicationFactory<Program>
         builder.ConfigureTestServices(services =>
         {
             var descriptor =
-                services.SingleOrDefault(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<EfContext>)); 
-            if (descriptor != null) 
+                services.SingleOrDefault(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<EfContext>));
+            if (descriptor != null)
                 services.Remove(descriptor);
 
             var id = Guid.NewGuid().ToString("D");
-            
-            services.AddDbContext<EfContext>(options => 
+
+            services.AddDbContext<EfContext>(options =>
                 options.UseInMemoryDatabase(id)
-                    .UseSeeding((c,_) => EfContext.SeedData(c))
-                    .UseAsyncSeeding((c,_, t) =>
+                    .UseSeeding((c, _) => EfContext.SeedData(c))
+                    .UseAsyncSeeding((c, _, t) =>
                     {
                         EfContext.SeedData(c);
                         return Task.CompletedTask;
@@ -38,15 +38,14 @@ public class WebHostFixture : WebApplicationFactory<Program>
         base.ConfigureWebHost(builder);
     }
 
-     
-    
+
     internal HttpClient GetClient(bool standalone = false)
     {
         using var scope = Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<EfContext>();
         context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
-        
+
         return CreateClient();
     }
 

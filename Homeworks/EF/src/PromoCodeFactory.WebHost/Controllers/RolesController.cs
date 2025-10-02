@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
@@ -13,33 +15,37 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class RolesController
+    public class RolesController(
+        ILogger<RolesController> logger,
+        IRepository<Role> rolesRepository
+        ) : ControllerBase
     {
-        private readonly IRepository<Role> _rolesRepository;
-
-        public RolesController(IRepository<Role> rolesRepository)
-        {
-            _rolesRepository = rolesRepository;
-        }
-
         /// <summary>
         /// Получить все доступные роли сотрудников
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IEnumerable<RoleItemResponse>> GetRolesAsync()
+        public async Task<ActionResult<IEnumerable<RoleItemResponse>>> GetRolesAsync()
         {
-            var roles = await _rolesRepository.GetAllAsync();
+            try
+            {
+               var roles = await rolesRepository.GetAllAsync();
 
-            var rolesModelList = roles.Select(x =>
-                new RoleItemResponse()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList();
+                var rolesModelList = roles.Select(x =>
+                    new RoleItemResponse()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description
+                    }).ToList();
 
-            return rolesModelList;
+                return rolesModelList;
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error get roles list: [{msg}]", e.Message);
+                return StatusCode(500, e.Message);
+            }
         }
     }
 }

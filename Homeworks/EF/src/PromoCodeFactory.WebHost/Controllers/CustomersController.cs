@@ -33,14 +33,22 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerShortResponse>>> GetCustomersAsync()
         {
-            var customers = await customersRepository.GetAllAsync();
-            return Ok(customers.Select(x => new CustomerShortResponse
+            try
             {
-                Id = x.Id,
-                Email = x.Email,
-                FirstName = x.FirstName,
-                LastName = x.LastName
-            }).ToList());
+                var customers = await customersRepository.GetAllAsync();
+                return Ok(customers.Select(x => new CustomerShortResponse
+                {
+                    Id = x.Id,
+                    Email = x.Email,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName
+                }).ToList());
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed to get list of customers: [{msg}]", e.Message);
+                return StatusCode(500, e.Message);
+            }
         }
 
         /// <summary>
@@ -67,7 +75,6 @@ namespace PromoCodeFactory.WebHost.Controllers
                 logger.LogError(e, "Error get customer with id [{id:D}]: {msg}", id, e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
-            
         }
 
         /// <summary>
@@ -98,10 +105,12 @@ namespace PromoCodeFactory.WebHost.Controllers
             }
             catch (KeyNotFoundException e)
             {
+                logger.LogError(e, "Bad request on customer creation: {msg}", e.Message);
                 return BadRequest(e.Message);
             }
             catch (Exception e)
             {
+                logger.LogError(e, "Error on customer creation: {msg}", e.Message);
                 return StatusCode(500, e.Message);
             }
         }
@@ -132,10 +141,12 @@ namespace PromoCodeFactory.WebHost.Controllers
             }
             catch (KeyNotFoundException e)
             {
+                logger.LogError(e, "Bad request on customer update: {msg}", e.Message);
                 return BadRequest(e.Message);
             }
             catch (Exception e)
             {
+                logger.LogError(e, "Error on customer update: {msg}", e.Message);
                 return StatusCode(500, e.Message);
             }
         }
@@ -159,6 +170,7 @@ namespace PromoCodeFactory.WebHost.Controllers
             }
             catch (Exception e)
             {
+                logger.LogError(e, "Error on customer deletion: {msg}", e.Message);
                 return StatusCode(500, e.Message);
             }
         }

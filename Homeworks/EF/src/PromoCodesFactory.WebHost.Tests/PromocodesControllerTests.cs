@@ -29,7 +29,7 @@ public class PromocodesControllerTests(WebHostFixture fixture) : IClassFixture<W
     }
     
     [Fact]
-    public async Task Post_Should_Return_Status_200()
+    public async Task Post_Should_Add_Promocode_To_Customer()
     {
         var client = fixture.GetClient(true);
         var response = await client.PostAsJsonAsync("api/v1/Promocodes", new GivePromoCodeRequest
@@ -41,6 +41,65 @@ public class PromocodesControllerTests(WebHostFixture fixture) : IClassFixture<W
         });
         response.Should().Be200Ok();
         
-        //TODO: add extended testing
+        var customerResponse = await client.GetAsync($"api/v1/Customers/{FakeDataFactory.Customers.First().Id}");
+        customerResponse.Should().Be200Ok();
+        
+        var customer = await customerResponse.Content.ReadFromJsonAsync<CustomerResponse>();
+
+        customer.Should()
+            .NotBeNull()
+            .And.Satisfy<CustomerResponse>(x => x.Preferences.Should().Contain(FakeDataFactory.Preferences.First().Id));
+
+
+    }
+    
+    [Fact]
+    public async Task Post_Should_Not_Add_Promocode_To_Customer()
+    {
+        var client = fixture.GetClient(true);
+        var response = await client.PostAsJsonAsync("api/v1/Promocodes", new GivePromoCodeRequest
+        {
+            PartnerName = FakeDataFactory.Employees.First().FullName,
+            ServiceInfo = "SvcInfo New",
+            Preference = "Дети",
+            PromoCode = "CODE_TEST"
+        });
+        response.Should().Be200Ok();
+        
+        var customerResponse = await client.GetAsync($"api/v1/Customers/{FakeDataFactory.Customers.First().Id}");
+        customerResponse.Should().Be200Ok();
+        
+        var customer = await customerResponse.Content.ReadFromJsonAsync<CustomerResponse>();
+
+        customer.Should()
+            .NotBeNull()
+            .And.Satisfy<CustomerResponse>(x => x.Preferences.Should().NotContain(FakeDataFactory.Preferences.Last().Id));
+
+
+    }
+    
+    [Fact]
+    public async Task Post_Should_Add_Customer_Promocode()
+    {
+        var client = fixture.GetClient(true);
+        var response = await client.PostAsJsonAsync("api/v1/Promocodes", new GivePromoCodeRequest
+        {
+            PartnerName = FakeDataFactory.Employees.First().FullName,
+            ServiceInfo = "SvcInfo New",
+            Preference = "Театр",
+            PromoCode = "CODE_TEST"
+        });
+        response.Should().Be200Ok();
+        
+        var customerResponse = await client.GetAsync($"api/v1/Customers/{FakeDataFactory.Customers.First().Id}");
+        customerResponse.Should().Be200Ok();
+        
+        var customer = await customerResponse.Content.ReadFromJsonAsync<CustomerResponse>();
+
+        customer.Should()
+            .NotBeNull()
+            .And.Satisfy<CustomerResponse>(x => x.Preferences.Should().Contain(FakeDataFactory.Preferences.First().Id));
+
+
     }
 }

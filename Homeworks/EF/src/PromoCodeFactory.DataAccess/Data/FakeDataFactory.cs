@@ -81,7 +81,6 @@ namespace PromoCodeFactory.DataAccess.Data
                         Email = "ivan_sergeev@mail.ru",
                         FirstName = "Иван",
                         LastName = "Петров",
-                        //TODO: Добавить предзаполненный список предпочтений
                         Preferences = Preferences.Where(x => x.Name == "Театр" || x.Name == "Семья").ToList()
                     }
                 };
@@ -89,38 +88,5 @@ namespace PromoCodeFactory.DataAccess.Data
                 return customers;
             }
         }
-
-        // public static IEnumerable<PromoCode> PromoCodes => new List<PromoCode>([
-        //     new ()
-        //     {
-        //         Id = Guid.NewGuid(),
-        //         Code = "Code-1",
-        //         BeginDate = DateTime.UtcNow,
-        //         EndDate = DateTime.UtcNow.AddDays(10),
-        //         PartnerName = "Partner-1",
-        //         ServiceInfo = "SvcInfo-1"
-        //     },
-        //     new ()
-        //     {
-        //         Id = Guid.NewGuid(),
-        //         Code = "Code-2",
-        //         BeginDate = DateTime.UtcNow,
-        //         EndDate = DateTime.UtcNow.AddDays(10),
-        //         PartnerName = "Partner-2",
-        //         ServiceInfo = "SvcInfo-2"
-        //     },
-        //     new ()
-        //     {
-        //         Id = Guid.NewGuid(),
-        //         Code = "Code-3",
-        //         BeginDate = DateTime.UtcNow,
-        //         EndDate = DateTime.UtcNow.AddDays(10),
-        //         PartnerName = "Partner-3",
-        //         ServiceInfo = "SvcInfo-3"
-        //     }
-        //     
-        // ]);
-        
-
     }
 }

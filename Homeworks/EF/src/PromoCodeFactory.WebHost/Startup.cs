@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
@@ -31,6 +32,7 @@ namespace PromoCodeFactory.WebHost
             {
                 options
                     .UseSqlite("Data Source=PromoCodeFactory.db")
+                    .LogTo(Console.WriteLine, LogLevel.Trace)
                     .UseSeeding((c,b) => EfContext.SeedData(c))
                     .UseAsyncSeeding((c,b, t) =>
                     {
@@ -52,8 +54,6 @@ namespace PromoCodeFactory.WebHost
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                
-                Console.WriteLine("EnsureCreated/EnsureDeleted");
                 efContext.Database.EnsureDeleted();
                 efContext.Database.EnsureCreated();
             }
