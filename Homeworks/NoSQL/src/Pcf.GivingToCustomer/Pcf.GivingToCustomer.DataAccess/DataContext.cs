@@ -11,8 +11,6 @@ namespace Pcf.GivingToCustomer.DataAccess
 
         public DbSet<Customer> Customers { get; set; }
         
-        public DbSet<Preference> Preferences { get; set; }
-
         public DataContext()
         {
             
@@ -32,10 +30,6 @@ namespace Pcf.GivingToCustomer.DataAccess
                 .HasOne(bc => bc.Customer)
                 .WithMany(b => b.Preferences)
                 .HasForeignKey(bc => bc.CustomerId);  
-            modelBuilder.Entity<CustomerPreference>()
-                .HasOne(bc => bc.Preference)
-                .WithMany()
-                .HasForeignKey(bc => bc.PreferenceId); 
         }
     }
 }

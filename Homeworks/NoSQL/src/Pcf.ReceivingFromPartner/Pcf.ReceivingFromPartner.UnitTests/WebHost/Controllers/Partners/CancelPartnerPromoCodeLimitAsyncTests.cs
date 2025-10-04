@@ -37,8 +37,8 @@ namespace Pcf.ReceivingFromPartner.UnitTests.WebHost.Controllers.Partners
                     new PartnerPromoCodeLimit()
                     {
                         Id = Guid.Parse("e00633a5-978a-420e-a7d6-3e1dab116393"),
-                        CreateDate = new DateTime(2020, 07, 9),
-                        EndDate = new DateTime(2020, 10, 9),
+                        CreateDate = new DateTime(2020, 7, 9).ToUniversalTime(),
+                        EndDate = new DateTime(2020, 10, 9).ToUniversalTime(),
                         Limit = 100
                     }
                 }

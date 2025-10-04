@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
+using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.WebHost.Controllers;
 using Pcf.GivingToCustomer.WebHost.Models;
+using Pcf.SharedLibrary.Models;
 using Xunit;
 
 namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
@@ -16,16 +19,13 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
     {
         private readonly CustomersController _customersController;
         private readonly EfRepository<Customer> _customerRepository;
-        private readonly EfRepository<Preference> _preferenceRepository;
-        
+        private readonly Mock<IPreferencesDirectoryGateway> _preferenceGatewayMock;
+
         public CustomersControllerTests(EfDatabaseFixture efDatabaseFixture)
         {
             _customerRepository = new EfRepository<Customer>(efDatabaseFixture.DbContext);
-            _preferenceRepository = new EfRepository<Preference>(efDatabaseFixture.DbContext);
-            
-            _customersController = new CustomersController(
-                _customerRepository, 
-                _preferenceRepository);
+            _preferenceGatewayMock = new Mock<IPreferencesDirectoryGateway>();
+            _customersController = new CustomersController(_customerRepository, _preferenceGatewayMock.Object);
         }
         
         [Fact]
@@ -43,6 +43,10 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
                     preferenceId
                 }
             };
+
+            _preferenceGatewayMock
+                .Setup(x => x.GetPreferenceByIdAsync(preferenceId))
+                .ReturnsAsync(new PreferenceResponse { Id = preferenceId, Name = "Театр" });
 
             //Act
             var result = await _customersController.CreateCustomerAsync(request);

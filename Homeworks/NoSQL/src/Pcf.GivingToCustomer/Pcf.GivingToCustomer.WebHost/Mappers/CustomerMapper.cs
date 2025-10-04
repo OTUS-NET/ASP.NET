@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Pcf.GivingToCustomer.Core.Domain;
+using Pcf.GivingToCustomer.WebHost.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Pcf.GivingToCustomer.Core.Domain;
-using Pcf.GivingToCustomer.WebHost.Models;
 
 namespace Pcf.GivingToCustomer.WebHost.Mappers
 {
     public class CustomerMapper
     {
 
-        public static Customer MapFromModel(CreateOrEditCustomerRequest model, IEnumerable<Preference> preferences, Customer customer = null)
+        public static Customer MapFromModel(CreateOrEditCustomerRequest model, IEnumerable<Guid> preferenceIds, Customer customer = null)
         {
             if(customer == null)
             {
@@ -22,11 +21,10 @@ namespace Pcf.GivingToCustomer.WebHost.Mappers
             customer.LastName = model.LastName;
             customer.Email = model.Email;
 
-            customer.Preferences = preferences.Select(x => new CustomerPreference()
+            customer.Preferences = preferenceIds.Select(x => new CustomerPreference()
             {
                 CustomerId = customer.Id,
-                Preference = x,
-                PreferenceId = x.Id
+                PreferenceId = x
             }).ToList();
             
             return customer;

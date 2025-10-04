@@ -18,9 +18,6 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Data
             _dataContext.Database.EnsureDeleted();
             _dataContext.Database.EnsureCreated();
 
-            _dataContext.AddRange(TestDataFactory.Preferences);
-            _dataContext.SaveChanges();
-            
             _dataContext.AddRange(TestDataFactory.Customers);
             _dataContext.SaveChanges();
         }

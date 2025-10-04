@@ -9,22 +9,22 @@ namespace Pcf.ReceivingFromPartner.WebHost.Mappers
 {
     public class PromoCodeMapper
     {
-        public static PromoCode MapFromModel(ReceivingPromoCodeRequest request, Preference preference, Partner partner) {
+        public static PromoCode MapFromModel(ReceivingPromoCodeRequest request, Guid preferenceId, Partner partner) {
 
-            var promocode = new PromoCode();
+            var promocode = new PromoCode
+            {
+                PartnerId = partner.Id,
+                Partner = partner,
+                Code = request.PromoCode,
+                ServiceInfo = request.ServiceInfo,
 
-            promocode.PartnerId = partner.Id;
-            promocode.Partner = partner;
-            promocode.Code = request.PromoCode;
-            promocode.ServiceInfo = request.ServiceInfo;
-           
-            promocode.BeginDate = DateTime.Now;
-            promocode.EndDate = DateTime.Now.AddDays(30);
+                BeginDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(30),
 
-            promocode.Preference = preference;
-            promocode.PreferenceId = preference.Id;
+                PreferenceId = preferenceId,
 
-            promocode.PartnerManagerId = request.PartnerManagerId;
+                PartnerManagerId = request.PartnerManagerId
+            };
 
             return promocode;
         }

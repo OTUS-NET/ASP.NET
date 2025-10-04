@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.WebHost.Mappers;
@@ -19,13 +20,13 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         : ControllerBase
     {
         private readonly IRepository<Customer> _customerRepository;
-        private readonly IRepository<Preference> _preferenceRepository;
+        private readonly IPreferencesDirectoryGateway _preferencesDirectoryGateway;
 
-        public CustomersController(IRepository<Customer> customerRepository, 
-            IRepository<Preference> preferenceRepository)
+        public CustomersController(IRepository<Customer> customerRepository,
+            IPreferencesDirectoryGateway preferencesDirectoryGateway)
         {
             _customerRepository = customerRepository;
-            _preferenceRepository = preferenceRepository;
+            _preferencesDirectoryGateway = preferencesDirectoryGateway;
         }
         
         /// <summary>
@@ -57,8 +58,19 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         public async Task<ActionResult<CustomerResponse>> GetCustomerAsync(Guid id)
         {
             var customer =  await _customerRepository.GetByIdAsync(id);
+            if (customer == null)
+                return NotFound();
 
-            var response = new CustomerResponse(customer);
+            // Получаем имена предпочтений по ID через шлюз
+            var preferenceIds = customer.Preferences.Select(p => p.PreferenceId).ToList();
+            var preferenceResponses = await Task.WhenAll(
+                preferenceIds.Select(id => _preferencesDirectoryGateway.GetPreferenceByIdAsync(id))
+            );
+            var preferenceDict = preferenceResponses
+                .Where(p => p != null)
+                .ToDictionary(p => p.Id, p => p.Name);
+
+            var response = new CustomerResponse(customer, preferenceDict);
 
             return Ok(response);
         }
@@ -70,11 +82,14 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync(CreateOrEditCustomerRequest request)
         {
-            //Получаем предпочтения из бд и сохраняем большой объект
-            var preferences = await _preferenceRepository
-                .GetRangeByIdsAsync(request.PreferenceIds);
+            var preferenceTasks = request.PreferenceIds.Select(id =>
+                _preferencesDirectoryGateway.GetPreferenceByIdAsync(id));
+            var preferenceResponses = await Task.WhenAll(preferenceTasks);
 
-            Customer customer = CustomerMapper.MapFromModel(request, preferences);
+            if (preferenceResponses.Any(p => p == null))
+                return BadRequest("Одно или несколько предпочтений не найдено");
+
+            Customer customer = CustomerMapper.MapFromModel(request, request.PreferenceIds);
             
             await _customerRepository.AddAsync(customer);
 
@@ -93,10 +108,15 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
             
             if (customer == null)
                 return NotFound();
-            
-            var preferences = await _preferenceRepository.GetRangeByIdsAsync(request.PreferenceIds);
-            
-            CustomerMapper.MapFromModel(request, preferences, customer);
+
+            var preferenceTasks = request.PreferenceIds.Select(id =>
+                _preferencesDirectoryGateway.GetPreferenceByIdAsync(id));
+            var preferenceResponses = await Task.WhenAll(preferenceTasks);
+
+            if (preferenceResponses.Any(p => p == null))
+                return BadRequest("Одно или несколько предпочтений не найдено");
+
+            CustomerMapper.MapFromModel(request, request.PreferenceIds, customer);
 
             await _customerRepository.UpdateAsync(customer);
 

@@ -21,9 +21,10 @@ namespace Pcf.ReceivingFromPartner.Integration
             var dto = new GivePromoCodeToCustomerDto()
             {
                 PartnerId = promoCode.Partner.Id,
-                BeginDate = promoCode.BeginDate.ToShortDateString(),
-                EndDate = promoCode.EndDate.ToShortDateString(),
+                BeginDate = promoCode.BeginDate.ToString("yyyy-MM-dd"),
+                EndDate = promoCode.EndDate.ToString("yyyy-MM-dd"),
                 PreferenceId = promoCode.PreferenceId,
+                PromoCodeId = promoCode.Id,
                 PromoCode = promoCode.Code,
                 ServiceInfo = promoCode.ServiceInfo,
                 PartnerManagerId = promoCode.PartnerManagerId

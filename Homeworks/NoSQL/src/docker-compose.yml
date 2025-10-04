@@ -1,0 +1,112 @@
+name: pcf-docker-compose
+services:
+  #Administration Db
+  promocode-factory-administration-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-administration-db'
+    restart: always 
+    ports:
+      - 5433:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+  #Administration Api
+  promocode-factory-administration-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-administration:latest
+    build:
+      context: .
+      dockerfile: Pcf.Administration/Pcf.Administration.WebHost/Dockerfile
+    container_name: 'promocode-factory-administration-api'
+    restart: always
+    ports:
+      - "8191:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=postgres;Password=docker"          
+    depends_on: 
+      - promocode-factory-administration-db
+ 
+  #ReceivingFromPartner Db
+  promocode-factory-receiving-from-partner-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-receiving-from-partner-db'
+    restart: always 
+    ports:
+      - 5434:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+  #ReceivingFromPartner Api
+  promocode-factory-receiving-from-partner-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-receiving-from-partner:latest
+    build:
+      context: .
+      dockerfile: Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.WebHost/Dockerfile
+    container_name: 'promocode-factory-receiving-from-partner-api'
+    restart: always
+    ports:
+      - "8192:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryReceivingFromPartnerDb=Host=promocode-factory-receiving-from-partner-db;Database=promocode_factory_receiving_from_partner_db;Username=postgres;Password=docker"
+      - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api:8080/"
+      - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api:8080/"
+      - "IntegrationSettings:PreferencesDirectoryApiUrl=http://promocode-factory-preferences-directory-api:8080/"
+    depends_on: 
+      - promocode-factory-receiving-from-partner-db
+ 
+  #GivingToCustomer Db
+  promocode-factory-giving-to-customer-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-giving-to-customer-db'
+    restart: always 
+    ports:
+      - 5435:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+  #GivingToCustomer Api
+  promocode-factory-giving-to-customer-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-giving-to-customer:latest
+    build:
+      context: .
+      dockerfile: Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost/Dockerfile
+    container_name: 'promocode-factory-giving-to-customer-api'
+    restart: always
+    ports:
+      - "8193:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"
+      - "IntegrationSettings:PreferencesDirectoryApiUrl=http://promocode-factory-preferences-directory-api:8080/"
+    depends_on: 
+      - promocode-factory-giving-to-customer-db
+
+  #PreferencesDirectory Cache
+  promocode-factory-preferences-redis-cache:
+    container_name: 'promocode-factory-preferences-redis-cache'
+    image: redis:latest
+    restart: always
+    ports:
+      - 6388:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+  #PreferencesDirectory Db
+  promocode-factory-preferences-directory-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-preferences-directory-db'
+    restart: always 
+    ports:
+      - 5436:5432
+    environment: 
+      - POSTGRES_PASSWORD=docker
+  #PreferencesDirectory Api
+  promocode-factory-preferences-directory-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-preferences-directory:latest
+    build:
+      context: .
+      dockerfile: Pcf.PreferencesDirectory/Pcf.PreferencesDirectory.WebHost/Dockerfile
+    container_name: 'promocode-factory-preferences-directory-api'
+    restart: always
+    ports:
+      - "8194:8080"
+    environment:
+      - "ConnectionStrings:PromocodeFactoryPreferencesDirectoryDb=Host=promocode-factory-preferences-directory-db;Database=promocode_factory_preferences_directory_db;Username=postgres;Password=docker"
+      - "ConnectionStrings:PromocodeFactoryPreferencesDirectoryCache=promocode-factory-preferences-redis-cache:6379,ssl=False,abortConnect=False"
+    depends_on: 
+      - promocode-factory-preferences-directory-db
+      - promocode-factory-preferences-redis-cache

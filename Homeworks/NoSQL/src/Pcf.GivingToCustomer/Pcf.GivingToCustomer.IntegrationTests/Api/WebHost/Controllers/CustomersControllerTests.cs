@@ -12,6 +12,7 @@ using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.IntegrationTests.Fakes;
 using Pcf.GivingToCustomer.WebHost;
 using Pcf.GivingToCustomer.WebHost.Models;
+using Pcf.SharedLibrary.Models;
 using Xunit;
 
 namespace Pcf.GivingToCustomer.IntegrationTests.Api.WebHost.Controllers

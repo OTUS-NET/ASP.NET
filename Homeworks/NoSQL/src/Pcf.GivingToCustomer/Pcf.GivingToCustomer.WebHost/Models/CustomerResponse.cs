@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Pcf.GivingToCustomer.Core.Domain;
+using Pcf.SharedLibrary.Models;
 
 namespace Pcf.GivingToCustomer.WebHost.Models
 {
@@ -19,17 +20,17 @@ namespace Pcf.GivingToCustomer.WebHost.Models
             
         }
 
-        public CustomerResponse(Customer customer)
+        public CustomerResponse(Customer customer, IReadOnlyDictionary<Guid, string> preferenceNames)
         {
             Id = customer.Id;
             Email = customer.Email;
             FirstName = customer.FirstName;
             LastName = customer.LastName;
-            Preferences = customer.Preferences.Select(x => new PreferenceResponse()
+            Preferences = [.. customer.Preferences.Select(x => new PreferenceResponse()
             {
                 Id = x.PreferenceId,
-                Name = x.Preference.Name
-            }).ToList();
+                Name = preferenceNames.GetValueOrDefault(x.PreferenceId, "Неизвестное предпочтение")
+            })];
             PromoCodes = customer.PromoCodes.Select(x => new PromoCodeShortResponse()
                 {
                     Id = x.PromoCode.Id,

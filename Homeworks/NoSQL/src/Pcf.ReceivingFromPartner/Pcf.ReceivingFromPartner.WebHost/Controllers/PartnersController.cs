@@ -20,22 +20,22 @@ using Microsoft.AspNetCore.Mvc;
         : ControllerBase
     {
         private readonly IRepository<Partner> _partnersRepository;
-        private readonly IRepository<Preference> _preferencesRepository;
         private readonly INotificationGateway _notificationGateway;
         private readonly IGivingPromoCodeToCustomerGateway _givingPromoCodeToCustomerGateway;
         private readonly IAdministrationGateway _administrationGateway;
+        private readonly IPreferencesDirectoryGateway _preferencesDirectoryGateway;
 
         public PartnersController(IRepository<Partner> partnersRepository,
-            IRepository<Preference> preferencesRepository, 
             INotificationGateway notificationGateway,
             IGivingPromoCodeToCustomerGateway givingPromoCodeToCustomerGateway,
-            IAdministrationGateway administrationGateway)
+            IAdministrationGateway administrationGateway,
+            IPreferencesDirectoryGateway preferencesDirectoryGateway)
         {
             _partnersRepository = partnersRepository;
-            _preferencesRepository = preferencesRepository;
             _notificationGateway = notificationGateway;
             _givingPromoCodeToCustomerGateway = givingPromoCodeToCustomerGateway;
             _administrationGateway = administrationGateway;
+            _preferencesDirectoryGateway = preferencesDirectoryGateway;
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ using Microsoft.AspNetCore.Mvc;
                 partner.NumberIssuedPromoCodes = 0;
                 
                 //При установке лимита нужно отключить предыдущий лимит
-                activeLimit.CancelDate = DateTime.Now;
+                activeLimit.CancelDate = DateTime.UtcNow;
             }
 
             if (request.Limit <= 0)
@@ -140,7 +140,7 @@ using Microsoft.AspNetCore.Mvc;
                 Limit = request.Limit,
                 Partner = partner,
                 PartnerId = partner.Id,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 EndDate = request.EndDate
             };
             
@@ -205,7 +205,7 @@ using Microsoft.AspNetCore.Mvc;
             
             if (activeLimit != null)
             {
-                activeLimit.CancelDate = DateTime.Now;
+                activeLimit.CancelDate = DateTime.UtcNow;
             }
 
             await _partnersRepository.UpdateAsync(partner);
@@ -299,7 +299,7 @@ using Microsoft.AspNetCore.Mvc;
             }
 
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x
-                => !x.CancelDate.HasValue && x.EndDate > DateTime.Now);
+                => !x.CancelDate.HasValue && x.EndDate > DateTime.UtcNow);
 
             if (activeLimit == null)
             {
@@ -316,15 +316,14 @@ using Microsoft.AspNetCore.Mvc;
                 return BadRequest("Данный промокод уже был выдан ранее");
             }
 
-            //Получаем предпочтение по имени
-            var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
-
+            //Получаем предпочтение по id
+            var preference = await _preferencesDirectoryGateway.GetPreferenceByIdAsync(request.PreferenceId);
             if (preference == null)
             {
                 return BadRequest("Предпочтение не найдено");
             }
 
-            PromoCode promoCode = PromoCodeMapper.MapFromModel(request, preference, partner);
+            PromoCode promoCode = PromoCodeMapper.MapFromModel(request, preference.Id, partner);
             partner.PromoCodes.Add(promoCode);
             partner.NumberIssuedPromoCodes++;
 
