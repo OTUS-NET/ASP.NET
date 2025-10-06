@@ -18,7 +18,12 @@ namespace PromoCodeFactory.WebHost
                 new InMemoryRepository<Employee>(FakeDataFactory.Employees));
             services.AddSingleton(typeof(IRepository<Role>), (x) => 
                 new InMemoryRepository<Role>(FakeDataFactory.Roles));
-
+            //https://stackoverflow.com/questions/39459348/asp-net-core-web-api-no-route-matches-the-supplied-values
+            services.AddMvc(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
+            
             services.AddOpenApiDocument(options =>
             {
                 options.Title = "PromoCode Factory API Doc";

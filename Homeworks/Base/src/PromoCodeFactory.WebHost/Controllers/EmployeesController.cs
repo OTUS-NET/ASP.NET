@@ -70,5 +70,43 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             return employeeModel;
         }
+
+        /// <summary>
+        /// Добавить сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> CreateEmployeesAsync(Employee employee)
+        {
+            var newEmployee = await _employeeRepository.CreateAsync(employee);
+            
+            return CreatedAtAction(
+                nameof(GetEmployeeByIdAsync), 
+                new { id = newEmployee.Id }, 
+                newEmployee
+            );
+        }
+        
+        /// <summary>
+        /// Изменить информацию о сотруднике
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<IActionResult> UpdateEmployeesAsync(Employee employee)
+        {
+            await _employeeRepository.UpdateAsync(employee.Id, employee);
+            return NoContent();
+        }
+        
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteEmployeesAsync(Guid id)
+        {
+            await _employeeRepository.DeleteAsync(id);
+            return NoContent();
+        }
     }
 }
