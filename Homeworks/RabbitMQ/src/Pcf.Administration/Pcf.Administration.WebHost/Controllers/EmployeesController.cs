@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Pcf.Administration.Core.Abstractions.Repositories;
+using Pcf.Administration.Core.Abstractions.Services;
+using Pcf.Administration.Core.Domain.Administration;
+using Pcf.Administration.WebHost.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Pcf.Administration.Core.Abstractions.Repositories;
-using Pcf.Administration.Core.Domain.Administration;
-using Pcf.Administration.WebHost.Models;
 
 namespace Pcf.Administration.WebHost.Controllers
 {
@@ -14,15 +15,12 @@ namespace Pcf.Administration.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class EmployeesController
-        : ControllerBase
+    public class EmployeesController(IRepository<Employee> employeeRepository,
+        IAdministrationService administrationService)
+                : ControllerBase
     {
-        private readonly IRepository<Employee> _employeeRepository;
-
-        public EmployeesController(IRepository<Employee> employeeRepository)
-        {
-            _employeeRepository = employeeRepository;
-        }
+        private readonly IRepository<Employee> _employeeRepository = employeeRepository;
+        private readonly IAdministrationService _administrationService = administrationService;
 
         /// <summary>
         /// Получить данные всех сотрудников
@@ -83,16 +81,8 @@ namespace Pcf.Administration.WebHost.Controllers
 
         public async Task<IActionResult> UpdateAppliedPromocodesAsync(Guid id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
-                return NotFound();
-
-            employee.AppliedPromocodesCount++;
-
-            await _employeeRepository.UpdateAsync(employee);
-
-            return Ok();
+            bool result = await _administrationService.UpdateAppliedPromocodesAsync(id);
+            return result ? Ok() : NotFound();
         }
     }
 }

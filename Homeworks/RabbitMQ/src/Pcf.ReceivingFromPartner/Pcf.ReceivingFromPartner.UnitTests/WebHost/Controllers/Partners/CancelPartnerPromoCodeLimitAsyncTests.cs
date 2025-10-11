@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +6,8 @@ using Moq;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Repositories;
 using Pcf.ReceivingFromPartner.Core.Domain;
 using Pcf.ReceivingFromPartner.WebHost.Controllers;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Pcf.ReceivingFromPartner.UnitTests.WebHost.Controllers.Partners
@@ -24,30 +24,30 @@ namespace Pcf.ReceivingFromPartner.UnitTests.WebHost.Controllers.Partners
             _partnersController = fixture.Build<PartnersController>().OmitAutoProperties().Create();
         }
 
-        public Partner CreateBasePartner()
+        public static Partner CreateBasePartner()
         {
             var partner = new Partner()
             {
                 Id = Guid.Parse("7d994823-8226-4273-b063-1a95f3cc1df8"),
                 Name = "Суперигрушки",
                 IsActive = true,
-                PartnerLimits = new List<PartnerPromoCodeLimit>()
-                {
-                    new PartnerPromoCodeLimit()
+                PartnerLimits =
+                [
+                    new()
                     {
                         Id = Guid.Parse("e00633a5-978a-420e-a7d6-3e1dab116393"),
-                        CreateDate = new DateTime(2020, 07, 9),
-                        EndDate = new DateTime(2020, 10, 9),
+                        CreateDate = new DateTime(2020, 7, 9).ToUniversalTime(),
+                        EndDate = new DateTime(2020, 10, 9).ToUniversalTime(),
                         Limit = 100
                     }
-                }
+                ]
             };
 
             return partner;
         }
 
         [Fact]
-        public async void CancelPartnerPromoCodeLimitAsync_PartnerIsNotFound_ReturnsNotFound()
+        public async Task CancelPartnerPromoCodeLimitAsync_PartnerIsNotFound_ReturnsNotFound()
         {
             // Arrange
             var partnerId = Guid.Parse("def47943-7aaf-44a1-ae21-05aa4948b165");
@@ -64,7 +64,7 @@ namespace Pcf.ReceivingFromPartner.UnitTests.WebHost.Controllers.Partners
         }
 
         [Fact]
-        public async void CancelPartnerPromoCodeLimitAsync_PartnerIsNotActive_ReturnsBadRequest()
+        public async Task CancelPartnerPromoCodeLimitAsync_PartnerIsNotActive_ReturnsBadRequest()
         {
             // Arrange
             var partnerId = Guid.Parse("def47943-7aaf-44a1-ae21-05aa4948b165");

@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Pcf.Integration\Pcf.Integration.csproj" />
+    <ProjectReference Include="..\..\Pcf.SharedLibrary\Pcf.SharedLibrary.csproj" />
+    <ProjectReference Include="..\Pcf.Administration.Core\Pcf.Administration.Core.csproj" />
+  </ItemGroup>
+
+</Project>

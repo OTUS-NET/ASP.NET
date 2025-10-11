@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pcf.GivingToCustomer.WebHost.Models
+namespace Pcf.GivingToCustomer.Core.Models
 {
     public class GivePromoCodeRequest
     {

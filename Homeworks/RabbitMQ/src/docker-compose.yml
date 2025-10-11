@@ -1,0 +1,106 @@
+name: pcf-docker-compose
+services:
+  #Administration Db
+  promocode-factory-administration-db:
+    image: "postgres:latest"
+    restart: always 
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=${PGR_USER}
+      - POSTGRES_PASSWORD=${PGR_PASSWORD}
+      - POSTGRES_DB=promocode_factory_administration_db
+  #Administration Api
+  promocode-factory-administration-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-administration:latest
+    build:
+      context: .
+      dockerfile: Pcf.Administration/Pcf.Administration.WebHost/Dockerfile
+    restart: always
+    ports:
+      - 8191:8080
+    environment:
+      - ConnectionStrings__PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=${PGR_USER};Password=${PGR_PASSWORD}
+      - ApplicationSettings__RmqSettings__Host=promocode-factory-rabbitmq
+      - ApplicationSettings__RmqSettings__VHost=/
+      - ApplicationSettings__RmqSettings__Login=${RMQ_LOGIN}
+      - ApplicationSettings__RmqSettings__Password=${RMQ_PASSWORD}
+    depends_on: 
+      - promocode-factory-administration-db
+      - promocode-factory-rabbitmq
+ 
+  #GivingToCustomer Db
+  promocode-factory-giving-to-customer-db:
+    image: "postgres:latest"
+    restart: always 
+    ports:
+      - 5435:5432
+    environment: 
+      - POSTGRES_USER=${PGR_USER}
+      - POSTGRES_PASSWORD=${PGR_PASSWORD}
+      - POSTGRES_DB=promocode_factory_giving_to_customer_db
+  #GivingToCustomer Api
+  promocode-factory-giving-to-customer-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-giving-to-customer:latest
+    build:
+      context: .
+      dockerfile: Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost/Dockerfile
+    restart: always
+    ports:
+      - 8193:8080
+    environment:
+      - ConnectionStrings__PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=${PGR_USER};Password=${PGR_PASSWORD}
+      - ApplicationSettings__RmqSettings__Host=promocode-factory-rabbitmq
+      - ApplicationSettings__RmqSettings__VHost=/
+      - ApplicationSettings__RmqSettings__Login=${RMQ_LOGIN}
+      - ApplicationSettings__RmqSettings__Password=${RMQ_PASSWORD}
+    depends_on: 
+      - promocode-factory-giving-to-customer-db
+      - promocode-factory-rabbitmq
+
+  #ReceivingFromPartner Db
+  promocode-factory-receiving-from-partner-db:
+    image: "postgres:latest"
+    container_name: 'promocode-factory-receiving-from-partner-db'
+    restart: always 
+    ports:
+      - 5434:5432
+    environment: 
+      - POSTGRES_USER=${PGR_USER}
+      - POSTGRES_PASSWORD=${PGR_PASSWORD}
+      - POSTGRES_DB=promocode_factory_receiving_from_partner_db
+  #ReceivingFromPartner Api
+  promocode-factory-receiving-from-partner-api:
+    image: ${DOCKER_REGISTRY-}promocode-factory-receiving-from-partner:latest
+    build:
+      context: .
+      dockerfile: Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.WebHost/Dockerfile
+    restart: always
+    ports:
+      - 8192:8080
+    environment:
+      - ConnectionStrings__PromocodeFactoryReceivingFromPartnerDb=Host=promocode-factory-receiving-from-partner-db;Database=promocode_factory_receiving_from_partner_db;Username=${PGR_USER};Password=${PGR_PASSWORD}
+      - ApplicationSettings__RmqSettings__Host=promocode-factory-rabbitmq
+      - ApplicationSettings__RmqSettings__VHost=/
+      - ApplicationSettings__RmqSettings__Login=${RMQ_LOGIN}
+      - ApplicationSettings__RmqSettings__Password=${RMQ_PASSWORD}
+    depends_on: 
+      - promocode-factory-receiving-from-partner-db
+      - promocode-factory-rabbitmq
+
+  #RabbitMQ
+  promocode-factory-rabbitmq:
+    image: rabbitmq:4-management-alpine
+    restart: always
+    hostname: rabbitmqhost
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RMQ_DFLT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RMQ_DFLT_PASS}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+volumes:
+  rabbitmq_data:

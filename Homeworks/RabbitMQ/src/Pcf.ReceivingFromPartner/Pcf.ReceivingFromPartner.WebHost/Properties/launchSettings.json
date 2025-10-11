@@ -1,13 +1,23 @@
-﻿{
+{
   "profiles": {
     "Otus.Teaching.PromocodeFactory.WebHost": {
       "commandName": "Project",
-      "launchUrl": "swagger/index.html",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:8092",
+      "launchUrl": "swagger/index.html",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:8092"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger/index.html",
+      "environmentVariables": {
+        "ASPNETCORE_HTTP_PORTS": "8080"
+      },
+      "publishAllPorts": true,
+      "useSSL": false
     }
   }
 }

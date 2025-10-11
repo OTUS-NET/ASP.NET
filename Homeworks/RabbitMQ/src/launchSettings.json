@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "pcf.administration.webhost": "StartDebugging",
+        "pcf.givingtocustomer.webhost": "StartDebugging",
+        "pcf.receivingfrompartner.webhost": "StartDebugging"
+      }
+    }
+  }
+}
