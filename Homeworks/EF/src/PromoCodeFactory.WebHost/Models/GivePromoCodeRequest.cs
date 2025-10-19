@@ -1,10 +1,14 @@
-﻿namespace PromoCodeFactory.WebHost.Models
+﻿using System;
+
+namespace PromoCodeFactory.WebHost.Models
 {
     public class GivePromoCodeRequest
     {
         public string ServiceInfo { get; set; }
 
         public string PartnerName { get; set; }
+
+        public Guid PartnerManagerId { get; set; }
 
         public string PromoCode { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.WebHost.Models
 {
@@ -9,7 +10,7 @@ namespace PromoCodeFactory.WebHost.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        //TODO: Добавить список предпочтений
-        public List<PromoCodeShortResponse> PromoCodes { get; set; }
+        public virtual List<PreferenceResponse> Preferences { get; set; }
+        public virtual List<PromoCodeShortResponse> PromoCodes { get; set; }
     }
 }
