@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
+using Pcf.ReceivingFromPartner.Core.Abstractions.Repositories;
+using Pcf.ReceivingFromPartner.Core.Domain;
+using Pcf.ReceivingFromPartner.WebHost.Mappers;
+using Pcf.ReceivingFromPartner.WebHost.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Pcf.ReceivingFromPartner.Core.Abstractions.Repositories;
-using Pcf.ReceivingFromPartner.Core.Domain;
-using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
-using Pcf.ReceivingFromPartner.WebHost.Models;
-using Pcf.ReceivingFromPartner.WebHost.Mappers;
 
 namespace Pcf.ReceivingFromPartner.WebHost.Controllers
 {
@@ -16,27 +16,18 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PartnersController
-        : ControllerBase
+    public class PartnersController(IRepository<Partner> partnersRepository,
+    IRepository<Preference> preferencesRepository,
+    INotificationGateway notificationGateway,
+        IGivingPromoCodeToCustomerGateway givingPromoCodeToCustomerGateway,
+        IAdministrationGateway administrationGateway)
+                : ControllerBase
     {
-        private readonly IRepository<Partner> _partnersRepository;
-        private readonly IRepository<Preference> _preferencesRepository;
-        private readonly INotificationGateway _notificationGateway;
-        private readonly IGivingPromoCodeToCustomerGateway _givingPromoCodeToCustomerGateway;
-        private readonly IAdministrationGateway _administrationGateway;
-
-        public PartnersController(IRepository<Partner> partnersRepository,
-            IRepository<Preference> preferencesRepository,
-            INotificationGateway notificationGateway,
-            IGivingPromoCodeToCustomerGateway givingPromoCodeToCustomerGateway,
-            IAdministrationGateway administrationGateway)
-        {
-            _partnersRepository = partnersRepository;
-            _preferencesRepository = preferencesRepository;
-            _notificationGateway = notificationGateway;
-            _givingPromoCodeToCustomerGateway = givingPromoCodeToCustomerGateway;
-            _administrationGateway = administrationGateway;
-        }
+        private readonly IRepository<Partner> _partnersRepository = partnersRepository;
+        private readonly IRepository<Preference> _preferencesRepository = preferencesRepository;
+        private readonly INotificationGateway _notificationGateway = notificationGateway;
+        private readonly IGivingPromoCodeToCustomerGateway _givingPromoCodeToCustomerGateway = givingPromoCodeToCustomerGateway;
+        private readonly IAdministrationGateway _administrationGateway = administrationGateway;
 
         /// <summary>
         /// Получить список партнеров
@@ -52,7 +43,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
                 Name = x.Name,
                 NumberIssuedPromoCodes = x.NumberIssuedPromoCodes,
                 IsActive = true,
-                PartnerLimits = x.PartnerLimits
+                PartnerLimits = [.. x.PartnerLimits
                     .Select(y => new PartnerPromoCodeLimitResponse()
                     {
                         Id = y.Id,
@@ -61,7 +52,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
                         CreateDate = y.CreateDate.ToString("dd.MM.yyyy hh:mm:ss"),
                         EndDate = y.EndDate.ToString("dd.MM.yyyy hh:mm:ss"),
                         CancelDate = y.CancelDate?.ToString("dd.MM.yyyy hh:mm:ss"),
-                    }).ToList()
+                    })]
             });
 
             return Ok(response);
@@ -87,7 +78,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
                 Name = partner.Name,
                 NumberIssuedPromoCodes = partner.NumberIssuedPromoCodes,
                 IsActive = true,
-                PartnerLimits = partner.PartnerLimits
+                PartnerLimits = [.. partner.PartnerLimits
                     .Select(y => new PartnerPromoCodeLimitResponse()
                     {
                         Id = y.Id,
@@ -96,7 +87,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
                         CreateDate = y.CreateDate.ToString("dd.MM.yyyy hh:mm:ss"),
                         EndDate = y.EndDate.ToString("dd.MM.yyyy hh:mm:ss"),
                         CancelDate = y.CancelDate?.ToString("dd.MM.yyyy hh:mm:ss"),
-                    }).ToList()
+                    })]
             };
 
             return Ok(response);
@@ -129,7 +120,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
                 partner.NumberIssuedPromoCodes = 0;
 
                 //При установке лимита нужно отключить предыдущий лимит
-                activeLimit.CancelDate = DateTime.Now;
+                activeLimit.CancelDate = DateTime.UtcNow;
             }
 
             if (request.Limit <= 0)
@@ -140,7 +131,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
                 Limit = request.Limit,
                 Partner = partner,
                 PartnerId = partner.Id,
-                CreateDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
                 EndDate = request.EndDate
             };
 
@@ -205,7 +196,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
 
             if (activeLimit != null)
             {
-                activeLimit.CancelDate = DateTime.Now;
+                activeLimit.CancelDate = DateTime.UtcNow;
             }
 
             await _partnersRepository.UpdateAsync(partner);
@@ -299,7 +290,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
             }
 
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x
-                => !x.CancelDate.HasValue && x.EndDate > DateTime.Now);
+                => !x.CancelDate.HasValue && x.EndDate > DateTime.UtcNow);
 
             if (activeLimit == null)
             {
