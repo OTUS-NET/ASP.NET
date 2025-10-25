@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "Protos/common.proto";
+
+option csharp_namespace = "Pcf.GivingToCustomer.GrpcHost.Protos";
+
+package customer;
+
+// Клиенты
+service CustomerGrpc {
+  // Получить список клиентов
+  rpc GetCustomers (google.protobuf.Empty) returns (CustomerShortReplyList);
+
+  // Получить клиента по ID
+  rpc GetCustomer (CustomerIdRequest) returns (CustomerReply);
+
+  // Создать клиента
+  rpc CreateCustomer (CreateCustomerRequest) returns (CustomerReply);
+
+  // Обновить клиента
+  rpc EditCustomer (EditCustomerRequest) returns (google.protobuf.Empty);
+
+  // Удалить клиента
+  rpc DeleteCustomer (CustomerIdRequest) returns (google.protobuf.Empty);
+}
+
+message CustomerShortReplyList {
+  repeated CustomerShortReply customers = 1;
+}
+
+message CustomerReply {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  repeated PreferenceReply preferences = 5;
+  repeated PromoCodeShortReply promo_codes = 6;
+}
+
+message CustomerIdRequest {
+  string id = 1;
+}
+
+message CreateCustomerRequest {
+  string firstName = 1;
+  string lastName = 2;
+  string email = 3;
+  repeated string preferenceIds = 4;
+}
+
+message EditCustomerRequest {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  repeated string preferenceIds = 5;
+}

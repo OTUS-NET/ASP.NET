@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "promocode-factory-administration-api": "StartDebugging",
+        "promocode-factory-giving-to-customer-web-api": "StartDebugging",
+        "promocode-factory-giving-to-customer-grpc-api": "StartDebugging",
+        "promocode-factory-giving-to-customer-graphql-api": "StartDebugging",
+        "promocode-factory-receiving-from-partner-api": "StartDebugging"
+      }
+    }
+  }
+}

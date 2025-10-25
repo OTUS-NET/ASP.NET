@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "Pcf.GivingToCustomer.GrpcHost.Protos";  
+
+message PromoCodeShortReply {
+  string id = 1;
+  string code = 2;
+  string serviceInfo = 3;
+  string beginDate = 4;
+  string endDate = 5;
+  string partnerId = 6;
+}
+
+message CustomerShortReply {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+}
+
+message PreferenceReply {
+  string id = 1;
+  string name = 2;
+}

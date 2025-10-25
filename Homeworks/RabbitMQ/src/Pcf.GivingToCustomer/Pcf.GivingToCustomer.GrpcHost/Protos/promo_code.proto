@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "Protos/common.proto";
+
+option csharp_namespace = "Pcf.GivingToCustomer.GrpcHost.Protos";
+
+package promo_code;
+
+// Промокоды
+service PromoCodeGrpc {
+  // Получить все промокоды
+  rpc GetPromoCodes (google.protobuf.Empty) returns (PromoCodeShortReplyList);
+  // Получить промокод по ID
+  rpc GetPromoCode (PromoCodeIdRequest) returns (PromoCodeReply);
+  // Создать промокод и выдать клиентам с указанным предпочтением
+  rpc GivePromoCodeToCustomersWithPreference (GivePromoCodeRequest) returns (PromoCodeReply);
+}
+
+message PromoCodeIdRequest {
+  string id = 1;
+}
+
+message PromoCodeShortReplyList {
+  repeated PromoCodeShortReply promo_codes = 1;
+}
+
+message PromoCodeReply {
+  string id = 1;
+  string code = 2;
+  string serviceInfo = 3;
+  string beginDate = 4;
+  string endDate = 5;
+  string partnerId = 6;
+  PreferenceReply preference = 7;
+  repeated CustomerShortReply customers = 8;
+}
+
+message GivePromoCodeRequest {
+  string serviceInfo = 1;
+  string partnerId = 2;
+  string promoCodeId = 3;
+  string promoCode = 4;
+  string preferenceId = 5;
+  string beginDate = 6;
+  string endDate = 7;
+}

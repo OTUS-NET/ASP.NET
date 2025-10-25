@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "Protos/common.proto";
+
+option csharp_namespace = "Pcf.GivingToCustomer.GrpcHost.Protos";
+
+package preference;
+
+// Предпочтения клиентов
+service PreferenceGrpc {
+  // Получить список предпочтений
+  rpc GetPreferences (google.protobuf.Empty) returns (PreferenceReplyList);
+}
+
+message PreferenceReplyList {
+  repeated PreferenceReply preferences = 1;
+}
