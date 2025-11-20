@@ -67,3 +67,30 @@ services:
       - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
     depends_on: 
       - promocode-factory-giving-to-customer-db
+
+  pcf_rabbitmq:
+    image: rabbitmq:3.10.7-management
+    container_name: pcf_rabbitmq
+    hostname: pcf
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: pcf
+      RABBITMQ_DEFAULT_PASS: pcf_password
+    ports:
+      - "15672:15672" 
+      - "5672:5672" 
+    volumes:
+      - olp_rabbitmq_data:/var/lib/rabbitmq/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running", "-q"]
+      interval: 30s
+      timeout: 30s
+      retries: 3     
