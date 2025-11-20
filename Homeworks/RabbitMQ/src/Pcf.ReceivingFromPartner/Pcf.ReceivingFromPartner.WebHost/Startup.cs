@@ -12,6 +12,8 @@ using Pcf.ReceivingFromPartner.DataAccess;
 using Pcf.ReceivingFromPartner.DataAccess.Repositories;
 using Pcf.ReceivingFromPartner.DataAccess.Data;
 using Pcf.ReceivingFromPartner.Integration;
+using MassTransit;
+using Pcf.ReceivingFromPartner.WebHost.Settings;
 
 namespace Pcf.ReceivingFromPartner.WebHost
 {
@@ -54,6 +56,13 @@ namespace Pcf.ReceivingFromPartner.WebHost
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            services.AddMassTransit(x => {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    ConfigureRmq(cfg, Configuration);
+                });
+            });
+
             services.AddOpenApiDocument(options =>
             {
                 options.Title = "PromoCode Factory Receiving From Partner API Doc";
@@ -89,6 +98,19 @@ namespace Pcf.ReceivingFromPartner.WebHost
             });
 
             dbInitializer.InitializeDb();
+        }
+
+        private static void ConfigureRmq(IRabbitMqBusFactoryConfigurator configurator, IConfiguration configuration)
+        {
+            var rmqSettings = configuration.Get<ApplicationSettings>().RmqSettings;
+            configurator.Host(rmqSettings.Host,
+                rmqSettings.VHost,
+                h =>
+                {
+                    h.Username(rmqSettings.Login);
+                    h.Password(rmqSettings.Password);
+                });
+
         }
     }
 }
