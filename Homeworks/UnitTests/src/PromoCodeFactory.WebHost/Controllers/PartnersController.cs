@@ -86,6 +86,9 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (!partner.IsActive)
                 return BadRequest("Данный партнер не активен");
             
+            if (request.Limit <= 0)
+                return BadRequest("Лимит должен быть больше 0");
+
             //Установка лимита партнеру
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
                 !x.CancelDate.HasValue);
@@ -101,9 +104,6 @@ namespace PromoCodeFactory.WebHost.Controllers
                 activeLimit.CancelDate = DateTime.Now;
             }
 
-            if (request.Limit <= 0)
-                return BadRequest("Лимит должен быть больше 0");
-            
             var newLimit = new PartnerPromoCodeLimit()
             {
                 Limit = request.Limit,
