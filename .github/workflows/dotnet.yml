@@ -20,12 +20,18 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
+    - name: Restore dependencies Unit
       working-directory: ./Homeworks/UnitTests/src
       run: dotnet restore
-    - name: Build
+    - name: Restore dependencies EF
+      working-directory: ./Homeworks/EF/src
+      run: dotnet restore PromoCodeFactory.sln
+    - name: Build Unit
       working-directory: ./Homeworks/UnitTests/src
       run: dotnet build --no-restore
+    - name: Build EF
+      working-directory: ./Homeworks/EF/src
+      run: dotnet build PromoCodeFactory.sln --no-restore
     - name: Test
       working-directory: ./Homeworks/UnitTests/src
       run: dotnet test --no-build --verbosity normal

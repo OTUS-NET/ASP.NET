@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
-using PromoCodeFactory.DataAccess.Repositories;
 
 namespace PromoCodeFactory.DataAccess.Data
 {
     public class DataContext : DbContext
     {
+        public const string DefaultDefaultSchema = "PROMO";
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Customer> Customers { get; set; }
@@ -30,6 +30,8 @@ namespace PromoCodeFactory.DataAccess.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema(DefaultDefaultSchema);
+
             modelBuilder.Entity<CustomerPreference>().HasKey(cp => new { cp.CustomerId, cp.PreferenceId });
 
             modelBuilder.Entity<CustomerPreference>()

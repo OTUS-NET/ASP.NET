@@ -1,0 +1,18 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hoverkraft-tech/compose-action@b716db5b717cb9b81e391fe638e5aceaa2299e43 # v2.4.0
+        with:
+          compose-file: "./Homeworks/EF/src/docker-compose.yml"
