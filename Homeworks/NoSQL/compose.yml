@@ -38,8 +38,8 @@ services:
       - "8092:8080"
     environment:
       - "ConnectionStrings:PromocodeFactoryReceivingFromPartnerDb=Host=promocode-factory-receiving-from-partner-db;Database=promocode_factory_receiving_from_partner_db;Username=postgres;Password=docker"
-      - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api"    
-      - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api"       
+      - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api"
+      - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api"
     depends_on: 
       - promocode-factory-receiving-from-partner-db
   
@@ -63,3 +63,25 @@ services:
       - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
     depends_on: 
       - promocode-factory-giving-to-customer-db
+  #Cache Api
+  preference-cache-api:
+    build: src/Pcf.PreferencesCache/
+    container_name: 'preference-cache-api'
+    restart: always
+    ports:
+      - "8094:8080"
+ # redis
+  redis-stack:
+    image: redis/redis-stack:latest
+    container_name: my-redis-stack
+    restart: unless-stopped
+    ports:
+      - "9979:6379"              # Redis database port
+      - "8001:8001"              # Redis Insight UI
+    # environment:
+    #   - REDIS_ARGS=--requirepass your_strong_password_here  # Optional password
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
