@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36705.20
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pcf.PreferencesCache", "Pcf.PreferencesCache.WebHost\Pcf.PreferencesCache.WebHost.csproj", "{7B01E9E6-3875-79FC-AF31-B0E0E601EBA7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B01E9E6-3875-79FC-AF31-B0E0E601EBA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B01E9E6-3875-79FC-AF31-B0E0E601EBA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B01E9E6-3875-79FC-AF31-B0E0E601EBA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B01E9E6-3875-79FC-AF31-B0E0E601EBA7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8D15C78-78B5-425F-93B0-0658F916337F}
+	EndGlobalSection
+EndGlobal

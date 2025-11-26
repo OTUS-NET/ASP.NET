@@ -1,6 +1,6 @@
 using StackExchange.Redis;
 
-namespace Pcf.PreferencesCache
+namespace Pcf.PreferencesCache.WebHost
 {
     public class Program
     {

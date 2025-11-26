@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.WebHost.Mappers;
@@ -20,12 +21,14 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
     {
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<Preference> _preferenceRepository;
+        private readonly IPreferenceCacheGateway _preferenceCacheGateway;
 
         public CustomersController(IRepository<Customer> customerRepository, 
-            IRepository<Preference> preferenceRepository)
+            IRepository<Preference> preferenceRepository, IPreferenceCacheGateway preferenceCacheGateway)
         {
             _customerRepository = customerRepository;
             _preferenceRepository = preferenceRepository;
+            _preferenceCacheGateway = preferenceCacheGateway;
         }
         
         /// <summary>

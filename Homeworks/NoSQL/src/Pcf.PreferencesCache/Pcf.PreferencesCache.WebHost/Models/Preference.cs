@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pcf.PreferencesCache.Models
+namespace Pcf.PreferencesCache.WebHost.Models
 {
     public class Preference
     {

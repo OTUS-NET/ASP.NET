@@ -24,18 +24,21 @@ using Microsoft.AspNetCore.Mvc;
         private readonly INotificationGateway _notificationGateway;
         private readonly IGivingPromoCodeToCustomerGateway _givingPromoCodeToCustomerGateway;
         private readonly IAdministrationGateway _administrationGateway;
+        private readonly IPreferenceCacheGateway _preferenceCacheGateway;
 
         public PartnersController(IRepository<Partner> partnersRepository,
             IRepository<Preference> preferencesRepository, 
             INotificationGateway notificationGateway,
             IGivingPromoCodeToCustomerGateway givingPromoCodeToCustomerGateway,
-            IAdministrationGateway administrationGateway)
+            IAdministrationGateway administrationGateway,
+            IPreferenceCacheGateway preferenceCacheGateway)
         {
             _partnersRepository = partnersRepository;
             _preferencesRepository = preferencesRepository;
             _notificationGateway = notificationGateway;
             _givingPromoCodeToCustomerGateway = givingPromoCodeToCustomerGateway;
             _administrationGateway = administrationGateway;
+            _preferenceCacheGateway = preferenceCacheGateway;
         }
 
         /// <summary>
@@ -316,13 +319,22 @@ using Microsoft.AspNetCore.Mvc;
                 return BadRequest("Данный промокод уже был выдан ранее");
             }
 
-            //Получаем предпочтение по имени
-            var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
+            // Получаем предпочтение по имени из кэша
+            var preferenceFromCache = await _preferenceCacheGateway.GetByIdAsync(request.PreferenceId);
+
+            Preference preference = null;
+
+            if (preferenceFromCache == null)
+            {
+                preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
+            }
 
             if (preference == null)
             {
                 return BadRequest("Предпочтение не найдено");
             }
+
+            await _preferenceCacheGateway.AddPreferenceAsync(preference);
 
             PromoCode promoCode = PromoCodeMapper.MapFromModel(request, preference, partner);
             partner.PromoCodes.Add(promoCode);

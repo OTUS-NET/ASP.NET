@@ -40,6 +40,7 @@ services:
       - "ConnectionStrings:PromocodeFactoryReceivingFromPartnerDb=Host=promocode-factory-receiving-from-partner-db;Database=promocode_factory_receiving_from_partner_db;Username=postgres;Password=docker"
       - "IntegrationSettings:GivingToCustomerApiUrl=http://promocode-factory-giving-to-customer-api"
       - "IntegrationSettings:AdministrationApiUrl=http://promocode-factory-administration-api"
+      - "IntegrationSettings:PreferenceCacheUrl=http://preference-cache-api"
     depends_on: 
       - promocode-factory-receiving-from-partner-db
   

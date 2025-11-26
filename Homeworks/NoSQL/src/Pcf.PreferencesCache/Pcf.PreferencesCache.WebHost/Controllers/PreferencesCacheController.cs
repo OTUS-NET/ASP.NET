@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Pcf.PreferencesCache.Models;
+using Pcf.PreferencesCache.WebHost.Models;
 using StackExchange.Redis;
 using System.Text.Json;
 
-namespace Pcf.PreferencesCache.Controllers
+namespace Pcf.PreferencesCache.WebHost.Controllers
 {
     [ApiController]
     [Route("[controller]")]

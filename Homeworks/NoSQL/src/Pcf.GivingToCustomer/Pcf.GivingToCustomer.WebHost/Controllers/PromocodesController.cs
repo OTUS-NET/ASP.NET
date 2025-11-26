@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.WebHost.Mappers;
@@ -21,13 +21,15 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         private readonly IRepository<PromoCode> _promoCodesRepository;
         private readonly IRepository<Preference> _preferencesRepository;
         private readonly IRepository<Customer> _customersRepository;
+        private readonly IPreferenceCacheGateway _preferenceCacheGateway;
 
         public PromocodesController(IRepository<PromoCode> promoCodesRepository, 
-            IRepository<Preference> preferencesRepository, IRepository<Customer> customersRepository)
+            IRepository<Preference> preferencesRepository, IRepository<Customer> customersRepository, IPreferenceCacheGateway preferenceCacheGateway)
         {
             _promoCodesRepository = promoCodesRepository;
             _preferencesRepository = preferencesRepository;
             _customersRepository = customersRepository;
+            _preferenceCacheGateway = preferenceCacheGateway;
         }
         
         /// <summary>
@@ -59,13 +61,22 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         [HttpPost]
         public async Task<IActionResult> GivePromoCodesToCustomersWithPreferenceAsync(GivePromoCodeRequest request)
         {
-            //Получаем предпочтение по имени
-            var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
+            // Получаем предпочтение по имени из кэша
+            var preferenceFromCache = await _preferenceCacheGateway.GetByIdAsync(request.PreferenceId);
+
+            Preference preference = null;
+
+            if (preferenceFromCache == null)
+            {
+                preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
+            }
 
             if (preference == null)
             {
                 return BadRequest();
             }
+
+            await _preferenceCacheGateway.AddPreferenceAsync(preference);
 
             //  Получаем клиентов с этим предпочтением:
             var customers = await _customersRepository
