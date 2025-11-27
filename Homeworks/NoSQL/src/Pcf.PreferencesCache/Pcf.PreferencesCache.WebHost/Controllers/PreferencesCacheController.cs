@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Pcf.PreferencesCache.WebHost.Models;
 using StackExchange.Redis;
+using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Pcf.PreferencesCache.WebHost.Controllers
 {
@@ -21,6 +25,10 @@ namespace Pcf.PreferencesCache.WebHost.Controllers
             _redis = redis;
         }
 
+        /// <summary>
+        /// Получить все предпочтения
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<List<Preference>>> GetAllAsync()
         {
@@ -31,12 +39,17 @@ namespace Pcf.PreferencesCache.WebHost.Controllers
 
             if (!cached.IsNull)
             {
-                return Ok(JsonSerializer.Deserialize<IEnumerable<Preference>>(cached));
+                return Ok(JsonSerializer.Deserialize<List<Preference>>(cached));
             }
 
             return NotFound();
         }
 
+        /// <summary>
+        /// Получить предпочтение
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<Preference>> GetByIdAsync(Guid id)
         {
@@ -53,6 +66,11 @@ namespace Pcf.PreferencesCache.WebHost.Controllers
             return NotFound();
         }
 
+        /// <summary>
+        /// Добавить предпочтение в кэш
+        /// </summary>
+        /// <param name="preference"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult> AddPreferenceAsync([FromBody] Preference preference)
         {
@@ -67,6 +85,11 @@ namespace Pcf.PreferencesCache.WebHost.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Добавить список предпочтений в кеш
+        /// </summary>
+        /// <param name="preferences"></param>
+        /// <returns></returns>
         [HttpPost("list")]
         public async Task<ActionResult> AddPreferencesAsync([FromBody] IEnumerable<Preference> preferences)
         {

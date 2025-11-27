@@ -39,7 +39,7 @@ namespace Pcf.GivingToCustomer.WebHost
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddHttpClient<IPreferenceCacheGateway, PreferenceCacheGateway>(c =>
             {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:PreferenceCacheUrl"] ?? @"http:\\localhost");
+                c.BaseAddress = new Uri(Configuration["IntegrationSettings:PreferenceCacheUrl"]);
             });
             services.AddScoped<IDbInitializer, EfDbInitializer>();
             services.AddDbContext<DataContext>(x =>

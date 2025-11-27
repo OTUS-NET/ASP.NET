@@ -1,6 +1,0 @@
-@Pcf.PreferencesCache_HostAddress = http://localhost:5214
-
-GET {{Pcf.PreferencesCache_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 
 namespace Pcf.PreferencesCache.WebHost
@@ -15,26 +18,44 @@ namespace Pcf.PreferencesCache.WebHost
             // for local
             //builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
             //                                  ConnectionMultiplexer.Connect("localhost:6669, defaultDatabase=1"));
-
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddMvcOptions(x =>
+                x.SuppressAsyncSuffixInActionNames = false);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddOpenApiDocument(options =>
+            {
+                options.Title = "PromoCode Factory Preference Cache API Doc";
+                options.Version = "1.0";
+            });
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();
+            }
+
+            app.UseOpenApi();
+            app.UseSwaggerUi(x =>
+            {
+                x.DocExpansion = "list";
+            });
 
             app.UseHttpsRedirection();
 
+            app.UseRouting();
+
             app.UseAuthorization();
 
-            app.MapControllers();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             app.Run();
         }
