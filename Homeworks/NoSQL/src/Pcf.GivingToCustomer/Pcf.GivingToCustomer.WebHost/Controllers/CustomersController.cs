@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
@@ -22,13 +23,15 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<Preference> _preferenceRepository;
         private readonly IPreferenceCacheGateway _preferenceCacheGateway;
+        private readonly ILogger<CustomersController> _logger;
 
         public CustomersController(IRepository<Customer> customerRepository, 
-            IRepository<Preference> preferenceRepository, IPreferenceCacheGateway preferenceCacheGateway)
+            IRepository<Preference> preferenceRepository, IPreferenceCacheGateway preferenceCacheGateway, ILogger<CustomersController> logger)
         {
             _customerRepository = customerRepository;
             _preferenceRepository = preferenceRepository;
             _preferenceCacheGateway = preferenceCacheGateway;
+            _logger = logger;
         }
         
         /// <summary>
@@ -73,9 +76,40 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync(CreateOrEditCustomerRequest request)
         {
-            //Получаем предпочтения из бд и сохраняем большой объект
-            var preferences = await _preferenceRepository
-                .GetRangeByIdsAsync(request.PreferenceIds);
+            IEnumerable<Preference> preferences = new List<Preference>();
+
+            try
+            {
+                var preferencesFromCache = await _preferenceCacheGateway.GetAllAsync();
+
+                if (preferencesFromCache != null)
+                {
+                    preferences = preferencesFromCache.Where(p => request.PreferenceIds.Contains(p.Id));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Get all preferences from cache error");
+            }
+
+            if (!preferences.Any())
+            {
+                //Получаем предпочтения из бд и сохраняем большой объект
+                preferences = await _preferenceRepository
+                    .GetRangeByIdsAsync(request.PreferenceIds);
+
+                if (preferences.Any())
+                {
+                    try
+                    {
+                        await _preferenceCacheGateway.AddPreferencesAsync(preferences);
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Add preferences to cache error");
+                    }
+                }
+            }
 
             Customer customer = CustomerMapper.MapFromModel(request, preferences);
             
@@ -96,8 +130,41 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
             
             if (customer == null)
                 return NotFound();
-            
-            var preferences = await _preferenceRepository.GetRangeByIdsAsync(request.PreferenceIds);
+
+            IEnumerable<Preference> preferences = new List<Preference>();
+
+            try
+            {
+                var preferencesFromCache = await _preferenceCacheGateway.GetAllAsync();
+
+                if (preferencesFromCache != null)
+                {
+                    preferences = preferencesFromCache.Where(p => request.PreferenceIds.Contains(p.Id));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Get all preferences from cache error");
+            }
+
+            if (!preferences.Any())
+            {
+                //Получаем предпочтения из бд и сохраняем большой объект
+                preferences = await _preferenceRepository
+                    .GetRangeByIdsAsync(request.PreferenceIds);
+
+                if (preferences.Any())
+                {
+                    try
+                    {
+                        await _preferenceCacheGateway.AddPreferencesAsync(preferences);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Add preferences to cache error");
+                    }
+                }
+            }
             
             CustomerMapper.MapFromModel(request, preferences, customer);
 

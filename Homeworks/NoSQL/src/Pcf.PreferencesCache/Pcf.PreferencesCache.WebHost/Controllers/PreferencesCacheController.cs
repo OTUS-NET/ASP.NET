@@ -53,31 +53,6 @@ namespace Pcf.PreferencesCache.WebHost.Controllers
             return NotFound();
         }
 
-        [HttpGet("list")]
-        public async Task<ActionResult<List<Preference>>> GetRangeAsync([FromQuery] IEnumerable<Guid> ids)
-        {
-            var db = GetDatabase();
-            string cacheKey = $"preferences:all";
-
-            var cached = await db.StringGetAsync(cacheKey);
-
-            if (!cached.IsNull)
-            {
-                var preferences = JsonSerializer.Deserialize<IEnumerable<Preference>>(cached);
-
-                var result = preferences?.Where(p => ids.Contains(p.Id));
-
-                if (result != null && result.Any())
-                {
-                    return Ok(result);
-                }
-
-                return NotFound();
-            }
-
-            return NotFound();
-        }
-
         [HttpPost]
         public async Task<ActionResult> AddPreferenceAsync([FromBody] Preference preference)
         {

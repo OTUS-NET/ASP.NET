@@ -61,7 +61,8 @@ services:
     ports:
       - "8093:8080"
     environment:
-      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
+      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"
+      - "IntegrationSettings:PreferenceCacheUrl=http://preference-cache-api"
     depends_on: 
       - promocode-factory-giving-to-customer-db
   #Cache Api
