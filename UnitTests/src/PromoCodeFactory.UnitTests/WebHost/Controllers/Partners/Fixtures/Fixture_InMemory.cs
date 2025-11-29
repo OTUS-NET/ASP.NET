@@ -7,6 +7,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PromoCodeFactory.Compose;
 using PromoCodeFactory.WebHost.Helpers;
+using AutoFixture;
+using FluentAssertions;
+using Moq;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.WebHost.Controllers;
+using Xunit;
+using AutoFixture.AutoMoq;
+using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.UnitTests.Helps;
+using AutoFixture.Xunit2;
 
 namespace PromoCodeFactory.UnitTests.WebHost.Controllers.Partners.Fixtures
 {
