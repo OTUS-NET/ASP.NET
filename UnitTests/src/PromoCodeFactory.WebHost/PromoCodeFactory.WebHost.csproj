@@ -19,15 +19,12 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.22" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="8.0.22" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.22">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="NSwag.AspNetCore" Version="14.2.0" />
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />      
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />      
     </ItemGroup>
 
 </Project>

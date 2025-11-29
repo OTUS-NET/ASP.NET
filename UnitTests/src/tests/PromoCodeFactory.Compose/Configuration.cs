@@ -60,7 +60,7 @@ namespace PromoCodeFactory.Compose
             return services;
         }
         private static IServiceCollection ConfigureAutomapper(this IServiceCollection services) => services
-            .AddAutoMapper(typeof(Program));
+             .AddAutoMapper(typeof(Program));
     }
 }
 
