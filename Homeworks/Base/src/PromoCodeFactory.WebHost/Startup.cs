@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Abstractions.Repositories.Interfaces.Employees;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
@@ -14,8 +15,8 @@ namespace PromoCodeFactory.WebHost
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton(typeof(IRepository<Employee>), (x) => 
-                new InMemoryRepository<Employee>(FakeDataFactory.Employees));
+            services.AddSingleton(typeof(IEmployeeRepository), (x) => 
+                new EmployeeRepository(FakeDataFactory.Employees, new InMemoryRepository<Role>(FakeDataFactory.Roles)));
             services.AddSingleton(typeof(IRepository<Role>), (x) => 
                 new InMemoryRepository<Role>(FakeDataFactory.Roles));
 
