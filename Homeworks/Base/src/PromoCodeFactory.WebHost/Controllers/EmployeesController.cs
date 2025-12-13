@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Abstractions.Models.Employees;
+using PromoCodeFactory.Core.Abstractions.Repositories;
+using PromoCodeFactory.Core.Abstractions.Repositories.Interfaces.Employees;
+using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Exceptions;
+using PromoCodeFactory.WebHost.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using PromoCodeFactory.Core.Abstractions.Repositories;
-using PromoCodeFactory.Core.Domain.Administration;
-using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -16,9 +20,9 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
         }
@@ -69,6 +73,27 @@ namespace PromoCodeFactory.WebHost.Controllers
             };
 
             return employeeModel;
+        }
+
+        [HttpPost("Create")]
+        public async Task<Employee> CreateAsync([FromBody] EmployeeCreateDto employeeCreate, CancellationToken cancellationToken) =>
+            await this._employeeRepository.AddAsync(employeeCreate, cancellationToken);
+
+        [HttpPatch("Update/{id:guid}")]
+        public async Task<Employee> UpdateAsync(Guid id, [FromBody] EmployeeUpdateDto employeeUpdate, CancellationToken cancellationToken) =>
+            await this._employeeRepository.UpdateAsync(id, employeeUpdate, cancellationToken);
+
+        [HttpDelete("Delete")]
+        public async Task<ActionResult<Guid>> DeleteAsync(Guid id)
+        {
+            try
+            {
+                return await this._employeeRepository.DeleteAsync(id);
+            }
+            catch (NotFoundEntityException ex)
+            {
+                return NotFound();
+            }
         }
     }
 }
