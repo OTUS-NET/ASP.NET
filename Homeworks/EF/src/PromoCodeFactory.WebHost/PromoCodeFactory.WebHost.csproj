@@ -13,6 +13,10 @@
 
     <ItemGroup>
       <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
 </Project>
