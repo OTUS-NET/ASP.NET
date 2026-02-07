@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -85,6 +85,9 @@ namespace PromoCodeFactory.WebHost.Controllers
             //Если партнер заблокирован, то нужно выдать исключение
             if (!partner.IsActive)
                 return BadRequest("Данный партнер не активен");
+
+            if (request.Limit <= 0)
+                return BadRequest("Лимит должен быть больше 0");
             
             //Установка лимита партнеру
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
@@ -95,17 +98,18 @@ namespace PromoCodeFactory.WebHost.Controllers
                 //Если партнеру выставляется лимит, то мы 
                 //должны обнулить количество промокодов, которые партнер выдал, если лимит закончился, 
                 //то количество не обнуляется
-                partner.NumberIssuedPromoCodes = 0;
+                if (activeLimit.EndDate > DateTime.Now)
+                {
+                    partner.NumberIssuedPromoCodes = 0;
+                }
                 
                 //При установке лимита нужно отключить предыдущий лимит
                 activeLimit.CancelDate = DateTime.Now;
             }
-
-            if (request.Limit <= 0)
-                return BadRequest("Лимит должен быть больше 0");
             
             var newLimit = new PartnerPromoCodeLimit()
             {
+                Id = Guid.NewGuid(),
                 Limit = request.Limit,
                 Partner = partner,
                 PartnerId = partner.Id,
