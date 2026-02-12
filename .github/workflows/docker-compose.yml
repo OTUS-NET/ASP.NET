@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "Homework-Docker" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/promocodefactory-webhost
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build and start services
+        run: |
+          cd ${{ github.workspace }}/Homeworks/EF/src/
+          docker-compose up --build -d
+          docker-compose ps
+
+      - name: View logs
+        if: always()
+        run: |
+          cd ${{ github.workspace }}/Homeworks/EF/src/
+          docker-compose logs
+
+      - name: Stop services
+        if: always()
+        run: |
+          cd ${{ github.workspace }}/Homeworks/EF/src/
+          docker-compose down
