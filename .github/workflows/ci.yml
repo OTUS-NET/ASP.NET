@@ -25,6 +25,10 @@ jobs:
         working-directory: Homeworks/UnitTests/src
         run: dotnet restore PromoCodeFactory.sln
 
+      - name: Build
+        working-directory: Homeworks/UnitTests/src
+        run: dotnet build PromoCodeFactory.sln -c Release --no-restore
+
       - name: Test
         working-directory: Homeworks/UnitTests/src
         run: dotnet test PromoCodeFactory.sln -c Release --no-restore

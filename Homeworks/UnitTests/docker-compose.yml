@@ -1,0 +1,35 @@
+services:
+  promocode-factory-db:
+    image: postgres:16
+    container_name: promocode-factory-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: promocode_factory_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+    volumes:
+      - promocode_factory_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d promocode_factory_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  promocode-factory-api:
+    build:
+      context: ./src
+    container_name: promocode-factory-api
+    restart: unless-stopped
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__PromoCodeFactoryDb: Host=promocode-factory-db;Database=promocode_factory_db;Username=postgres;Password=docker
+    depends_on:
+      promocode-factory-db:
+        condition: service_healthy
+
+volumes:
+  promocode_factory_pgdata:

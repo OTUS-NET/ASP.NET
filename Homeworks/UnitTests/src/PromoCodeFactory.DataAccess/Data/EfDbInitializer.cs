@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace PromoCodeFactory.DataAccess.Data
 {
@@ -14,8 +15,12 @@ namespace PromoCodeFactory.DataAccess.Data
         
         public void InitializeDb()
         {
-            _dataContext.Database.EnsureDeleted();
-            _dataContext.Database.EnsureCreated();
+            _dataContext.Database.Migrate();
+
+            if (_dataContext.Employees.Any())
+            {
+                return;
+            }
             
             _dataContext.AddRange(FakeDataFactory.Employees);
             _dataContext.SaveChanges();
