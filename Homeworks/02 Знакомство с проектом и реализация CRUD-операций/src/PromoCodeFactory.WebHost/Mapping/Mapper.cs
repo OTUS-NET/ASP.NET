@@ -1,4 +1,3 @@
-using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Mapping;
@@ -11,7 +10,7 @@ public static class Mapper
             employee.Id,
             employee.FullName,
             employee.Email,
-            employee.Roles.Select(ToRoleItemResponse).ToList(),
+            ToRoleResponse(employee.Role),
             employee.AppliedPromocodesCount);
     }
 
@@ -23,11 +22,24 @@ public static class Mapper
             employee.Email);
     }
 
-    public static RoleItemResponse ToRoleItemResponse(Role role)
+    public static RoleResponse ToRoleResponse(Role role)
     {
-        return new RoleItemResponse(
+        return new RoleResponse(
             role.Id,
             role.Name,
             role.Description);
+    }
+
+    public static Employee ToEmployee(EmployeeCreateRequest request, Role role)
+    {
+        return new Employee
+        {
+            Id = Guid.NewGuid(),
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            Role = role,
+            AppliedPromocodesCount = 0
+        };
     }
 }
