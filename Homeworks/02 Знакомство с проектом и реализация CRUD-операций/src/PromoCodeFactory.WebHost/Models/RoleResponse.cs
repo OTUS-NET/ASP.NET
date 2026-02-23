@@ -1,6 +1,6 @@
 namespace PromoCodeFactory.WebHost.Models;
 
-public record RoleItemResponse(
+public record RoleResponse(
     Guid Id,
     string Name,
     string? Description);

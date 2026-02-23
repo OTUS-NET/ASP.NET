@@ -12,10 +12,7 @@ public static class FakeDataFactory
             Email = "owner@somemail.ru",
             FirstName = "Иван",
             LastName = "Сергеев",
-            Roles =
-            [
-                Roles.First(x => x.Name == "Admin")  
-            ],
+            Role = Roles.First(x => x.Name == "Admin"),
             AppliedPromocodesCount = 5
         },
         new Employee()
@@ -24,10 +21,7 @@ public static class FakeDataFactory
             Email = "andreev@somemail.ru",
             FirstName = "Петр",
             LastName = "Андреев",
-            Roles =
-            [
-                Roles.First(x => x.Name == "PartnerManager")  
-            ],
+            Role = Roles.First(x => x.Name == "PartnerManager"),
             AppliedPromocodesCount = 10
         },
     ];

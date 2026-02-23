@@ -16,20 +16,24 @@
     - Запустить проект ProcodeFactory.WebHost
     - Проверить работу методов API через Swagger UI
 2. Добавить метод GetById в EmployeesController
-    - Расширить интерфейс IRepository<T>
-    - Добавить EmployeeResponse в папку Models
-    - Расширить Mapper
-    - Реализовать метод Get в EmployeesController
+    - Реализовать метод GetById в InMemoryRepository
+    - Использовать EmployeeResponse из папки Models
+    - Использовать Mapper для получения EmployeeResponse
+    - Реализовать метод GetById в EmployeesController
     - Если Employee по Id не найден, то возвращать NotFound
 3. Добавить метод Create в EmployeesController
-    - Использовать подход аналогичный п.2
-    - Если запрос не прошёл валидацию (не заполнены обязательные поля), то возвращать BadRequest
+    - Реализовать метод Add в InMemoryRepository
+    - Использовать EmployeeCreateRequest из папки Models
+    - Использовать Mapper для получения Employee
+    - Если запрос не прошёл валидацию, то возвращать BadRequest
+    - Если не найден Role, то возвращать BadRequest
 4. Добавить метод Update в EmployeesController
-    - Использовать подход аналогичный п.2
+    - Реализовать метод Update в InMemoryRepository. Возвращать EntityNotFoundException, если не найдена сущность
+    - Использовать EmployeeUpdateRequest из папки Models
     - Если Employee по Id не найден, то возвращать NotFound
-    - Если запрос не прошёл валидацию (не заполнены обязательные поля), то возвращать BadRequest
+    - Если запрос не прошёл валидацию, то возвращать BadRequest
 5. Добавить метод Delete в EmployeesController
-    - Использовать подход аналогичный п.2
+    - Реализовать метод Delete в InMemoryRepository. Возвращать EntityNotFoundException, если не найдена сущность
     - Если Employee по Id не найден, то возвращать NotFound
 
 ---

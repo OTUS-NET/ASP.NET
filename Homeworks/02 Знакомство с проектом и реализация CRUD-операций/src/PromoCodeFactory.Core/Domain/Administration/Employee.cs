@@ -10,7 +10,7 @@ public class Employee : BaseEntity
 
     public required string Email { get; set; }
 
-    public List<Role> Roles { get; set; } = [];
+    public required Role Role { get; set; }
 
     public int AppliedPromocodesCount { get; set; }
 }

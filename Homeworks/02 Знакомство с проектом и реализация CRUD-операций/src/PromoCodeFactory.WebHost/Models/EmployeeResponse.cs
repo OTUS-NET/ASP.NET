@@ -4,5 +4,5 @@ public record EmployeeResponse(
     Guid Id,
     string FullName,
     string Email,
-    IReadOnlyCollection<RoleItemResponse> Roles,
+    RoleResponse Role,
     int AppliedPromocodesCount);
