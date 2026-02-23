@@ -1,6 +1,4 @@
 using PromoCodeFactory.DataAccess;
-using PromoCodeFactory.WebHost;
-
 var builder = WebApplication.CreateBuilder();
 
 builder.Services.AddDataAccess();

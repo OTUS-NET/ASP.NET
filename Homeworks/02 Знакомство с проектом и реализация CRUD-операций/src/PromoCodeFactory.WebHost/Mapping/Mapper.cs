@@ -1,4 +1,3 @@
-using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Mapping;
