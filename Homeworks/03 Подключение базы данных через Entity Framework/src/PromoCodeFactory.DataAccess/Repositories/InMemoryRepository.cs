@@ -34,7 +34,6 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task Update(T entity, CancellationToken ct)
     {
-        // TryGetValue + TryUpdate = корректно и потокобезопасно
         if (!_data.TryGetValue(entity.Id, out var existing))
             throw new EntityNotFoundException(typeof(T), entity.Id);
 

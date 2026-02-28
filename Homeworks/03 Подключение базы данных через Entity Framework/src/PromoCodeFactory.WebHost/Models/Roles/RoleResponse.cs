@@ -1,4 +1,4 @@
-namespace PromoCodeFactory.WebHost.Models;
+namespace PromoCodeFactory.WebHost.Models.Roles;
 
 public record RoleResponse(
     Guid Id,

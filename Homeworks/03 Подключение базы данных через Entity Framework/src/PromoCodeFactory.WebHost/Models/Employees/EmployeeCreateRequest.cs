@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PromoCodeFactory.WebHost.Models;
+namespace PromoCodeFactory.WebHost.Models.Employees;
 
-public record EmployeeUpdateRequest(
+public record EmployeeCreateRequest(
     [Required(ErrorMessage = "First name is required")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "First name must be between 2 and 50 characters")]
     string FirstName,

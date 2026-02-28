@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.WebHost.Mapping;
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Employees;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -21,7 +21,7 @@ public class EmployeesController(
     {
         var employees = await employeeRepository.GetAll(ct);
 
-        var employeesModels = employees.Select(Mapper.ToEmployeeShortResponse).ToList();
+        var employeesModels = employees.Select(EmployeesMapper.ToEmployeeShortResponse).ToList();
 
         return Ok(employeesModels);
     }
@@ -39,7 +39,7 @@ public class EmployeesController(
         if (employee is null)
             return NotFound();
 
-        return Ok(Mapper.ToEmployeeResponse(employee));
+        return Ok(EmployeesMapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class EmployeesController(
         if (role is null)
             return BadRequest(new ProblemDetails { Title = "Invalid role", Detail = $"Role with Id {request.RoleId} not found." });
 
-        var employee = Mapper.ToEmployee(request, role);
+        var employee = EmployeesMapper.ToEmployee(request, role);
         await employeeRepository.Add(employee, ct);
 
         return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employee);
@@ -94,7 +94,7 @@ public class EmployeesController(
             return NotFound();
         }
 
-        return Ok(Mapper.ToEmployeeResponse(employee));
+        return Ok(EmployeesMapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class EmployeesController(
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<EmployeeResponse>> Delete(
+    public async Task<IActionResult> Delete(
         [FromRoute] Guid id,
         CancellationToken ct)
     {

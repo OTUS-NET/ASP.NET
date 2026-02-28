@@ -1,8 +1,8 @@
-using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.Employees;
 
 namespace PromoCodeFactory.WebHost.Mapping;
 
-public static class Mapper
+public static class EmployeesMapper
 {
     public static EmployeeResponse ToEmployeeResponse(Employee employee)
     {
@@ -10,8 +10,8 @@ public static class Mapper
             employee.Id,
             employee.FullName,
             employee.Email,
-            ToRoleResponse(employee.Role),
-            employee.AppliedPromocodesCount);
+            RolesMapper.ToRoleResponse(employee.Role),
+            employee.AppliedPromoCodesCount);
     }
 
     public static EmployeeShortResponse ToEmployeeShortResponse(Employee employee)
@@ -20,14 +20,6 @@ public static class Mapper
             employee.Id,
             employee.FullName,
             employee.Email);
-    }
-
-    public static RoleResponse ToRoleResponse(Role role)
-    {
-        return new RoleResponse(
-            role.Id,
-            role.Name,
-            role.Description);
     }
 
     public static Employee ToEmployee(EmployeeCreateRequest request, Role role)
@@ -39,7 +31,7 @@ public static class Mapper
             LastName = request.LastName,
             Email = request.Email,
             Role = role,
-            AppliedPromocodesCount = 0
+            AppliedPromoCodesCount = 0
         };
     }
 }

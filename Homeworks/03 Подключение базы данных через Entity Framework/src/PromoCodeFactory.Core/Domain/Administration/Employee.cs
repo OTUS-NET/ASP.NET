@@ -12,5 +12,5 @@ public class Employee : BaseEntity
 
     public required Role Role { get; set; }
 
-    public int AppliedPromocodesCount { get; set; }
+    public int AppliedPromoCodesCount { get; set; }
 }

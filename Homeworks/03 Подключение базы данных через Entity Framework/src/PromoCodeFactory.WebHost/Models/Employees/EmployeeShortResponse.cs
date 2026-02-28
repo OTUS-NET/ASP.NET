@@ -1,4 +1,4 @@
-namespace PromoCodeFactory.WebHost.Models;
+namespace PromoCodeFactory.WebHost.Models.Employees;
 
 public record EmployeeShortResponse(
     Guid Id,
