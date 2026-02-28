@@ -66,7 +66,7 @@ public class CustomersController
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public Task<IActionResult> Delete(Guid id)
+    public Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
         //TODO: Удаление клиента вместе с выданными ему промокодами
         throw new NotImplementedException();

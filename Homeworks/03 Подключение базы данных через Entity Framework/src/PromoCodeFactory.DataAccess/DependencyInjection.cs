@@ -9,7 +9,7 @@ namespace PromoCodeFactory.DataAccess;
 
 public static class DependencyInjection
 {
-    public static void AddDataAccess(this IServiceCollection services)
+    public static void AddInMemoryDataAccess(this IServiceCollection services)
     {
         services.AddSingleton(typeof(IRepository<Employee>), (x) =>
             new InMemoryRepository<Employee>(FakeDataFactory.Employees));

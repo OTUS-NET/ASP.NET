@@ -2,6 +2,7 @@ using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Exceptions;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
 
@@ -13,17 +14,32 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
     {
         _data = new ConcurrentDictionary<Guid, T>(data.Select(e => new KeyValuePair<Guid, T>(e.Id, e)));
     }
-    public Task<IReadOnlyCollection<T>> GetAll(CancellationToken ct)
+
+    public Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
     {
         return Task.FromResult((IReadOnlyCollection<T>)_data.Values);
     }
 
-    public Task<T?> GetById(Guid id, CancellationToken ct)
+    public Task<T?> GetById(Guid id, bool withIncludes = false, CancellationToken ct = default)
     {
         if (_data.TryGetValue(id, out var result))
             return Task.FromResult((T?)result);
         else
             return Task.FromResult((T?)null);
+    }
+
+    public Task<IReadOnlyCollection<T>> GetWhere(
+        Expression<Func<T, bool>> predicate,
+        bool withIncludes = false,
+        CancellationToken ct = default)
+    {
+        var result = _data.Values
+            .AsQueryable()
+            .Where(predicate)
+            .ToList()
+            .AsReadOnly();
+
+        return Task.FromResult<IReadOnlyCollection<T>>(result);
     }
 
     public Task Add(T entity, CancellationToken ct)

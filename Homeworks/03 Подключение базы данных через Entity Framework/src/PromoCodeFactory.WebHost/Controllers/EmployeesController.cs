@@ -19,7 +19,7 @@ public class EmployeesController(
     [ProducesResponseType(typeof(IEnumerable<EmployeeShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<EmployeeShortResponse>>> Get(CancellationToken ct)
     {
-        var employees = await employeeRepository.GetAll(ct);
+        var employees = await employeeRepository.GetAll(ct: ct);
 
         var employeesModels = employees.Select(EmployeesMapper.ToEmployeeShortResponse).ToList();
 
@@ -34,7 +34,7 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        var employee = await employeeRepository.GetById(id, ct);
+        var employee = await employeeRepository.GetById(id, ct: ct);
 
         if (employee is null)
             return NotFound();
@@ -50,7 +50,7 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        var role = await roleRepository.GetById(request.RoleId, ct);
+        var role = await roleRepository.GetById(request.RoleId, ct: ct);
         if (role is null)
             return BadRequest(new ProblemDetails { Title = "Invalid role", Detail = $"Role with Id {request.RoleId} not found." });
 
@@ -72,11 +72,11 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        var employee = await employeeRepository.GetById(id, ct);
+        var employee = await employeeRepository.GetById(id, ct: ct);
         if (employee is null)
             return NotFound();
 
-        var role = await roleRepository.GetById(request.RoleId, ct);
+        var role = await roleRepository.GetById(request.RoleId, ct: ct);
         if (role is null)
             return BadRequest(new ProblemDetails { Title = "Invalid role", Detail = $"Role with Id {request.RoleId} not found." });
 

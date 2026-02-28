@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Linq.Expressions;
 using PromoCodeFactory.Core.Domain;
 using PromoCodeFactory.Core.Exceptions;
 
@@ -5,9 +7,14 @@ namespace PromoCodeFactory.Core.Abstractions.Repositories;
 
 public interface IRepository<T> where T : BaseEntity
 {
-    Task<IReadOnlyCollection<T>> GetAll(CancellationToken ct);
+    Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default);
 
-    Task<T?> GetById(Guid id, CancellationToken ct);
+    Task<T?> GetById(Guid id, bool withIncludes = false, CancellationToken ct = default);
+
+    Task<IReadOnlyCollection<T>> GetWhere(
+        Expression<Func<T, bool>> predicate,
+        bool withIncludes = false,
+        CancellationToken ct = default);
 
     Task Add(T entity, CancellationToken ct);
 

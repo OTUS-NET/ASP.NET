@@ -1,7 +1,7 @@
 using PromoCodeFactory.DataAccess;
 var builder = WebApplication.CreateBuilder();
 
-builder.Services.AddDataAccess();
+builder.Services.AddInMemoryDataAccess();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddRouting(options =>
