@@ -28,6 +28,15 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
             return Task.FromResult((T?)null);
     }
 
+    public Task<IReadOnlyCollection<T>> GetByRangeId(
+        IEnumerable<Guid> ids,
+        bool withIncludes = false,
+        CancellationToken ct = default)
+    {
+        var result = _data.Values.Where(e => ids.Contains(e.Id)).ToList();
+        return Task.FromResult((IReadOnlyCollection<T>)result);
+    }
+
     public Task<IReadOnlyCollection<T>> GetWhere(
         Expression<Func<T, bool>> predicate,
         bool withIncludes = false,

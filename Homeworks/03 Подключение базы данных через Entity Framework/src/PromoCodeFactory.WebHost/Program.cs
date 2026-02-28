@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.DataAccess;
+using PromoCodeFactory.DataAccess.Data;
+
 var builder = WebApplication.CreateBuilder();
 
-builder.Services.AddInMemoryDataAccess();
+builder.Services.AddEfDataAccess();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddRouting(options =>
@@ -13,6 +16,14 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi(builder.Environment);
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<PromoCodeFactoryDbContext>();
+    context.Database.Migrate();
+    await PromoCodeFactoryDbSeeder.SeedAsync(context, CancellationToken.None);
+}
 
 app.UseExceptionHandler();
 
