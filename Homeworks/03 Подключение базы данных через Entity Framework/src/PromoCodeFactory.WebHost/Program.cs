@@ -1,5 +1,4 @@
 using PromoCodeFactory.DataAccess;
-using PromoCodeFactory.DataAccess.Data;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -26,11 +25,8 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.MigrateDatabase();
+
 if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<PromoCodeFactoryDbContext>();
-    await PromoCodeFactoryDbSeeder.SeedAsync(context, CancellationToken.None);
-}
+    await app.SeedDatabase();
 
 app.Run();

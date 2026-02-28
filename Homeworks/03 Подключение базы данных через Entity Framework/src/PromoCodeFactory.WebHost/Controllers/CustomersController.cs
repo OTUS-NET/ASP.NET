@@ -21,7 +21,7 @@ public class CustomersController(
     [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<CustomerShortResponse>>> Get(CancellationToken ct)
     {
-        var customers = await customersRepository.GetAll(false, ct);
+        var customers = await customersRepository.GetAll(true, ct);
         return Ok(customers.Select(CustomersMapper.ToCustomerShortResponse));
     }
 
@@ -38,7 +38,7 @@ public class CustomersController(
             return NotFound();
 
         var promoCodeIds = customer.CustomerPromoCodes.Select(cpc => cpc.PromoCodeId).Distinct().ToArray();
-        var promocodes = await promoCodesRepository.GetByRangeId(promoCodeIds, ct: ct);
+        var promocodes = await promoCodesRepository.GetByRangeId(promoCodeIds, true, ct: ct);
 
         return Ok(CustomersMapper.ToCustomerResponse(customer, promocodes));
     }

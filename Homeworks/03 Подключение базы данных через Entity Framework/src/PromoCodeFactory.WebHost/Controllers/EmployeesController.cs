@@ -34,7 +34,7 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        var employee = await employeeRepository.GetById(id, ct: ct);
+        var employee = await employeeRepository.GetById(id, true, ct);
 
         if (employee is null)
             return NotFound();
