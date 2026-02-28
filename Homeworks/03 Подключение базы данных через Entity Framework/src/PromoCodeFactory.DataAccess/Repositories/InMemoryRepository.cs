@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
 
-public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
+internal class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 {
     private readonly ConcurrentDictionary<Guid, T> _data;
 

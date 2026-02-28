@@ -3,7 +3,7 @@ using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.DataAccess.Data;
 
-public static class FakeDataFactory
+internal static class FakeDataFactory
 {
     public static IReadOnlyCollection<Customer> Customers { get; } = [];
 
