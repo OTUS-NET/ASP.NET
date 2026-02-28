@@ -11,6 +11,4 @@ public class Employee : BaseEntity
     public required string Email { get; set; }
 
     public required Role Role { get; set; }
-
-    public int AppliedPromoCodesCount { get; set; }
 }

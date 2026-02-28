@@ -1,9 +1,14 @@
 using PromoCodeFactory.Core.Domain.Administration;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.DataAccess.Data;
 
 public static class FakeDataFactory
 {
+    public static IReadOnlyCollection<Customer> Customers { get; } = [];
+
+    public static IReadOnlyCollection<PromoCode> PromoCodes { get; } = [];
+
     public static IReadOnlyCollection<Employee> Employees =>
     [
         new Employee()
@@ -12,8 +17,7 @@ public static class FakeDataFactory
             Email = "owner@somemail.ru",
             FirstName = "Иван",
             LastName = "Сергеев",
-            Role = Roles.First(x => x.Name == "Admin"),
-            AppliedPromocodesCount = 5
+            Role = Roles.First(x => x.Name == "Admin")
         },
         new Employee()
         {
@@ -21,8 +25,7 @@ public static class FakeDataFactory
             Email = "andreev@somemail.ru",
             FirstName = "Петр",
             LastName = "Андреев",
-            Role = Roles.First(x => x.Name == "PartnerManager"),
-            AppliedPromocodesCount = 10
+            Role = Roles.First(x => x.Name == "PartnerManager")
         },
     ];
 

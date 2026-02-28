@@ -17,4 +17,6 @@ public class PromoCode : BaseEntity
     public required Employee PartnerManager { get; set; }
 
     public required Preference Preference { get; set; }
+
+    public ICollection<CustomerPromoCode> CustomerPromoCodes { get; set; } = [];
 }

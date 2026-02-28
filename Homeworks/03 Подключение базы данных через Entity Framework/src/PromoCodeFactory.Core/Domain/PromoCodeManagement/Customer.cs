@@ -12,5 +12,5 @@ public class Customer : BaseEntity
 
     public ICollection<Preference> Preferences { get; set; } = [];
 
-    public ICollection<PromoCode> PromoCodes { get; set; } = [];
+    public ICollection<CustomerPromoCode> CustomerPromoCodes { get; set; } = [];
 }

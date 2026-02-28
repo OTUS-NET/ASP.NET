@@ -14,7 +14,7 @@ public class CustomersController
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), StatusCodes.Status200OK)]
-    public Task<ActionResult<CustomerShortResponse>> Get(CancellationToken ct)
+    public Task<ActionResult<IEnumerable<CustomerShortResponse>>> Get(CancellationToken ct)
     {
         //TODO: Добавить получение списка клиентов
         throw new NotImplementedException();
@@ -26,9 +26,9 @@ public class CustomersController
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public Task<ActionResult<CustomerResponse>> GetById(Guid id)
+    public Task<ActionResult<CustomerResponse>> GetById(Guid id, CancellationToken ct)
     {
-        //TODO: Добавить получение клиента вместе с выданными ему промомкодами
+        //TODO: Добавить получение клиента вместе с выданными ему промокодами
         throw new NotImplementedException();
     }
 

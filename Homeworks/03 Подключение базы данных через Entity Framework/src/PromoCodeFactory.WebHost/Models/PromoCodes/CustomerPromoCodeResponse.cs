@@ -1,6 +1,6 @@
 namespace PromoCodeFactory.WebHost.Models.PromoCodes;
 
-public record PromoCodeShortResponse(
+public record CustomerPromoCodeResponse(
     Guid Id,
     string Code,
     string ServiceInfo,
@@ -8,4 +8,6 @@ public record PromoCodeShortResponse(
     DateTimeOffset BeginDate,
     DateTimeOffset EndDate,
     Guid PartnerManagerId,
-    Guid PreferenceId);
+    Guid PreferenceId,
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? AppliedAt);

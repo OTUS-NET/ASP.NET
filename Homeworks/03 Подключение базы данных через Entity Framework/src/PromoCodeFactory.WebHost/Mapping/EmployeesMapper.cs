@@ -10,8 +10,7 @@ public static class EmployeesMapper
             employee.Id,
             employee.FullName,
             employee.Email,
-            RolesMapper.ToRoleResponse(employee.Role),
-            employee.AppliedPromoCodesCount);
+            RolesMapper.ToRoleResponse(employee.Role));
     }
 
     public static EmployeeShortResponse ToEmployeeShortResponse(Employee employee)
@@ -30,8 +29,7 @@ public static class EmployeesMapper
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            Role = role,
-            AppliedPromoCodesCount = 0
+            Role = role
         };
     }
 }

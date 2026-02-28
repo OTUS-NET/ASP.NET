@@ -9,4 +9,4 @@ public record CustomerResponse(
     string LastName,
     string Email,
     IReadOnlyCollection<PreferenceShortResponse> Preferences,
-    IReadOnlyCollection<PromoCodeShortResponse> PromoCodes);
+    IReadOnlyCollection<CustomerPromoCodeResponse> PromoCodes);
