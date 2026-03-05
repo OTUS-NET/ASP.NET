@@ -1,6 +1,7 @@
+using System.Collections.Concurrent;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
-using System.Collections.Concurrent;
+using PromoCodeFactory.Core.Exceptions;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
 
@@ -19,21 +20,40 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task<T?> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ct.ThrowIfCancellationRequested();
+
+        _data.TryGetValue(id, out var entity);
+        return Task.FromResult(entity);
     }
 
     public Task Add(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ct.ThrowIfCancellationRequested();
+
+        if (!_data.TryAdd(entity.Id, entity))
+            throw new InvalidOperationException($"Объект с id = '{entity.Id}' уже существует.");
+
+        return Task.CompletedTask;
     }
 
     public Task Update(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ct.ThrowIfCancellationRequested();
+
+        if (!_data.ContainsKey(entity.Id))
+            throw new EntityNotFoundException<T>(entity.Id);
+
+        _data[entity.Id] = entity;
+        return Task.CompletedTask;
     }
 
     public Task Delete(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ct.ThrowIfCancellationRequested();
+
+        if (!_data.TryRemove(id, out _))
+            throw new EntityNotFoundException<T>(id);
+
+        return Task.CompletedTask;
     }
 }
