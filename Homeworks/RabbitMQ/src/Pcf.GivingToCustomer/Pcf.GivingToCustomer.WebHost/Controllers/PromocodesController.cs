@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
+using Pcf.GivingToCustomer.Core.Abstractions.Services;
+using Pcf.GivingToCustomer.Core.Abstractions.Services.Models;
 using Pcf.GivingToCustomer.Core.Domain;
-using Pcf.GivingToCustomer.WebHost.Mappers;
 using Pcf.GivingToCustomer.WebHost.Models;
 
 namespace Pcf.GivingToCustomer.WebHost.Controllers
@@ -19,15 +20,13 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         : ControllerBase
     {
         private readonly IRepository<PromoCode> _promoCodesRepository;
-        private readonly IRepository<Preference> _preferencesRepository;
-        private readonly IRepository<Customer> _customersRepository;
+        private readonly IPromoCodeIssuingService _promoCodeIssuingService;
 
         public PromocodesController(IRepository<PromoCode> promoCodesRepository,
-            IRepository<Preference> preferencesRepository, IRepository<Customer> customersRepository)
+            IPromoCodeIssuingService promoCodeIssuingService)
         {
             _promoCodesRepository = promoCodesRepository;
-            _preferencesRepository = preferencesRepository;
-            _customersRepository = customersRepository;
+            _promoCodeIssuingService = promoCodeIssuingService;
         }
 
         /// <summary>
@@ -59,22 +58,25 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         [HttpPost]
         public async Task<IActionResult> GivePromoCodesToCustomersWithPreferenceAsync(GivePromoCodeRequest request)
         {
-            //Получаем предпочтение по имени
-            var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
-
-            if (preference == null)
-            {
+            if (!DateTime.TryParse(request.BeginDate, out var beginDate))
                 return BadRequest();
-            }
+            if (!DateTime.TryParse(request.EndDate, out var endDate))
+                return BadRequest();
 
-            //  Получаем клиентов с этим предпочтением:
-            var customers = await _customersRepository
-                .GetWhere(d => d.Preferences.Any(x =>
-                    x.Preference.Id == preference.Id));
+            var ok = await _promoCodeIssuingService.GivePromoCodesToCustomersWithPreferenceAsync(
+                new GivePromoCodeToCustomersWithPreferenceCommand
+                {
+                    PromoCodeId = request.PromoCodeId,
+                    PartnerId = request.PartnerId,
+                    PromoCode = request.PromoCode,
+                    PreferenceId = request.PreferenceId,
+                    BeginDate = beginDate,
+                    EndDate = endDate,
+                    ServiceInfo = request.ServiceInfo
+                });
 
-            PromoCode promoCode = PromoCodeMapper.MapFromModel(request, preference, customers);
-
-            await _promoCodesRepository.AddAsync(promoCode);
+            if (!ok)
+                return BadRequest();
 
             return CreatedAtAction(nameof(GetPromocodesAsync), new { }, null);
         }

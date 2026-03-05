@@ -5,13 +5,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using MassTransit;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
+using Pcf.GivingToCustomer.Core.Abstractions.Services;
 using Pcf.GivingToCustomer.DataAccess.Data;
 using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Repositories;
+using Pcf.GivingToCustomer.Core.Services;
 using Pcf.GivingToCustomer.Integration;
+using Pcf.GivingToCustomer.WebHost.Consumers;
 
 namespace Pcf.GivingToCustomer.WebHost
 {
@@ -33,6 +37,36 @@ namespace Pcf.GivingToCustomer.WebHost
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
+            services.AddScoped<IPromoCodeIssuingService, PromoCodeIssuingService>();
+
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PromoCodeReceivedFromPartnerEventConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    var host = Configuration["RabbitMq:Host"] ?? "localhost";
+                    var virtualHost = Configuration["RabbitMq:VirtualHost"] ?? "/";
+                    var username = Configuration["RabbitMq:Username"] ?? "guest";
+                    var password = Configuration["RabbitMq:Password"] ?? "guest";
+
+                    ushort port = 5672;
+                    if (ushort.TryParse(Configuration["RabbitMq:Port"], out var parsedPort))
+                        port = parsedPort;
+
+                    cfg.Host(host, port, virtualHost, h =>
+                    {
+                        h.Username(username);
+                        h.Password(password);
+                    });
+
+                    cfg.ReceiveEndpoint("pcf-givingtocustomer-promocode-received-from-partner", e =>
+                    {
+                        e.UseMessageRetry(r => r.Intervals(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10)));
+                        e.ConfigureConsumer<PromoCodeReceivedFromPartnerEventConsumer>(context);
+                    });
+                });
+            });
             services.AddDbContext<DataContext>(x =>
             {
                 //x.UseSqlite("Filename=PromocodeFactoryGivingToCustomerDb.sqlite");

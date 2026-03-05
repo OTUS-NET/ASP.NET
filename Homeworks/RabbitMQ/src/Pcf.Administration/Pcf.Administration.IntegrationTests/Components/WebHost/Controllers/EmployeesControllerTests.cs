@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Pcf.Administration.Core.Abstractions.Services;
 using Pcf.Administration.Core.Domain.Administration;
 using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.WebHost.Controllers;
@@ -17,7 +18,7 @@ namespace Pcf.Administration.IntegrationTests.Components.WebHost.Controllers
         public EmployeesControllerTests(EfDatabaseFixture efDatabaseFixture)
         {
             _employeesRepository = new EfRepository<Employee>(efDatabaseFixture.DbContext);
-            _employeesController = new EmployeesController(_employeesRepository);
+            _employeesController = new EmployeesController(_employeesRepository, new FakeAppliedPromocodesService(_employeesRepository));
         }
 
         [Fact]
@@ -31,6 +32,31 @@ namespace Pcf.Administration.IntegrationTests.Components.WebHost.Controllers
 
             //Assert
             result.Value.Id.Should().Be(expectedEmployeeId);
+        }
+
+        private class FakeAppliedPromocodesService : IAppliedPromocodesService
+        {
+            private readonly EfRepository<Employee> _employeesRepository;
+
+            public FakeAppliedPromocodesService(EfRepository<Employee> employeesRepository)
+            {
+                _employeesRepository = employeesRepository;
+            }
+
+            public async Task<bool> IncrementAppliedPromocodesAsync(Guid employeeId, int incrementBy = 1)
+            {
+                if (incrementBy <= 0)
+                    return false;
+
+                var employee = await _employeesRepository.GetByIdAsync(employeeId);
+                if (employee == null)
+                    return false;
+
+                employee.AppliedPromocodesCount += incrementBy;
+                await _employeesRepository.UpdateAsync(employee);
+
+                return true;
+            }
         }
     }
 }

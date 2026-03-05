@@ -1,0 +1,55 @@
+services:
+  promocode-factory-administration-db:
+    image: postgres:16
+    container_name: promocode-factory-administration-db
+    environment:
+      POSTGRES_DB: promocode_factory_administration_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5433:5432"
+    volumes:
+      - promocode-factory-administration-db-data:/var/lib/postgresql/data
+
+  promocode-factory-receiving-from-partner-db:
+    image: postgres:16
+    container_name: promocode-factory-receiving-from-partner-db
+    environment:
+      POSTGRES_DB: promocode_factory_receivingFromPartner_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5434:5432"
+    volumes:
+      - promocode-factory-receiving-from-partner-db-data:/var/lib/postgresql/data
+
+  promocode-factory-giving-to-customer-db:
+    image: postgres:16
+    container_name: promocode-factory-giving-to-customer-db
+    environment:
+      POSTGRES_DB: promocode_factory_givingToCustomer_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5435:5432"
+    volumes:
+      - promocode-factory-giving-to-customer-db-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: promocode-factory-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - promocode-factory-rabbitmq-data:/var/lib/rabbitmq
+
+volumes:
+  promocode-factory-administration-db-data:
+  promocode-factory-receiving-from-partner-db-data:
+  promocode-factory-giving-to-customer-db-data:
+  promocode-factory-rabbitmq-data:
+

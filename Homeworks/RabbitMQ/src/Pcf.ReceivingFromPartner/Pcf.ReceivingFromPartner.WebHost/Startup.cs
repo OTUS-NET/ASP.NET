@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using MassTransit;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Repositories;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
@@ -34,14 +35,25 @@ namespace Pcf.ReceivingFromPartner.WebHost
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
 
-            services.AddHttpClient<IGivingPromoCodeToCustomerGateway, GivingPromoCodeToCustomerGateway>(c =>
+            services.AddMassTransit(x =>
             {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:GivingToCustomerApiUrl"]);
-            });
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    var host = Configuration["RabbitMq:Host"] ?? "localhost";
+                    var virtualHost = Configuration["RabbitMq:VirtualHost"] ?? "/";
+                    var username = Configuration["RabbitMq:Username"] ?? "guest";
+                    var password = Configuration["RabbitMq:Password"] ?? "guest";
 
-            services.AddHttpClient<IAdministrationGateway, AdministrationGateway>(c =>
-            {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:AdministrationApiUrl"]);
+                    ushort port = 5672;
+                    if (ushort.TryParse(Configuration["RabbitMq:Port"], out var parsedPort))
+                        port = parsedPort;
+
+                    cfg.Host(host, port, virtualHost, h =>
+                    {
+                        h.Username(username);
+                        h.Password(password);
+                    });
+                });
             });
 
             services.AddDbContext<DataContext>(x =>

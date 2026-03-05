@@ -10,6 +10,10 @@ using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using System;
+using MassTransit;
+using Pcf.Administration.Core.Abstractions.Services;
+using Pcf.Administration.Core.Services;
+using Pcf.Administration.WebHost.Consumers;
 
 namespace Pcf.Administration.WebHost
 {
@@ -30,6 +34,37 @@ namespace Pcf.Administration.WebHost
                 x.SuppressAsyncSuffixInActionNames = false);
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<IDbInitializer, EfDbInitializer>();
+            services.AddScoped<IAppliedPromocodesService, AppliedPromocodesService>();
+
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PromoCodeReceivedFromPartnerEventConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    var host = Configuration["RabbitMq:Host"] ?? "localhost";
+                    var virtualHost = Configuration["RabbitMq:VirtualHost"] ?? "/";
+                    var username = Configuration["RabbitMq:Username"] ?? "guest";
+                    var password = Configuration["RabbitMq:Password"] ?? "guest";
+
+                    ushort port = 5672;
+                    if (ushort.TryParse(Configuration["RabbitMq:Port"], out var parsedPort))
+                        port = parsedPort;
+
+                    cfg.Host(host, port, virtualHost, h =>
+                    {
+                        h.Username(username);
+                        h.Password(password);
+                    });
+
+                    cfg.ReceiveEndpoint("pcf-administration-promocode-received-from-partner", e =>
+                    {
+                        e.UseMessageRetry(r => r.Intervals(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10)));
+                        e.ConfigureConsumer<PromoCodeReceivedFromPartnerEventConsumer>(context);
+                    });
+                });
+            });
+
             services.AddDbContext<DataContext>(x =>
             {
                 //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
