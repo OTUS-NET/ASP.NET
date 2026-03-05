@@ -8,6 +8,16 @@ services:
       - 5433:5432
     environment: 
       - POSTGRES_PASSWORD=docker
+
+  #Administration Mongo
+  promocode-factory-administration-mongo:
+    image: "mongo:4.2.3"
+    container_name: 'promocode-factory-administration-mongo'
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - promocode-factory-administration-mongo-data:/data/db
   #Administration Api
   promocode-factory-administration-api:
     build: src/Pcf.Administration/
@@ -17,8 +27,11 @@ services:
       - "8091:8080"
     environment:
       - "ConnectionStrings:PromocodeFactoryAdministrationDb=Host=promocode-factory-administration-db;Database=promocode_factory_administration_db;Username=postgres;Password=docker"          
+      - "MongoDbSettings:ConnectionString=mongodb://promocode-factory-administration-mongo:27017"
+      - "MongoDbSettings:DatabaseName=promocode_factory_administration"
     depends_on: 
       - promocode-factory-administration-db
+      - promocode-factory-administration-mongo
 
   #ReceivingFromPartner Db
   promocode-factory-receiving-from-partner-db:
@@ -52,6 +65,16 @@ services:
       - 5435:5432
     environment: 
       - POSTGRES_PASSWORD=docker
+
+  #GivingToCustomer Mongo
+  promocode-factory-giving-to-customer-mongo:
+    image: "mongo:4.2.3"
+    container_name: 'promocode-factory-giving-to-customer-mongo'
+    restart: always
+    ports:
+      - "27019:27017"
+    volumes:
+      - promocode-factory-giving-to-customer-mongo-data:/data/db
   #GivingToCustomer Api
   promocode-factory-giving-to-customer-api:
     build: src/Pcf.GivingToCustomer/
@@ -61,5 +84,12 @@ services:
       - "8093:8080"
     environment:
       - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
+      - "MongoDbSettings:ConnectionString=mongodb://promocode-factory-giving-to-customer-mongo:27017"
+      - "MongoDbSettings:DatabaseName=promocode_factory_giving_to_customer"
     depends_on: 
       - promocode-factory-giving-to-customer-db
+      - promocode-factory-giving-to-customer-mongo
+
+volumes:
+  promocode-factory-administration-mongo-data:
+  promocode-factory-giving-to-customer-mongo-data:

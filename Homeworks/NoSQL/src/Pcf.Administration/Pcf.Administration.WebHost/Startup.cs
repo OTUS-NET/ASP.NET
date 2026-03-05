@@ -1,20 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Castle.Core.Configuration;
+using MongoDB.Driver;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Pcf.Administration.Core.Abstractions.Repositories;
-using Pcf.Administration.DataAccess;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.Core.Domain.Administration;
+using Pcf.Administration.DataAccess.Mongo;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Pcf.Administration.WebHost
@@ -34,15 +29,24 @@ namespace Pcf.Administration.WebHost
         {
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
+
+            MongoMappings.Register();
+            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
+
+            services.AddSingleton<IMongoClient>(sp =>
             {
-                //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
+                var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<MongoDbSettings>>().Value;
+                return new MongoClient(settings.ConnectionString);
             });
+            services.AddSingleton<IMongoDatabase>(sp =>
+            {
+                var settings = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<MongoDbSettings>>().Value;
+                return sp.GetRequiredService<IMongoClient>().GetDatabase(settings.DatabaseName);
+            });
+
+            services.AddScoped<IRepository<Role>, MongoRoleRepository>();
+            services.AddScoped<IRepository<Employee>, MongoEmployeeRepository>();
+            services.AddScoped<IDbInitializer, MongoDbInitializer>();
 
             services.AddOpenApiDocument(options =>
             {
