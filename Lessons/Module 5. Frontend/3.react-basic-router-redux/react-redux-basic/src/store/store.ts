@@ -1,12 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'; // Импортируем функцию configureStore из библиотеки @reduxjs/toolkit
-import counterReducerAsync from './counterSliceAsync'; // Импортируем редьюсер из слайса
+import counterReducer from './counterSlice'; // Импортируем редьюсер из слайса
+import counterReducerAsync from './counterSliceAsync'; 
+import currencyReducer from './currencySlice';
 
 // configureStore — это функция, которая создает хранилище
 // reducer — это объект, который содержит редьюсеры
 // counterReducerAsync — это редьюсер счетчика
 export const store = configureStore({
   reducer: {
-    counter: counterReducerAsync,
+    counter: counterReducer,
+    counterAsync: counterReducerAsync,
+    currency: currencyReducer,
   },
 });
 
