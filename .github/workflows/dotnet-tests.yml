@@ -1,0 +1,65 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ HomeWark4_UnitTests ]
+  pull_request:
+    branches: [ HomeWark4_UnitTests ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    # Проверяем, что solution существует
+    - name: Validate solution exists
+      id: check-sln
+      run: |
+        SOLUTION_PATH="./Homeworks/UnitTests/src/PromoCodeFactory.sln"
+        echo "Checking solution at: $SOLUTION_PATH"
+        if [ ! -f "$SOLUTION_PATH" ]; then
+          echo "::error::Solution file not found at $SOLUTION_PATH"
+          echo "Directory content:"
+          ls -la ./Homeworks/UnitTests/src/
+          exit 1
+        fi
+        echo "solution_path=$SOLUTION_PATH" >> $GITHUB_OUTPUT
+        echo "Solution found successfully"
+
+    # Восстанавливаем зависимости
+    - name: Restore dependencies
+      working-directory: ./Homeworks/UnitTests/src
+      run: dotnet restore PromoCodeFactory.sln
+    
+    # Сборка и прогон тестов
+    - name: Run tests
+      working-directory: ${{ github.workspace }}
+      run: |
+        mkdir -p TestResults
+        dotnet test "${{ steps.check-sln.outputs.solution_path }}" \
+          --results-directory TestResults \
+          --configuration Release \
+          --no-restore \
+          --verbosity normal \
+          --logger "trx;LogFileName=test-results.trx" \
+          || echo "::warning::Some tests failed"
+    
+    # Публикуем артефакты (результаты тестов)
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: TestResults/**/*

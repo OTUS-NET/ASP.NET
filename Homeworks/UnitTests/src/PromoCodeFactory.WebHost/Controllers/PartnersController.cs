@@ -79,44 +79,38 @@ namespace PromoCodeFactory.WebHost.Controllers
         {
             var partner = await _partnersRepository.GetByIdAsync(id);
 
-            if (partner == null)
-                return NotFound();
-            
-            //Если партнер заблокирован, то нужно выдать исключение
-            if (!partner.IsActive)
-                return BadRequest("Данный партнер не активен");
-            
-            //Установка лимита партнеру
-            var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
-                !x.CancelDate.HasValue);
-            
-            if (activeLimit != null)
-            {
-                //Если партнеру выставляется лимит, то мы 
-                //должны обнулить количество промокодов, которые партнер выдал, если лимит закончился, 
-                //то количество не обнуляется
-                partner.NumberIssuedPromoCodes = 0;
-                
-                //При установке лимита нужно отключить предыдущий лимит
-                activeLimit.CancelDate = DateTime.Now;
-            }
+            var validateResult = ValidatePartner(partner);
+            if (validateResult != null)
+                return validateResult;
 
             if (request.Limit <= 0)
                 return BadRequest("Лимит должен быть больше 0");
-            
-            var newLimit = new PartnerPromoCodeLimit()
+
+            var activeLimit = partner.PartnerLimits.FirstOrDefault(x => !x.CancelDate.HasValue);
+            if (activeLimit != null)
             {
-                Limit = request.Limit,
-                Partner = partner,
+                // Сбрасываем счётчик только если лимит ещё не истёк
+                if (activeLimit.EndDate > DateTime.UtcNow)
+                {
+                    partner.NumberIssuedPromoCodes = 0;
+                }
+
+                activeLimit.CancelDate = DateTime.UtcNow;
+            }
+
+            var newLimit = new PartnerPromoCodeLimit
+            {
                 PartnerId = partner.Id,
-                CreateDate = DateTime.Now,
+                Partner = partner,
+                Limit = request.Limit,
+                CreateDate = DateTime.UtcNow,
                 EndDate = request.EndDate
             };
-            
+
             partner.PartnerLimits.Add(newLimit);
 
             await _partnersRepository.UpdateAsync(partner);
-            
+
             return CreatedAtAction(nameof(GetPartnerLimitAsync), new {id = partner.Id, limitId = newLimit.Id}, null);
         }
         
@@ -124,14 +118,11 @@ namespace PromoCodeFactory.WebHost.Controllers
         public async Task<IActionResult> CancelPartnerPromoCodeLimitAsync(Guid id)
         {
             var partner = await _partnersRepository.GetByIdAsync(id);
-            
-            if (partner == null)
-                return NotFound();
-            
-            //Если партнер заблокирован, то нужно выдать исключение
-            if (!partner.IsActive)
-                return BadRequest("Данный партнер не активен");
-            
+
+            var validateResult = ValidatePartner(partner);
+            if (validateResult != null)
+                return validateResult;
+
             //Отключение лимита
             var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
                 !x.CancelDate.HasValue);
@@ -144,6 +135,18 @@ namespace PromoCodeFactory.WebHost.Controllers
             await _partnersRepository.UpdateAsync(partner);
 
             return NoContent();
+        }
+
+        private IActionResult? ValidatePartner(Partner? partner)
+        {
+            if (partner == null)
+                return NotFound();
+
+            //Если партнер заблокирован, то нужно выдать исключение
+            if (!partner.IsActive)
+                return BadRequest("Данный партнер не активен");
+
+            return null;
         }
     }
 }
