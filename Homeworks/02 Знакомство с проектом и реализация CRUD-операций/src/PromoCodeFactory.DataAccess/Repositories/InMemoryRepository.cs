@@ -1,5 +1,6 @@
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core.Exceptions;
 using System.Collections.Concurrent;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
@@ -19,21 +20,42 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task<T?> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        _data.TryGetValue(id, out T? value);
+        return Task.FromResult(value);
     }
 
     public Task Add(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(entity);
+
+        if(!_data.TryAdd(entity.Id, entity))
+            throw new InvalidOperationException($"Entity with ID {entity.Id} already exists.");
+
+        return Task.CompletedTask;
     }
 
     public Task Update(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(entity);
+
+        T? oldEntity;
+        do
+        {
+            ct.ThrowIfCancellationRequested();
+
+            if(!_data.TryGetValue(entity.Id, out oldEntity))
+                throw new EntityNotFoundException<T>(entity.Id);
+        }
+        while (!_data.TryUpdate(entity.Id, entity, oldEntity));        
+
+        return Task.CompletedTask;
     }
 
     public Task Delete(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if(!_data.TryRemove(id, out _))
+            throw new EntityNotFoundException<T>(id);
+
+        return Task.CompletedTask;
     }
 }
