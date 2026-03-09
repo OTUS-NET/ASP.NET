@@ -49,9 +49,10 @@ public class PromoCodesController(
     [ProducesResponseType(typeof(PromoCodeShortResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<PromoCodeShortResponse>> Create(PromoCodeCreateRequest request, CancellationToken ct)
     {
-        var partner = await partnersRepository.GetById(request.PartnerId, ct: ct);
+        var partner = await partnersRepository.GetById(request.PartnerId, withIncludes: true, ct: ct);
         if (partner is null)
             return NotFound(new ProblemDetails
             {
@@ -70,6 +71,22 @@ public class PromoCodesController(
         var customersWithPreference = await customersRepository.GetWhere(
             c => c.Preferences.Any(p => p.Id == request.PreferenceId),
             ct: ct);
+
+        var activeLimit = partner.PartnerLimits
+            .FirstOrDefault(l => l.CanceledAt == null && l.EndAt > DateTimeOffset.UtcNow);
+        if (activeLimit is null)
+            return StatusCode(StatusCodes.Status422UnprocessableEntity, new ProblemDetails
+            {
+                Title = "No active limit",
+                Detail = "Partner has no active promo code limit."
+            });
+
+        if (activeLimit.IssuedCount >= activeLimit.Limit)
+            return StatusCode(StatusCodes.Status422UnprocessableEntity, new ProblemDetails
+            {
+                Title = "Limit exceeded",
+                Detail = $"Cannot create promo code. Limit would be exceeded (current: {activeLimit.IssuedCount}/{activeLimit.Limit})."
+            });
 
         var promoCodeId = Guid.NewGuid();
         var promoCode = new PromoCode
@@ -97,6 +114,9 @@ public class PromoCodesController(
         }
 
         await promoCodesRepository.Add(promoCode, ct);
+
+        activeLimit.IssuedCount += 1;
+        await partnersRepository.Update(partner, ct);
 
         return CreatedAtAction(
             nameof(GetById),
