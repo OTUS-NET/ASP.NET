@@ -176,7 +176,7 @@ namespace PromoCodeFactory.DataAccess.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("EndedAt")
+                    b.Property<DateTimeOffset>("EndAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Limit")

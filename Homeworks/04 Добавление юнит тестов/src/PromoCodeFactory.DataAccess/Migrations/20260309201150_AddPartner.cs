@@ -56,8 +56,8 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     PartnerId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EndAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    EndedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CanceledAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     Limit = table.Column<int>(type: "INTEGER", nullable: false)
                 },

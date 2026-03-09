@@ -56,22 +56,20 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task Update(T entity, CancellationToken ct)
     {
-        var exists = await context.Set<T>().AnyAsync(e => e.Id == entity.Id, ct);
-        if (!exists)
-            throw new EntityNotFoundException(typeof(T), entity.Id);
+        var rowAffected = await context.SaveChangesAsync(ct);
 
-        context.Set<T>().Update(entity);
-        await context.SaveChangesAsync(ct);
+        if(rowAffected == 0)
+            throw new EntityNotFoundException(typeof(T), entity.Id);
     }
 
     public async Task Delete(Guid id, CancellationToken ct)
     {
-        var entity = await context.Set<T>().FindAsync([id], ct);
-        if (entity is null)
+        var rowAffected = await context
+            .Set<T>()
+            .Where(e => e.Id == id)
+            .ExecuteDeleteAsync(ct);
+
+        if (rowAffected == 0)
             throw new EntityNotFoundException(typeof(T), id);
-
-        context.Set<T>().Remove(entity);
-        await context.SaveChangesAsync(ct);
     }
-
 }

@@ -11,7 +11,7 @@ using PromoCodeFactory.DataAccess;
 namespace PromoCodeFactory.DataAccess.Migrations
 {
     [DbContext(typeof(PromoCodeFactoryDbContext))]
-    [Migration("20260309190408_AddPartner")]
+    [Migration("20260309201150_AddPartner")]
     partial class AddPartner
     {
         /// <inheritdoc />
@@ -179,7 +179,7 @@ namespace PromoCodeFactory.DataAccess.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("EndedAt")
+                    b.Property<DateTimeOffset>("EndAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Limit")
