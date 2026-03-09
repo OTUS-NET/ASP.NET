@@ -5,4 +5,5 @@ public record PartnerPromoCodeLimitResponse(
     DateTimeOffset CreatedAt,
     DateTimeOffset EndAt,
     DateTimeOffset? CanceledAt,
-    int Limit);
+    int Limit,
+    int IssuedCount);

@@ -25,6 +25,7 @@ public static class HostExtensions
         await SeedEntity(scope.ServiceProvider, logger, SeedData.Employees, ct);
         await SeedEntity(scope.ServiceProvider, logger, SeedData.Customers, ct);
         await SeedEntity(scope.ServiceProvider, logger, SeedData.Partners, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.PartnerPromoCodeLimits, ct);
         await SeedEntity(scope.ServiceProvider, logger, SeedData.PromoCodes, ct);
         await SeedEntity(scope.ServiceProvider, logger, SeedData.CustomerPromoCodes, ct);
 

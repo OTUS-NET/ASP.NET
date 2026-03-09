@@ -11,4 +11,6 @@ public class PartnerPromoCodeLimit : BaseEntity
     public DateTimeOffset? CanceledAt { get; set; }
 
     public required int Limit { get; set; }
+
+    public int IssuedCount { get; set; }
 }

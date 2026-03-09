@@ -35,7 +35,6 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    NumberIssuedPromoCodes = table.Column<int>(type: "INTEGER", nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
                     ManagerId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
@@ -59,7 +58,8 @@ namespace PromoCodeFactory.DataAccess.Migrations
                     EndAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CanceledAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    Limit = table.Column<int>(type: "INTEGER", nullable: false)
+                    Limit = table.Column<int>(type: "INTEGER", nullable: false),
+                    IssuedCount = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

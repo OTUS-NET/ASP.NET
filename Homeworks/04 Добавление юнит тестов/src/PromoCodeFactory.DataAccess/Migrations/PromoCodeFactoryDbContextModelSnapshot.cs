@@ -154,9 +154,6 @@ namespace PromoCodeFactory.DataAccess.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("NumberIssuedPromoCodes")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ManagerId");
@@ -178,6 +175,9 @@ namespace PromoCodeFactory.DataAccess.Migrations
 
                     b.Property<DateTimeOffset>("EndAt")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("IssuedCount")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Limit")
                         .HasColumnType("INTEGER");

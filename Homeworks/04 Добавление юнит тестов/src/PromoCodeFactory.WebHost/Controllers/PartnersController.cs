@@ -86,19 +86,14 @@ public class PartnersController(
 
         // Отключить предыдущие активные лимиты
         var activeLimits = partner.PartnerLimits.Where(l => l.CanceledAt == null).ToList();
-        var hadActiveLimitEnded = activeLimits.Any(l => l.EndAt < now);
 
         foreach (var activeLimit in activeLimits)
         {
             activeLimit.CanceledAt = now;
         }
 
-        // Обнулить количество выданных промокодов, если предыдущий лимит не закончился
         if (activeLimits.Count > 0)
         {
-            if (!hadActiveLimitEnded)
-                partner.NumberIssuedPromoCodes = 0;
-
             try
             {
                 await partnersRepository.Update(partner, ct);
@@ -115,7 +110,8 @@ public class PartnersController(
             Partner = partner,
             CreatedAt = now,
             EndAt = request.EndAt,
-            Limit = request.Limit
+            Limit = request.Limit,
+            IssuedCount = 0
         };
 
         await partnerLimitsRepository.Add(newLimit, ct);

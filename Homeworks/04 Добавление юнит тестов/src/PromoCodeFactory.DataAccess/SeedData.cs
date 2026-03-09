@@ -74,7 +74,6 @@ internal static class SeedData
         {
             Id = Guid.Parse("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"),
             Name = "Театр им. Чехова",
-            NumberIssuedPromoCodes = 0,
             IsActive = true,
             Manager = Employees.First(e => e.Email == "andreev@somemail.ru")
         },
@@ -82,9 +81,30 @@ internal static class SeedData
         {
             Id = Guid.Parse("b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"),
             Name = "Центр обучения",
-            NumberIssuedPromoCodes = 0,
             IsActive = true,
             Manager = Employees.First(e => e.Email == "andreev@somemail.ru")
+        }
+    ];
+
+    public static IReadOnlyCollection<PartnerPromoCodeLimit> PartnerPromoCodeLimits { get; } =
+    [
+        new PartnerPromoCodeLimit
+        {
+            Id = Guid.Parse("c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f"),
+            Partner = Partners.ElementAt(0),
+            Limit = 100,
+            IssuedCount = 5,
+            CreatedAt = DateTimeOffset.Now.AddDays(-10),
+            EndAt = DateTimeOffset.Now.AddDays(20)
+        },
+        new PartnerPromoCodeLimit
+        {
+            Id = Guid.Parse("d2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a"),
+            Partner = Partners.ElementAt(1),
+            Limit = 50,
+            IssuedCount = 0,
+            CreatedAt = DateTimeOffset.Now.AddDays(-5),
+            EndAt = DateTimeOffset.Now.AddDays(55)
         }
     ];
 

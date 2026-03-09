@@ -10,7 +10,6 @@ public static class PartnersMapper
         return new PartnerResponse(
             partner.Id,
             partner.Name,
-            partner.NumberIssuedPromoCodes,
             partner.IsActive,
             partner.Manager.Id,
             partner.PartnerLimits
@@ -26,6 +25,7 @@ public static class PartnersMapper
             limit.CreatedAt,
             limit.EndAt,
             limit.CanceledAt,
-            limit.Limit);
+            limit.Limit,
+            limit.IssuedCount);
     }
 }
