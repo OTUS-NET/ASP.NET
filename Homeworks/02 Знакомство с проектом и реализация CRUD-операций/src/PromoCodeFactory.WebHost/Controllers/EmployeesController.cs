@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.WebHost.Mapping;
 using PromoCodeFactory.WebHost.Models;
+using static System.Net.WebRequestMethods;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -34,7 +35,11 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+        if (employee is null)
+            return this.NotFound(this.GetNotFoundProblemDetails(id));
+
+        return this.Ok(Mapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -45,7 +50,43 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Resource not created",
+            Type = "https://httpstatuses.com/400",
+            Instance = HttpContext.Request.Path
+        };
+
+        if (role is null)
+        {
+            problemDetails.Detail = $"The request contains invalid role Id.";
+
+            return this.BadRequest(problemDetails);
+        }
+
+        var employee = Mapper.ToEmployee(request, role);
+        try
+        {
+            await employeeRepository.Add(employee, ct);
+        }
+        catch (InvalidOperationException ex)
+        {
+            problemDetails.Detail = ex.Message;
+
+            return BadRequest(problemDetails);
+        }
+        catch
+        {
+            problemDetails.Detail = "An unexpected error occurred while creating the employee.";
+
+            return BadRequest(problemDetails);
+        }
+
+        var employeeModel = Mapper.ToEmployeeResponse(employee);
+
+        return CreatedAtAction(nameof(GetById), new { id = employeeModel.Id }, employeeModel);
     }
 
     /// <summary>
@@ -60,7 +101,45 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Resource not updated",
+            Type = "https://httpstatuses.com/400",
+            Instance = HttpContext.Request.Path
+        };
+
+        if (role is null)
+        {
+            problemDetails.Detail = $"The request contains invalid role Id.";
+
+            return this.BadRequest(problemDetails);
+        }
+
+        try
+        {
+            var employee = Mapper.ToEmployee(request, role, id);
+            await employeeRepository.Update(employee, ct);
+
+            return Ok(Mapper.ToEmployeeResponse(employee));
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(this.GetNotFoundProblemDetails(id));
+        }
+        catch (InvalidOperationException ex)
+        {
+            problemDetails.Detail = ex.Message;
+
+            return BadRequest(problemDetails);
+        }
+        catch
+        {
+            problemDetails.Detail = "An unexpected error occurred while creating the employee.";
+
+            return BadRequest(problemDetails);
+        }
     }
 
     /// <summary>
@@ -73,6 +152,25 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await employeeRepository.Delete(id, ct);
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound(this.GetNotFoundProblemDetails(id));
+        }
+
+        return NoContent();
     }
+
+    private ProblemDetails GetNotFoundProblemDetails(Guid id) =>
+        new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "Resource not found",
+            Detail = $"Employee with Id {id} does not exist.",
+            Type = "https://httpstatuses.com/404",
+            Instance = HttpContext.Request.Path
+        };
 }
