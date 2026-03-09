@@ -11,26 +11,19 @@
 Перед выполнением нужно ознакомиться с [Правилами отправки домашнего задания на проверку](../docs/homework-rules.md)
 
 1. Подключение Entity Framework и SQLite
-    - Добавить пакеты Microsoft.EntityFrameworkCore.Sqlite и Microsoft.EntityFrameworkCore.Design в проект PromoCodeFactory.DataAccess
-    - Создать класс PromoCodeFactoryDbContext, наследующий DbContext
+    - Добавить DbSet сущностей в PromoCodeFactoryDbContext
     - Настроить маппинг доменных моделей через OnModelCreating (доменные модели менять нельзя)
     - Добавить ограничения на длину для текстовых полей: FirstName/LastName — 50, Email — 256, Name — 100, Description — 500, Code/ServiceInfo/PartnerName — 100–256
-    - Создать EfRepository, реализующий IRepository<T>
+    - Реализовать методы в EfRepository
     - Заменить InMemoryRepository на EfRepository в регистрации сервисов
-    - Использовать SQLite с connection string из appsettings.json (DefaultConnection)
-2. Реализация методов контроллеров
-    - CustomersController: Get (список), GetById (с Preferences и CustomerPromoCodes), Create, Update, Delete
-    - PreferencesController: Get (список предпочтений)
-    - PromoCodesController: Get, GetById, Create (промокод + выдача клиентам с указанным предпочтением), Apply (отметить использование промокода клиентом)
-    - При необходимости добавлять общие методы в IRepository (например, GetWhere, GetById с includePaths)
-3. Миграции
-    - Добавить IDesignTimeDbContextFactory для корректной работы EF CLI
+2. Реализация контроллера CustomersController
+    - Реализовать методы Get, GetById (с Preferences и CustomerPromoCodes), Create, Update, Delete
+3. Реализация контроллера PreferencesController
+    - Реализовать метод Get
+4. Реализация контроллера PromoCodesController
+    - Реализовать методы Get, GetById, Create (промокод + выдача клиентам с указанным предпочтением), Apply (отметить использование промокода клиентом)
+5. Миграции
     - Создать миграцию InitialCreate
-    - Применять миграции при старте приложения
-4. Seeding (только для Development)
-    - Реализовать заполнение БД тестовыми данными через UseSeeding или отдельный сидер
-    - Seeding должен запускаться только в среде Development
-    - Добавить Roles, Employees, Preferences, Customers из FakeDataFactory и при необходимости расширить данные
 
 
 Дополнительная информация:
@@ -45,5 +38,6 @@
 - Пункт 2 — 2 балла
 - Пункт 3 — 2 балла
 - Пункт 4 — 2 балла
+- Пункт 5 — 2 балла
 
 Для зачёта домашнего задания достаточно 8 баллов.

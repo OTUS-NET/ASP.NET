@@ -19,6 +19,8 @@ public static class DependencyInjection
             new InMemoryRepository<Role>(SeedData.Roles));
         services.AddSingleton<IRepository<Customer>>(_ =>
             new InMemoryRepository<Customer>(SeedData.Customers));
+        services.AddSingleton<IRepository<Partner>>(_ =>
+            new InMemoryRepository<Partner>(SeedData.Partners));
         services.AddSingleton<IRepository<PromoCode>>(_ =>
             new InMemoryRepository<PromoCode>(SeedData.PromoCodes));
         services.AddSingleton<IRepository<CustomerPromoCode>>(_ =>
@@ -33,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IRepository<Employee>, EmployeeEfRepository>();
         services.AddScoped<IRepository<Role>, EfRepository<Role>>();
         services.AddScoped<IRepository<Customer>, CustomerEfRepository>();
+        services.AddScoped<IRepository<Partner>, EfRepository<Partner>>();
         services.AddScoped<IRepository<PromoCode>, PromoCodeEfRepository>();
         services.AddScoped<IRepository<Preference>, EfRepository<Preference>>();
         services.AddScoped<IRepository<CustomerPromoCode>, EfRepository<CustomerPromoCode>>();

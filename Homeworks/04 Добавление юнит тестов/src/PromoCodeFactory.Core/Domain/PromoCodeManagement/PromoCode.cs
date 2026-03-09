@@ -1,5 +1,3 @@
-using PromoCodeFactory.Core.Domain.Administration;
-
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 public class PromoCode : BaseEntity
@@ -12,9 +10,7 @@ public class PromoCode : BaseEntity
 
     public required DateTimeOffset EndDate { get; set; }
 
-    public required string PartnerName { get; set; }
-
-    public required Employee PartnerManager { get; set; }
+    public required Partner Partner { get; set; }
 
     public required Preference Preference { get; set; }
 

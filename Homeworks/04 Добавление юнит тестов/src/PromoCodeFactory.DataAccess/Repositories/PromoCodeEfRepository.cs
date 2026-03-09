@@ -8,7 +8,8 @@ internal class PromoCodeEfRepository(PromoCodeFactoryDbContext context) : EfRepo
     protected override IQueryable<PromoCode> ApplyIncludes(IQueryable<PromoCode> query)
     {
         return query
-            .Include(p => p.PartnerManager)
+            .Include(p => p.Partner)
+                .ThenInclude(partner => partner.Manager)
             .Include(p => p.Preference);
     }
 }

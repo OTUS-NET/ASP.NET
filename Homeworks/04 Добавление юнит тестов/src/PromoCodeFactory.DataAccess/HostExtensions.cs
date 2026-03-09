@@ -20,12 +20,13 @@ public static class HostExtensions
 
         logger.LogInformation("Starting database seed...");
 
-        await SeedEntity(scope.ServiceProvider, SeedData.Roles, ct);
-        await SeedEntity(scope.ServiceProvider, SeedData.Preferences, ct);
-        await SeedEntity(scope.ServiceProvider, SeedData.Employees, ct);
-        await SeedEntity(scope.ServiceProvider, SeedData.Customers, ct);
-        await SeedEntity(scope.ServiceProvider, SeedData.PromoCodes, ct);
-        await SeedEntity(scope.ServiceProvider, SeedData.CustomerPromoCodes, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.Roles, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.Preferences, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.Employees, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.Customers, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.Partners, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.PromoCodes, ct);
+        await SeedEntity(scope.ServiceProvider, logger, SeedData.CustomerPromoCodes, ct);
 
         logger.LogInformation("Database seed completed.");
     }
@@ -54,6 +55,7 @@ public static class HostExtensions
 
     public static async Task SeedEntity<T>(
         IServiceProvider serviceProvider,
+        ILogger logger,
         IReadOnlyCollection<T> entities,
         CancellationToken ct)
         where T : BaseEntity
@@ -61,7 +63,12 @@ public static class HostExtensions
         var repository = serviceProvider.GetRequiredService<IRepository<T>>();
 
         if ((await repository.GetAll()).Count > 0)
+        {
+            logger.LogInformation($"Entity '{typeof(T).Name}' is not empty. Skip seeding");
             return;
+        }
+
+        logger.LogInformation($"Starting seed {typeof(T).Name}");
 
         foreach (var entity in entities)
             await repository.Add(entity, ct);

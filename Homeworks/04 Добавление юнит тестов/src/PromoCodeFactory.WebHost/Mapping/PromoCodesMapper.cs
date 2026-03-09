@@ -11,10 +11,9 @@ public static class PromoCodesMapper
             promoCode.Id,
             promoCode.Code,
             promoCode.ServiceInfo,
-            promoCode.PartnerName,
+            promoCode.Partner.Id,
             promoCode.BeginDate,
             promoCode.EndDate,
-            promoCode.PartnerManager.Id,
             promoCode.Preference.Id);
     }
 }

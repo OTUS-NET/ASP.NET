@@ -14,6 +14,8 @@ public class PromoCodeFactoryDbContext : DbContext
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Partner> Partners => Set<Partner>();
+    public DbSet<PartnerPromoCodeLimit> PartnerPromoCodeLimits => Set<PartnerPromoCodeLimit>();
     public DbSet<PromoCode> PromoCodes => Set<PromoCode>();
     public DbSet<Preference> Preferences => Set<Preference>();
     public DbSet<CustomerPromoCode> CustomerPromoCodes => Set<CustomerPromoCode>();
@@ -55,14 +57,26 @@ public class PromoCodeFactoryDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        modelBuilder.Entity<Partner>(entity =>
+        {
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.HasOne(e => e.Manager)
+                .WithMany()
+                .HasForeignKey("ManagerId")
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(e => e.PartnerLimits)
+                .WithOne(l => l.Partner)
+                .HasForeignKey("PartnerId")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<PromoCode>(entity =>
         {
             entity.Property(e => e.Code).HasMaxLength(100);
             entity.Property(e => e.ServiceInfo).HasMaxLength(256);
-            entity.Property(e => e.PartnerName).HasMaxLength(256);
-            entity.HasOne(e => e.PartnerManager)
+            entity.HasOne(e => e.Partner)
                 .WithMany()
-                .HasForeignKey("PartnerManagerId")
+                .HasForeignKey("PartnerId")
                 .OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(e => e.Preference)
                 .WithMany()

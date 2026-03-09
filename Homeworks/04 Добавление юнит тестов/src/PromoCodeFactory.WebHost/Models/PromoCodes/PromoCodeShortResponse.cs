@@ -4,8 +4,7 @@ public record PromoCodeShortResponse(
     Guid Id,
     string Code,
     string ServiceInfo,
-    string PartnerName,
+    Guid PartnerId,
     DateTimeOffset BeginDate,
     DateTimeOffset EndDate,
-    Guid PartnerManagerId,
     Guid PreferenceId);

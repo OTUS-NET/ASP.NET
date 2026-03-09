@@ -34,10 +34,9 @@ public static class CustomersMapper
                     p.Id,
                     p.Code,
                     p.ServiceInfo,
-                    p.PartnerName,
+                    p.Partner.Id,
                     p.BeginDate,
                     p.EndDate,
-                    p.PartnerManager.Id,
                     p.Preference.Id,
                     customerPromoCode.CreatedAt,
                     customerPromoCode.AppliedAt);

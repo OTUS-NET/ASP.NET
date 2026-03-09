@@ -12,7 +12,7 @@ public class PromoCodesController(
     IRepository<PromoCode> promoCodesRepository,
     IRepository<Customer> customersRepository,
     IRepository<CustomerPromoCode> customerPromoCodesRepository,
-    IRepository<Employee> employeesRepository,
+    IRepository<Partner> partnersRepository,
     IRepository<Preference> preferencesRepository)
     : BaseController
 {
@@ -51,12 +51,12 @@ public class PromoCodesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PromoCodeShortResponse>> Create(PromoCodeCreateRequest request, CancellationToken ct)
     {
-        var partnerManager = await employeesRepository.GetById(request.PartnerManagerId, ct: ct);
-        if (partnerManager is null)
+        var partner = await partnersRepository.GetById(request.PartnerId, ct: ct);
+        if (partner is null)
             return NotFound(new ProblemDetails
             {
-                Title = "Partner manager not found",
-                Detail = $"Employee with Id {request.PartnerManagerId} not found."
+                Title = "Partner not found",
+                Detail = $"Partner with Id {request.PartnerId} not found."
             });
 
         var preference = await preferencesRepository.GetById(request.PreferenceId, ct: ct);
@@ -77,10 +77,9 @@ public class PromoCodesController(
             Id = promoCodeId,
             Code = request.Code,
             ServiceInfo = request.ServiceInfo,
-            PartnerName = request.PartnerName,
+            Partner = partner,
             BeginDate = request.BeginDate.UtcDateTime,
             EndDate = request.EndDate.UtcDateTime,
-            PartnerManager = partnerManager,
             Preference = preference,
             CustomerPromoCodes = customersWithPreference.Select(c => new CustomerPromoCode
             {

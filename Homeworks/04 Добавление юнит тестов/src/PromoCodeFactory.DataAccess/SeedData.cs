@@ -68,6 +68,26 @@ internal static class SeedData
         }
     ];
 
+    public static IReadOnlyCollection<Partner> Partners { get; } =
+    [
+        new Partner
+        {
+            Id = Guid.Parse("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"),
+            Name = "Театр им. Чехова",
+            NumberIssuedPromoCodes = 0,
+            IsActive = true,
+            Manager = Employees.First(e => e.Email == "andreev@somemail.ru")
+        },
+        new Partner
+        {
+            Id = Guid.Parse("b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e"),
+            Name = "Центр обучения",
+            NumberIssuedPromoCodes = 0,
+            IsActive = true,
+            Manager = Employees.First(e => e.Email == "andreev@somemail.ru")
+        }
+    ];
+
     public static IReadOnlyCollection<PromoCode> PromoCodes { get; } =
     [
         new PromoCode
@@ -77,8 +97,7 @@ internal static class SeedData
             ServiceInfo = "Скидка на театральные билеты",
             BeginDate = DateTimeOffset.Now,
             EndDate = DateTimeOffset.Now.AddDays(100),
-            PartnerName = "Театр им. Чехова",
-            PartnerManager = Employees.First(e => e.Email == "andreev@somemail.ru"),
+            Partner = Partners.ElementAt(0),
             Preference = Preferences.ElementAt(0)
         },
         new PromoCode
@@ -88,8 +107,7 @@ internal static class SeedData
             ServiceInfo = "Скидка на семинары",
             BeginDate = DateTimeOffset.Now,
             EndDate = DateTimeOffset.Now.AddDays(100),
-            PartnerName = "Центр обучения",
-            PartnerManager = Employees.First(e => e.Email == "andreev@somemail.ru"),
+            Partner = Partners.ElementAt(1),
             Preference = Preferences.ElementAt(1)
         }
     ];
