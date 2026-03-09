@@ -45,7 +45,7 @@ public class CancelLimitTests
     }
 
     [Fact]
-    public async Task CancelLimit_WhenPartnerBlocked_ReturnsBadRequest()
+    public async Task CancelLimit_WhenPartnerBlocked_ReturnsUnprocessableEntity()
     {
         // Arrange
         var partnerId = Guid.NewGuid();
@@ -60,10 +60,10 @@ public class CancelLimitTests
         var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = (BadRequestObjectResult)result;
-        badRequestResult.Value.Should().BeOfType<ProblemDetails>();
-        var problemDetails = (ProblemDetails)badRequestResult.Value!;
+        result.Should().BeOfType<UnprocessableEntityObjectResult>();
+        var objectResult = (UnprocessableEntityObjectResult)result;
+        objectResult.Value.Should().BeOfType<ProblemDetails>();
+        var problemDetails = (ProblemDetails)objectResult.Value!;
         problemDetails.Title.Should().Be("Partner blocked");
     }
 
@@ -92,7 +92,7 @@ public class CancelLimitTests
     }
 
     [Fact]
-    public async Task CancelLimit_WhenLimitAlreadyCanceled_ReturnsBadRequest()
+    public async Task CancelLimit_WhenLimitAlreadyCanceled_ReturnsUnprocessableEntity()
     {
         // Arrange
         var partnerId = Guid.NewGuid();
@@ -107,8 +107,8 @@ public class CancelLimitTests
         var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = (BadRequestObjectResult)result;
+        result.Should().BeOfType<UnprocessableEntityObjectResult>();
+        var badRequestResult = (UnprocessableEntityObjectResult)result;
         badRequestResult.Value.Should().BeOfType<ProblemDetails>();
         var problemDetails = (ProblemDetails)badRequestResult.Value!;
         problemDetails.Title.Should().Be("Limit already canceled");

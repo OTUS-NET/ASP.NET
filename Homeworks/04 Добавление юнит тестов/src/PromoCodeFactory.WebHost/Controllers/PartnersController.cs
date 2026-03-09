@@ -62,6 +62,7 @@ public class PartnersController(
     [ProducesResponseType(typeof(PartnerPromoCodeLimitResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<PartnerPromoCodeLimitResponse>> CreateLimit(
         [FromRoute] Guid partnerId,
         [FromBody] PartnerPromoCodeLimitCreateRequest request,
@@ -76,7 +77,7 @@ public class PartnersController(
             });
 
         if (!partner.IsActive)
-            return BadRequest(new ProblemDetails
+            return UnprocessableEntity(new ProblemDetails
             {
                 Title = "Partner blocked",
                 Detail = "Cannot create limit for a blocked partner."
@@ -124,8 +125,8 @@ public class PartnersController(
 
     [HttpPost("{partnerId:guid}/limits/{limitId:guid}/cancel")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> CancelLimit(
         [FromRoute] Guid partnerId,
         [FromRoute] Guid limitId,
@@ -140,7 +141,7 @@ public class PartnersController(
             });
 
         if (!partner.IsActive)
-            return BadRequest(new ProblemDetails
+            return UnprocessableEntity(new ProblemDetails
             {
                 Title = "Partner blocked",
                 Detail = "Cannot cancel limit for a blocked partner."
@@ -155,7 +156,7 @@ public class PartnersController(
             });
 
         if (limit.CanceledAt != null)
-            return BadRequest(new ProblemDetails
+            return UnprocessableEntity(new ProblemDetails
             {
                 Title = "Limit already canceled",
                 Detail = "This limit has already been canceled."
