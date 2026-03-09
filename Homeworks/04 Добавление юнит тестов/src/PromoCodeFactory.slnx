@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="PromoCodeFactory.Core/PromoCodeFactory.Core.csproj" />
+  <Project Path="PromoCodeFactory.DataAccess/PromoCodeFactory.DataAccess.csproj" />
+  <Project Path="PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj" />
+</Solution>
