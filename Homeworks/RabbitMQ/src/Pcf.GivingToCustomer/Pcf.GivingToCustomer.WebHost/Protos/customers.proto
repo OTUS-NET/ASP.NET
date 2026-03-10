@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option csharp_namespace = "Pcf.GivingToCustomer.WebHost.Grpc";
+
+package pcf.givingtocustomer.customers.v1;
+
+import "google/protobuf/empty.proto";
+
+service Customers {
+  rpc ListCustomers (ListCustomersRequest) returns (ListCustomersResponse);
+  rpc GetCustomer (GetCustomerRequest) returns (Customer);
+  rpc CreateCustomer (CreateCustomerRequest) returns (CustomerIdResponse);
+  rpc UpdateCustomer (UpdateCustomerRequest) returns (google.protobuf.Empty);
+  rpc DeleteCustomer (DeleteCustomerRequest) returns (google.protobuf.Empty);
+}
+
+message ListCustomersRequest {}
+
+message ListCustomersResponse {
+  repeated CustomerShort customers = 1;
+}
+
+message GetCustomerRequest {
+  string id = 1;
+}
+
+message CreateCustomerRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  repeated string preference_ids = 4;
+}
+
+message UpdateCustomerRequest {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  repeated string preference_ids = 5;
+}
+
+message DeleteCustomerRequest {
+  string id = 1;
+}
+
+message CustomerIdResponse {
+  string id = 1;
+}
+
+message CustomerShort {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+}
+
+message Customer {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  repeated Preference preferences = 5;
+  repeated PromoCodeShort promo_codes = 6;
+}
+
+message Preference {
+  string id = 1;
+  string name = 2;
+}
+
+message PromoCodeShort {
+  string id = 1;
+  string code = 2;
+  string begin_date = 3;
+  string end_date = 4;
+  string partner_id = 5;
+  string service_info = 6;
+}
+

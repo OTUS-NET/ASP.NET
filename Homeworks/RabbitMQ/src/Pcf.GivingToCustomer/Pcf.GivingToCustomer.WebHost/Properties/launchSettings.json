@@ -1,10 +1,10 @@
-﻿{
+{
   "profiles": {
     "Otus.Teaching.PromocodeFactory.WebHost": {
       "commandName": "Project",
       "launchUrl": "swagger/index.html",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:8093",
+      "applicationUrl": "https://localhost:8094;http://localhost:8093",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

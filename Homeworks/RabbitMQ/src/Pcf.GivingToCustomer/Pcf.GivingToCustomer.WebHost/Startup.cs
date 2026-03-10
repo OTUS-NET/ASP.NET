@@ -16,6 +16,8 @@ using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Core.Services;
 using Pcf.GivingToCustomer.Integration;
 using Pcf.GivingToCustomer.WebHost.Consumers;
+using Pcf.GivingToCustomer.WebHost.Grpc;
+using Pcf.GivingToCustomer.WebHost.GraphQL;
 
 namespace Pcf.GivingToCustomer.WebHost
 {
@@ -34,10 +36,15 @@ namespace Pcf.GivingToCustomer.WebHost
         {
             services.AddControllers().AddMvcOptions(x =>
                 x.SuppressAsyncSuffixInActionNames = false);
+            services.AddGrpc();
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
             services.AddScoped<IPromoCodeIssuingService, PromoCodeIssuingService>();
+            services
+                .AddGraphQLServer()
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>();
 
             services.AddMassTransit(x =>
             {
@@ -109,6 +116,8 @@ namespace Pcf.GivingToCustomer.WebHost
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGrpcService<CustomersGrpcService>();
+                endpoints.MapGraphQL("/graphql");
             });
 
             dbInitializer.InitializeDb();
