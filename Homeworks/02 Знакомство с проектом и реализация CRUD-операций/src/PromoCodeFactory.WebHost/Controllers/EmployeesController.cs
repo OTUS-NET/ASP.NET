@@ -53,7 +53,16 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role is not null)
+        {
+            await employeeRepository.Add(Mapper.ToEmployee(request, role), ct);
+            return Created();
+        }
+        else
+        {
+            return BadRequest(new EntityNotFoundException(typeof(Role), request.RoleId).Message);
+        }
     }
 
     /// <summary>
