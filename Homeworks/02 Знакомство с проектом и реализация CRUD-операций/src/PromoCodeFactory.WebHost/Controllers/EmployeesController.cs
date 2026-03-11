@@ -77,7 +77,30 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var roleId = request.RoleId;
+        var role = await roleRepository.GetById(roleId, ct);
+
+        if (role is null)
+        {
+            return BadRequest(new EntityNotFoundException(typeof(Role), roleId).Message);
+        }
+
+        try
+        {
+            await employeeRepository.Update(new Employee
+            {
+                Id = id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Role = role,
+            }, ct);
+            return Ok();
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     /// <summary>
