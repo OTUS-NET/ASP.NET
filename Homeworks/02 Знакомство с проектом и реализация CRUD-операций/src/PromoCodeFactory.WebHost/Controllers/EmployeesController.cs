@@ -113,6 +113,14 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await employeeRepository.Delete(id, ct);
+            return NoContent();
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
