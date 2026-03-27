@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core.Exceptions;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
 
@@ -17,7 +18,11 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task Delete(Guid id, CancellationToken ct)
     {
-        var entity = await context.Set<T>().Where(e => e.Id == id).FirstAsync(ct);
+        var entity = await context.Set<T>().Where(e => e.Id == id).FirstOrDefaultAsync(ct);
+        if (entity is null)
+        {
+            throw new EntityNotFoundException(typeof(T), id);
+        }
         context.Set<T>().Remove(entity);
         await context.SaveChangesAsync();
     }
@@ -56,6 +61,12 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task Update(T entity, CancellationToken ct)
     {
+        var entry = context.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.Id, ct);
+
+        if (entry is null)
+        {
+            throw new EntityNotFoundException(typeof(T), entity.Id);
+        }
         context.Set<T>().Update(entity);
         await context.SaveChangesAsync(ct);
     }
