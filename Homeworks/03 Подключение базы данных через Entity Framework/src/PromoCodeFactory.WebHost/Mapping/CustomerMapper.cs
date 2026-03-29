@@ -25,7 +25,7 @@ public static class CustomerMapper
             customer.LastName,
             customer.Email,
             customer.Preferences.Select(PreferencesMapper.ToPreferenceShortResponse).ToArray(),
-            tuples.Select(t => CustomerMapper.ToCustomerPromoCodeRespone(t.customerPromoCode, t.promoCode)).ToArray()
+            tuples.Select(t => CustomerPromoCodesMapper.ToCustomerPromoCodeResponse(t.customerPromoCode, t.promoCode)).ToArray()
             );
     }
 
@@ -51,21 +51,5 @@ public static class CustomerMapper
             Email = request.Email,
             Preferences = preferences.ToArray(),
         };
-    }
-
-    public static CustomerPromoCodeResponse ToCustomerPromoCodeRespone(CustomerPromoCode customerPromoCode, PromoCode promoCode)
-    {
-        return new CustomerPromoCodeResponse(
-            customerPromoCode.Id,
-            promoCode.Code,
-            promoCode.ServiceInfo,
-            promoCode.PartnerName,
-            promoCode.BeginDate,
-            promoCode.EndDate,
-            promoCode.PartnerManager.Id,
-            promoCode.Preference.Id,
-            customerPromoCode.CreatedAt,
-            customerPromoCode.AppliedAt
-        );
     }
 }
