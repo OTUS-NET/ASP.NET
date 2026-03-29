@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj" Id="f078827e-49c9-4d0e-8e2f-f5a99e84aac9" />
+  </Folder>
+  <Project Path="PromoCodeFactory.Core/PromoCodeFactory.Core.csproj" />
+  <Project Path="PromoCodeFactory.DataAccess/PromoCodeFactory.DataAccess.csproj" />
+  <Project Path="PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj" />
+</Solution>
