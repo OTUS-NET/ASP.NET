@@ -21,7 +21,7 @@ public class CustomersController(
     public async Task<ActionResult<IEnumerable<CustomerShortResponse>>> Get(CancellationToken ct)
     {
         var customer = await customerRepository.GetAll(ct: ct);
-        return Ok(customer.Select(CustomerMapper.ToCustomerShortResponse));
+        return Ok(customer.Select(CustomersMapper.ToCustomerShortResponse));
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class CustomersController(
             return NotFound(new ProblemDetails { Title = "Invalid Id", Detail = $"Customer with Id {id} not found." });
         }
         var customerRelatedPromoCodes = await promoCodeRepository.GetByRangeId(customer.CustomerPromoCodes.Select(cpc => cpc.PromoCodeId), ct: ct);
-        var customerResponse = CustomerMapper.ToCustomerResponse(
+        var customerResponse = CustomersMapper.ToCustomerResponse(
             customer,
             customer.CustomerPromoCodes.Join(customerRelatedPromoCodes, cpc => cpc.PromoCodeId, crpc => crpc.Id, (cpc, crpc) => (cpc, crpc))
             );
@@ -62,9 +62,9 @@ public class CustomersController(
         }
         else
         {
-            var customer = CustomerMapper.ToCustomer(request, preferences);
+            var customer = CustomersMapper.ToCustomer(request, preferences);
             await customerRepository.Add(customer, ct);
-            return Created(customer.Id.ToString(), CustomerMapper.ToCustomerShortResponse(customer));
+            return Created(customer.Id.ToString(), CustomersMapper.ToCustomerShortResponse(customer));
         }
     }
 
@@ -91,9 +91,9 @@ public class CustomersController(
         {
             return BadRequest(new ProblemDetails { Title = "Invalid preference Ids", Detail = $"No preference was found." });
         }
-        var updatedCustomer = CustomerMapper.ToCustomer(request, preferences);
+        var updatedCustomer = CustomersMapper.ToCustomer(request, preferences);
         await customerRepository.Update(updatedCustomer, ct);
-        return Ok(CustomerMapper.ToCustomerShortResponse(updatedCustomer));
+        return Ok(CustomersMapper.ToCustomerShortResponse(updatedCustomer));
     }
 
     /// <summary>

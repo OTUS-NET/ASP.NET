@@ -3,7 +3,7 @@ using PromoCodeFactory.WebHost.Models.PromoCodes;
 
 namespace PromoCodeFactory.WebHost.Mapping;
 
-public static class CustomerMapper
+public static class CustomersMapper
 {
     public static CustomerShortResponse ToCustomerShortResponse(Customer customer)
     {
