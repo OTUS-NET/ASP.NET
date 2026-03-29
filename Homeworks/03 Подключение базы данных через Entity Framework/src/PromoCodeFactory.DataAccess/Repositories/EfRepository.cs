@@ -30,7 +30,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
     {
-        var query = context.Set<T>().AsNoTracking();
+        IQueryable<T> query = context.Set<T>();
 
         if (withIncludes)
         {
@@ -41,7 +41,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task<T?> GetById(Guid id, bool withIncludes = false, CancellationToken ct = default)
     {
-        var query = context.Set<T>().AsNoTracking();
+        IQueryable<T> query = context.Set<T>();
 
         if (withIncludes)
         {
@@ -52,7 +52,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task<IReadOnlyCollection<T>> GetByRangeId(IEnumerable<Guid> ids, bool withIncludes = false, CancellationToken ct = default)
     {
-        var query = context.Set<T>().AsNoTracking().IntersectBy(ids, e => e.Id);
+        var query = context.Set<T>().Where(e => ids.Contains(e.Id));
 
         if (withIncludes)
         {
@@ -63,7 +63,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 
     public async Task<IReadOnlyCollection<T>> GetWhere(Expression<Func<T, bool>> predicate, bool withIncludes = false, CancellationToken ct = default)
     {
-        var query = context.Set<T>().AsNoTracking().Where(predicate);
+        var query = context.Set<T>().Where(predicate);
 
         if (withIncludes)
         {
@@ -72,15 +72,15 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
         return await query.ToArrayAsync(ct);
     }
 
-    public async Task Update(T entity, CancellationToken ct)
+    public virtual async Task Update(T entity, CancellationToken ct)
     {
-        var entry = context.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == entity.Id, ct);
+        var entityToUpdate = await context.Set<T>().FirstOrDefaultAsync(e => e.Id == entity.Id);
 
-        if (entry is null)
+        if (entityToUpdate is null)
         {
             throw new EntityNotFoundException(typeof(T), entity.Id);
         }
-        context.Set<T>().Update(entity);
+        context.Set<T>().Entry(entityToUpdate).CurrentValues.SetValues(entity);
         await context.SaveChangesAsync(ct);
     }
 }

@@ -20,8 +20,8 @@ public class CustomersController(
     [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<CustomerShortResponse>>> Get(CancellationToken ct)
     {
-        var customer = await customerRepository.GetAll(ct: ct);
-        return Ok(customer.Select(CustomersMapper.ToCustomerShortResponse));
+        var customer = await customerRepository.GetAll(withIncludes: true, ct: ct);
+        return Ok(customer.Select(CustomersMapper.ToCustomerShortResponse).ToArray());
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class CustomersController(
         {
             return NotFound(new ProblemDetails { Title = "Invalid Id", Detail = $"Customer with Id {id} not found." });
         }
-        var customerRelatedPromoCodes = await promoCodeRepository.GetByRangeId(customer.CustomerPromoCodes.Select(cpc => cpc.PromoCodeId), ct: ct);
+        var customerRelatedPromoCodes = await promoCodeRepository.GetByRangeId(customer.CustomerPromoCodes.Select(cpc => cpc.PromoCodeId), withIncludes: true, ct: ct);
         var customerResponse = CustomersMapper.ToCustomerResponse(
             customer,
             customer.CustomerPromoCodes.Join(customerRelatedPromoCodes, cpc => cpc.PromoCodeId, crpc => crpc.Id, (cpc, crpc) => (cpc, crpc))
@@ -80,7 +80,7 @@ public class CustomersController(
         [FromBody] CustomerUpdateRequest request,
         CancellationToken ct)
     {
-        var customer = await customerRepository.GetById(id, ct: ct);
+        var customer = await customerRepository.GetById(id, withIncludes: true, ct: ct);
         var preferences = await preferenceRepository.GetByRangeId(request.PreferenceIds, ct: ct);
 
         if (customer is null)
@@ -91,7 +91,7 @@ public class CustomersController(
         {
             return BadRequest(new ProblemDetails { Title = "Invalid preference Ids", Detail = $"No preference was found." });
         }
-        var updatedCustomer = CustomersMapper.ToCustomer(request, preferences);
+        var updatedCustomer = CustomersMapper.ToCustomer(id, request, preferences);
         await customerRepository.Update(updatedCustomer, ct);
         return Ok(CustomersMapper.ToCustomerShortResponse(updatedCustomer));
     }

@@ -29,15 +29,15 @@ public static class CustomersMapper
             );
     }
 
-    public static Customer ToCustomer(CustomerUpdateRequest request, IEnumerable<Preference> preferences)
+    public static Customer ToCustomer(Guid id, CustomerUpdateRequest request, IEnumerable<Preference> preferences)
     {
         return new Customer
         {
-            Id = Guid.NewGuid(),
+            Id = id,
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            Preferences = preferences.ToArray(),
+            Preferences = preferences.ToList(),
         };
     }
 
