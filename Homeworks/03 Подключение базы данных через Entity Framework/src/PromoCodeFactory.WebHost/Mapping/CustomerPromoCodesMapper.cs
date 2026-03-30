@@ -7,7 +7,7 @@ public static class CustomerPromoCodesMapper
     public static CustomerPromoCodeResponse ToCustomerPromoCodeResponse(CustomerPromoCode customerPromoCode, PromoCode promoCode)
     {
         return new CustomerPromoCodeResponse(
-            customerPromoCode.Id,
+            promoCode.Id,
             promoCode.Code,
             promoCode.ServiceInfo,
             promoCode.PartnerName,
