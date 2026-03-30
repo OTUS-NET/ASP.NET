@@ -21,7 +21,7 @@ public class PromoCodesController(
     [ProducesResponseType(typeof(IEnumerable<PromoCodeShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PromoCodeShortResponse>>> Get(CancellationToken ct)
     {
-        var promoCodes = await promoCodeRepository.GetAll(ct: ct);
+        var promoCodes = await promoCodeRepository.GetAll(withIncludes: true, ct: ct);
         return Ok(promoCodes.Select(PromoCodesMapper.ToPromoCodeShortResponse));
     }
 
@@ -33,7 +33,7 @@ public class PromoCodesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PromoCodeShortResponse>> GetById(Guid id, CancellationToken ct)
     {
-        var promoCode = await promoCodeRepository.GetById(id, ct: ct);
+        var promoCode = await promoCodeRepository.GetById(id, withIncludes: true, ct: ct);
 
         if (promoCode is null)
         {
@@ -92,7 +92,7 @@ public class PromoCodesController(
         [FromBody] PromoCodeApplyRequest request,
         CancellationToken ct)
     {
-        if(await promoCodeRepository.GetById(id, ct: ct) is null)
+        if (await promoCodeRepository.GetById(id, ct: ct) is null)
         {
             return NotFound(new ProblemDetails { Title = "Invalid promo code id", Detail = $"There is no such promo code with id {id}." });
         }
