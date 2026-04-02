@@ -1,16 +1,19 @@
 using PromoCodeFactory.DataAccess;
 var builder = WebApplication.CreateBuilder();
 
-builder.Services.AddDataAccess();
+var services = builder.Services;
 
-builder.Services.AddProblemDetails();
-builder.Services.AddRouting(options =>
+services.AddDataAccess();
+services.AddProblemDetails();
+services.AddRouting(options =>
 {
     options.LowercaseUrls = true;
 });
-builder.Services.AddControllers();
+services.AddControllers();
+services.AddOpenApi(builder.Environment);
 
-builder.Services.AddOpenApi(builder.Environment);
+// Tune Custom ValidationFailed
+services.ConfigureValidationFailed();
 
 var app = builder.Build();
 

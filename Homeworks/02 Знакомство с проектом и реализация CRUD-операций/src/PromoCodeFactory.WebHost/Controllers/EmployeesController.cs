@@ -34,7 +34,13 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employe = await employeeRepository.GetById(id, ct);
+
+        if (employe == null) return NotFound();
+
+        var employeeModel = Mapper.ToEmployeeResponse(employe);
+
+        return Ok(employeeModel);
     }
 
     /// <summary>
@@ -43,9 +49,24 @@ public class EmployeesController(
     [HttpPost]
     [ProducesResponseType(typeof(EmployeeResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
+    public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request,
+        CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+
+        if (role == null)
+            return Problem(
+                title: "Create Employee canceled.",
+                detail: $"Role {request.RoleId} does not exist",
+                statusCode: StatusCodes.Status400BadRequest);
+
+        var newEntity = Mapper.ToEmployee(request, role);
+
+        await employeeRepository.Add(newEntity, ct);
+
+        var employeeModel = Mapper.ToEmployeeResponse(newEntity);
+
+        return CreatedAtAction(nameof(GetById), new { id = newEntity.Id }, employeeModel);
     }
 
     /// <summary>
@@ -60,7 +81,38 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+
+        if (role == null)
+            return Problem(
+                title: "Update Employee canceled.",
+                detail: $"Role {request.RoleId} does not exist",
+                statusCode: StatusCodes.Status400BadRequest);
+
+        var updatedEntity = new Employee
+        {
+            Id = id,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            Role = role
+        };
+
+        try
+        {
+            await employeeRepository.Update(updatedEntity, ct);
+        }
+        catch (EntityNotFoundException<Employee>)
+        {
+            return Problem(
+                title: "Update Employee canceled.",
+                detail: $"Employee Id {id} does not exist",
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
+        var employeeModel = Mapper.ToEmployeeResponse(updatedEntity);
+
+        return Ok(employeeModel);
     }
 
     /// <summary>
@@ -73,6 +125,18 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await employeeRepository.Delete(id, ct);
+        }
+        catch (EntityNotFoundException<Employee>)
+        {
+            return Problem(
+                title: "Delete Employee canceled.",
+                detail: $"Employee Id {id} does not exist",
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
+        return NoContent();
     }
 }
