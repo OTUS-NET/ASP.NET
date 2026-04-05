@@ -2,6 +2,11 @@ name: CI
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Homeworks/06 Настройка CI/**'
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/promocode-factory-api
@@ -25,9 +30,7 @@ jobs:
       - name: Build SDK image
         run: docker build --target build -t sdk-build -f Dockerfile .
 
-      - name: Run tests in Docker
-        id: run-tests
-        continue-on-error: true
+      - name: Run tests
         run: |
           mkdir -p "${{ github.workspace }}/test-results"
           docker run --rm \
@@ -38,7 +41,7 @@ jobs:
               --logger "trx;LogFileName=test-results.trx" \
               --results-directory /test-results
 
-      - name: Upload test results artifact
+      - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -53,15 +56,11 @@ jobs:
           path: test-results/**/*.trx
           reporter: dotnet-trx
 
-      - name: Fail pipeline if tests failed
-        if: steps.run-tests.outcome == 'failure'
-        run: exit 1
-
       - name: Set up Docker Buildx
         if: github.event_name == 'push'
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to GHCR
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
@@ -69,7 +68,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Docker
+      - name: Docker metadata
         if: github.event_name == 'push'
         id: meta
         uses: docker/metadata-action@v5
@@ -80,11 +79,11 @@ jobs:
             type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build & push image
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
-          context: Homeworks/05 Упаковка в docker/src
+          context: Homeworks/06 Настройка CI/src
           target: final
           push: true
           tags: ${{ steps.meta.outputs.tags }}
