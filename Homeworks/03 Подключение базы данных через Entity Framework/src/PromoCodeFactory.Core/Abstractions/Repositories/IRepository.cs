@@ -6,7 +6,7 @@ namespace PromoCodeFactory.Core.Abstractions.Repositories;
 
 public interface IRepository<T> where T : BaseEntity
 {
-    Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default);
+    Task<IReadOnlyCollection<T>> GetAll(CancellationToken ct = default, bool withIncludes = false);
 
     Task<T?> GetById(Guid id, bool withIncludes = false, CancellationToken ct = default);
 

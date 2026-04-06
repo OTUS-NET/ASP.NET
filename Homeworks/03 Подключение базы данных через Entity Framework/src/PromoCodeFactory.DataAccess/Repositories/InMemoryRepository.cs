@@ -15,7 +15,7 @@ internal class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
         _data = new ConcurrentDictionary<Guid, T>(data.Select(e => new KeyValuePair<Guid, T>(e.Id, e)));
     }
 
-    public Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
+    public Task<IReadOnlyCollection<T>> GetAll(CancellationToken ct = default, bool withIncludes = false)
     {
         return Task.FromResult((IReadOnlyCollection<T>)_data.Values);
     }
