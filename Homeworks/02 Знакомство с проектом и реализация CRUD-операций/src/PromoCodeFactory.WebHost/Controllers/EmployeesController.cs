@@ -34,7 +34,11 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+        if (employee == null)
+            return NotFound();
+
+        return Ok(Mapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -45,7 +49,17 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role == null)
+            return BadRequest();
+
+        var employee = Mapper.ToEmployee(request, role);
+        await employeeRepository.Add(employee, ct);
+
+        return CreatedAtAction(nameof(GetById), new { id = employee.Id }, Mapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -60,7 +74,32 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role == null)
+            return BadRequest();
+
+        try
+        {
+            var employee = new Employee
+            {
+                Id = id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Role = role,
+                AppliedPromocodesCount = 0
+            };
+            await employeeRepository.Update(employee, ct);
+            
+            return Ok(Mapper.ToEmployeeResponse(employee));
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     /// <summary>
@@ -73,6 +112,14 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await employeeRepository.Delete(id, ct);
+            return NoContent();
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound();
+        }
     }
 }
