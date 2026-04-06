@@ -1,19 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { increment, decrement, incrementByAmount, fetchRandomNumber } from '../store/counterSliceAsync';
 
 const Counter: React.FC = () => {
-  const count = useSelector((state: RootState) => state.counter.value);
-  const status = useSelector((state: RootState) => state.counter.status);
-  const error = useSelector((state: RootState) => state.counter.error);
+  const count = useSelector((state: RootState) => state.counterAsync.value);
+  const status = useSelector((state: RootState) => state.counterAsync.status);
+  const error = useSelector((state: RootState) => state.counterAsync.error);
   const dispatch: AppDispatch = useDispatch();
-
-  // Загружаем случайное число при монтировании компонента с помощью useEffect
-  useEffect(() => {
-    dispatch(fetchRandomNumber());
-  }, [dispatch]);
-
+ 
   return (
     <div>
       <h1>Счетчик: {count}</h1>
@@ -25,7 +20,7 @@ const Counter: React.FC = () => {
       <button onClick={() => dispatch(decrement())}>Уменьшить</button>
       <button onClick={() => dispatch(incrementByAmount(5))}>Увеличить на 5</button>
       {/* Кнопка для повторной загрузки случайного числа */}
-      <button onClick={() => dispatch(fetchRandomNumber())}>Загрузить случайное число</button>
+      <button onClick={() => dispatch(fetchRandomNumber())}>Загрузить случайное число (Async)</button>
     </div>
   );
 };

@@ -9,7 +9,7 @@ interface CounterStateAsync {
 
 // Начальное состояние счетчика
 const initialState: CounterStateAsync = {
-  value: 0,
+  value: 2,
   status: 'idle',
   error: null,
 };
@@ -34,7 +34,7 @@ export const fetchRandomNumber = createAsyncThunk(
 
 // Создаем слайс (slice) для счетчика
 const counterSliceAsync = createSlice({
-  name: 'counter',
+  name: 'counterAsync',
   initialState,
   reducers: {
     increment: (state) => {

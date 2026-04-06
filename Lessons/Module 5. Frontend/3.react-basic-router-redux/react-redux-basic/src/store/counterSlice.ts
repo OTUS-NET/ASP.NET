@@ -7,7 +7,7 @@ interface CounterState {
 
 // initialState — это начальное состояние счетчика
 const initialState: CounterState = {
-  value: 0,
+  value: 1,
 };
 
 //Слайс — это часть хранилища, которая содержит редьюсер и действия
