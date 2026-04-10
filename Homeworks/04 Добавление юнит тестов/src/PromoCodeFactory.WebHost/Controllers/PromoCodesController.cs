@@ -108,10 +108,10 @@ public class PromoCodesController(
             }).ToList()
         };
 
-        foreach (var cpc in promoCode.CustomerPromoCodes)
+/*        foreach (var cpc in promoCode.CustomerPromoCodes)
         {
             cpc.PromoCodeId = promoCode.Id;
-        }
+        }*/
 
         await promoCodesRepository.Add(promoCode, ct);
 
