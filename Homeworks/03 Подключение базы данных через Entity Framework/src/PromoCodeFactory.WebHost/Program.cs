@@ -26,7 +26,7 @@ app.MapControllers();
 
 app.MigrateDatabase();
 
-if (app.Environment.IsDevelopment())
-    await app.SeedDatabase();
+//if (app.Environment.IsDevelopment())
+//    await app.SeedDatabase();
 
 app.Run();

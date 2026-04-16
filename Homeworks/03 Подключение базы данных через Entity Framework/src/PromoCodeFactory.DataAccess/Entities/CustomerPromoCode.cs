@@ -1,6 +1,8 @@
-namespace PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Core.Domain;
 
-public class CustomerPromoCode : BaseEntity
+namespace PromoCodeFactory.DataAccess.Entities;
+
+public class CustomerPromoCode: BaseEntity
 {
     public Guid CustomerId { get; set; }
     public Guid PromoCodeId { get; set; }

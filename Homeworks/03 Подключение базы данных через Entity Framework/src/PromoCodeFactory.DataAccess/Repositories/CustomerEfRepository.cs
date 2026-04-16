@@ -9,6 +9,11 @@ internal class CustomerEfRepository(PromoCodeFactoryDbContext context) : EfRepos
     {
         return query
             .Include(c => c.Preferences)
-            .Include(c => c.CustomerPromoCodes);
+            .Include(c => c.CustomerPromoCodes)
+                .ThenInclude(cp => cp.PromoCode)
+                    .ThenInclude(pc => pc.PartnerManager)
+            .Include(c => c.CustomerPromoCodes)
+                .ThenInclude(cp => cp.PromoCode)
+                    .ThenInclude(pc => pc.Preference);
     }
 }
