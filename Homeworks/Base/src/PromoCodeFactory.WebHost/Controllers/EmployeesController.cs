@@ -70,5 +70,69 @@ namespace PromoCodeFactory.WebHost.Controllers
 
             return employeeModel;
         }
+
+        /// <summary>
+        /// Создать сотрудника
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] Employee employee)
+        {
+            var createdEmployee = await _employeeRepository.CreateAsync(employee);
+
+            var employeeModel = new EmployeeResponse()
+            {
+                Id = createdEmployee.Id,
+                FullName = createdEmployee.FullName,
+                Email = createdEmployee.Email,
+                Roles = createdEmployee.Roles.Select(x => new RoleItemResponse()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description
+                }).ToList(),
+                AppliedPromocodesCount = createdEmployee.AppliedPromocodesCount
+            };
+
+            return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { id = createdEmployee.Id }, employeeModel);
+        }
+
+        /// <summary>
+        /// Обновить данные сотрудника
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        [HttpPut("id:guid")]
+        public async Task<ActionResult> UpdateEmployeeAsync(Guid id, [FromBody] Employee employee)
+        {
+            employee.Id = id;
+
+            var updated = await _employeeRepository.UpdateAsync(employee);
+
+            if (!updated)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> DeleteEmployeeAsync(Guid id)
+        {
+            var deleted = await _employeeRepository.DeleteAsync(id);
+
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
+
+
     }
 }
