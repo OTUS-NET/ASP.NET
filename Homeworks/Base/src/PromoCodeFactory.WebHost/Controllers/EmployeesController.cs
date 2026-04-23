@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -28,19 +29,28 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<List<EmployeeShortResponse>> GetEmployeesAsync()
+        public async Task<ActionResult<List<EmployeeShortResponse>>> GetEmployeesAsync()
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            try
+            {
+                var employees = await _employeeRepository.GetAllAsync();
 
-            var employeesModelList = employees.Select(x =>
-                new EmployeeShortResponse()
-                {
-                    Id = x.Id,
-                    Email = x.Email,
-                    FullName = x.FullName,
-                }).ToList();
+                var employeesModelList = employees.Select(x =>
+                    new EmployeeShortResponse()
+                    {
+                        Id = x.Id,
+                        Email = x.Email,
+                        FullName = x.FullName,
+                    }).ToList();
 
-            return employeesModelList;
+                return Ok(employeesModelList);
+            }
+            catch(Exception)
+            {
+                return Problem(
+                    title: "Ошибка при получении списка сотрудников",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -50,25 +60,34 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<EmployeeResponse>> GetEmployeeByIdAsync(Guid id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
-                return NotFound();
-
-            var employeeModel = new EmployeeResponse()
+            try
             {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
+                var employee = await _employeeRepository.GetByIdAsync(id);
 
-            return employeeModel;
+                if (employee == null)
+                    return NotFound();
+
+                var employeeModel = new EmployeeResponse()
+                {
+                    Id = employee.Id,
+                    Email = employee.Email,
+                    Roles = employee.Roles.Select(x => new RoleItemResponse()
+                    {
+                        Name = x.Name,
+                        Description = x.Description
+                    }).ToList(),
+                    FullName = employee.FullName,
+                    AppliedPromocodesCount = employee.AppliedPromocodesCount
+                };
+
+                return Ok(employeeModel);
+            }
+            catch (Exception)
+            {
+                return Problem(
+                    title: "Ошибка при получении данных сотрудника", 
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -79,23 +98,32 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpPost]
         public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync([FromBody] Employee employee)
         {
-            var createdEmployee = await _employeeRepository.CreateAsync(employee);
-
-            var employeeModel = new EmployeeResponse()
+            try
             {
-                Id = createdEmployee.Id,
-                FullName = createdEmployee.FullName,
-                Email = createdEmployee.Email,
-                Roles = createdEmployee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                AppliedPromocodesCount = createdEmployee.AppliedPromocodesCount
-            };
+                var createdEmployee = await _employeeRepository.CreateAsync(employee);
 
-            return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { id = createdEmployee.Id }, employeeModel);
+                var employeeModel = new EmployeeResponse()
+                {
+                    Id = createdEmployee.Id,
+                    FullName = createdEmployee.FullName,
+                    Email = createdEmployee.Email,
+                    Roles = createdEmployee.Roles.Select(x => new RoleItemResponse()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description
+                    }).ToList(),
+                    AppliedPromocodesCount = createdEmployee.AppliedPromocodesCount
+                };
+
+                return CreatedAtAction(nameof(GetEmployeeByIdAsync), new { id = createdEmployee.Id }, employeeModel);
+            }
+            catch(Exception) 
+            {
+                return Problem(
+                    title: "Ошибка при создании сотрудника",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -104,17 +132,26 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <param name="id"></param>
         /// <param name="employee"></param>
         /// <returns></returns>
-        [HttpPut("id:guid")]
+        [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateEmployeeAsync(Guid id, [FromBody] Employee employee)
         {
-            employee.Id = id;
+            try
+            {
+                employee.Id = id;
 
-            var updated = await _employeeRepository.UpdateAsync(employee);
+                var updated = await _employeeRepository.UpdateAsync(employee);
 
-            if (!updated)
-                return NotFound();
+                if (!updated)
+                    return NotFound();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch(Exception)
+            {
+                return Problem(
+                    title: "Ошибка при обновлении сотрудника",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -125,12 +162,21 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteEmployeeAsync(Guid id)
         {
-            var deleted = await _employeeRepository.DeleteAsync(id);
+            try
+            {
+                var deleted = await _employeeRepository.DeleteAsync(id);
 
-            if (!deleted)
-                return NotFound();
+                if (!deleted)
+                    return NotFound();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return Problem(
+                    title: "Ошибка при удалении сотрудника",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
 
 
