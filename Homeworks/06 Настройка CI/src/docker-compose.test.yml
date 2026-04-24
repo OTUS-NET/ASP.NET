@@ -1,0 +1,30 @@
+name: HW06_promocode_GHCR
+services:
+  promocode-factory-api_ghcr:
+    image: ghcr.io/goodman74/asp.net.otus:latest
+    #container_name: 'promocode-factory-api-ghcr'
+    restart: always
+    ports:
+      - "8099:8080"
+    volumes:
+      - db:/app/db
+    environment:
+      - "ConnectionStrings:PromocodeFactoryDb=Filename=/app/db/PromoCodeFactoryDb.sqlite"
+      - "ASPNETCORE_ENVIRONMENT=Development"
+
+  smoke:
+    image: curlimages/curl:latest
+    depends_on:
+      - promocode-factory-api_ghcr
+    command: >
+      sh -c "
+      echo 'Waiting before smoke test 5 sec ...';
+      sleep 5;
+      for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20;
+      do curl -f http://promocode-factory-api_ghcr:8080/api/v1/roles && exit 0;
+      sleep 1;
+      done;
+      exit 1"
+
+volumes:
+  db:

@@ -26,14 +26,8 @@ COPY ./PromoCodeFactory.UnitTests/ ./PromoCodeFactory.UnitTests/
 
 RUN dotnet build -c $BUILD_CONFIGURATION --no-restore
 
-# ---------- test ----------
-FROM build AS test
-RUN dotnet test --no-build --no-restore -c Release --collect:"XPlat Code Coverage" --settings PromoCodeFactory.UnitTests/coverage.runsettings \
-        --logger "trx" --results-directory /test-results
-
 # ---------- publish ----------
-FROM test AS publish
-ARG BUILD_CONFIGURATION=Release
+FROM build AS publish
 RUN dotnet publish ./PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj \
     -c $BUILD_CONFIGURATION -o /app/publish --no-build --no-restore
 

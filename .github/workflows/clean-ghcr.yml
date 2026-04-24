@@ -1,0 +1,22 @@
+name: Cleanup GHCR
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 0'
+
+permissions:
+  packages: write
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Keep last 5 images (prune others)
+        uses: actions/delete-package-versions@v5
+        with:
+            package-name: asp.net.otus
+            package-type: container
+            min-versions-to-keep: 5

@@ -1,6 +1,8 @@
+name: HW06_promocode
 services:
   promocode-factory-api:
-    build: src/
+    build:
+      context: .
     container_name: 'promocode-factory-api'
     restart: always
     ports:
@@ -10,6 +12,6 @@ services:
     environment:
       - "ConnectionStrings:PromocodeFactoryDb=Filename=/app/db/PromoCodeFactoryDb.sqlite"
       - "ASPNETCORE_ENVIRONMENT=Development"
-      
+
 volumes:
   db:

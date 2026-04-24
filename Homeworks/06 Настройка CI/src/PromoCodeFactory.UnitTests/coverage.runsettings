@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          
+          <!-- Формат -->
+          <Format>cobertura</Format>
+
+          <!-- Исключаем мусор -->
+          <ExcludeByFile>**/obj/**,**/bin/**,**/*.g.cs,**/*.generated.cs</ExcludeByFile>
+
+          <!-- (опционально) исключение по namespace/типам -->
+          <Exclude>
+            [*]Program
+          </Exclude>
+
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

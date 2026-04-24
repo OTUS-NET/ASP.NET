@@ -25,8 +25,6 @@
 **/values.dev.yaml
 LICENSE
 README.md
-!**/.gitignore
-!.git/HEAD
-!.git/config
-!.git/packed-refs
-!.git/refs/heads/**
+# Исключаем локальные артефакты (если есть)
+**/publish/
+**/TestResults/

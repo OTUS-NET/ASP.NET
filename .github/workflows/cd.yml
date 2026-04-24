@@ -1,0 +1,31 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+      inputs:
+          image_tag:
+            description: 'Tag to deploy'
+            required: true
+            default: 'latest'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: goodman74/asp.net.otus
+
+jobs:
+  cd-main-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull image
+        run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.image_tag }}
+
+      - name: Run container
+        run: docker run -d -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.image_tag }}
+
+      - name: Health check
+        run: |
+          for i in {1..20}; do
+            curl -f http://localhost:8080/api/v1/roles && exit 0
+            sleep 1
+          done
+          exit 1

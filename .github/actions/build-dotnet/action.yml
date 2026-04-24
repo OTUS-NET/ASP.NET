@@ -1,0 +1,37 @@
+name: build-dotnet
+description: ".NET restore + build"
+
+inputs:
+  project-dir:
+    description: "Project working directory"
+    required: true
+
+runs:
+    using: composite
+    steps:
+      - name: Setup .NET SDK (from global.json)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: '${{ inputs.project-dir }}/global.json'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles(format('{0}/**/*.csproj', inputs.project-dir), format('{0}/global.json', inputs.project-dir)) }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Clean Release
+        run: dotnet clean --configuration Release
+        shell: bash
+        working-directory: ${{ inputs.project-dir }}
+
+      - name: Restore
+        run: dotnet restore
+        shell: bash
+        working-directory: ${{ inputs.project-dir }}
+
+      - name: Build Release (warnings as errors)
+        run: dotnet build --configuration Release --no-restore -warnaserror
+        shell: bash
+        working-directory: ${{ inputs.project-dir }}
