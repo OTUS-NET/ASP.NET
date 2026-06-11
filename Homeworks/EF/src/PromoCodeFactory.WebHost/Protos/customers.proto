@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "PromoCodeFactory.WebHost.Grpc";
+
+package customers;
+
+service CustomersGrpc {
+  rpc GetCustomers (GetCustomersRequest) returns (GetCustomersResponse);
+  rpc GetCustomerById (GetCustomerByIdRequest) returns (CustomerGrpcResponse);
+}
+
+message GetCustomersRequest {
+}
+
+message GetCustomerByIdRequest {
+  string id = 1;
+}
+
+message GetCustomersResponse {
+  repeated CustomerShortGrpcResponse customers = 1;
+}
+
+message CustomerShortGrpcResponse {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+}
+
+message CustomerGrpcResponse {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  repeated PreferenceGrpcResponse preferences = 5;
+  repeated PromoCodeGrpcResponse promoCodes = 6;
+}
+
+message PreferenceGrpcResponse {
+  string id = 1;
+  string name = 2;
+}
+
+message PromoCodeGrpcResponse {
+  string id = 1;
+  string code = 2;
+  string serviceInfo = 3;
+  string beginDate = 4;
+  string endDate = 5;
+  string partnerName = 6;
+}

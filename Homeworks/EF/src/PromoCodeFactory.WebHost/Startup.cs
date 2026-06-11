@@ -8,6 +8,8 @@ using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
+using PromoCodeFactory.WebHost.GrpcServices;
+using PromoCodeFactory.WebHost.GraphQL;
 
 namespace PromoCodeFactory.WebHost
 {
@@ -23,6 +25,14 @@ namespace PromoCodeFactory.WebHost
                 options.UseSqlite("Data Source=promocodefactory.db"));
 
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+
+            services.AddGrpc();
+
+            services.AddGrpcReflection();
+
+            services
+                .AddGraphQLServer()
+                .AddQueryType<CustomersQuery>();
 
             services.AddOpenApiDocument(options =>
             {
@@ -62,6 +72,9 @@ namespace PromoCodeFactory.WebHost
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGrpcService<CustomersGrpcService>();
+                endpoints.MapGrpcReflectionService();
+                endpoints.MapGraphQL();
             });
         }
     }

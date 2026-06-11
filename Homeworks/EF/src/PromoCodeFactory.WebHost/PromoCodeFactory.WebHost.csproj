@@ -12,7 +12,14 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Grpc.AspNetCore" Version="2.80.0" />
+      <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.80.0" />
+      <PackageReference Include="HotChocolate.AspNetCore" Version="16.1.3" />
       <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
     </ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Protos\customers.proto" GrpcServices="Server" />
+	</ItemGroup>
 
 </Project>
