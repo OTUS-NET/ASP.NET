@@ -93,11 +93,12 @@ public class EmployeesController(
         {
             await employeeRepository.Update(new Employee()
             {
+                Id = employee.Id,
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 Role = role,
-                AppliedPromocodesCount = 0
+                AppliedPromocodesCount = employee.AppliedPromocodesCount,
             }, ct);
 
             return Ok();
