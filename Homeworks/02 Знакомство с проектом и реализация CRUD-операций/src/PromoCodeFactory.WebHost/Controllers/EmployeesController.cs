@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.WebHost.Mapping;
 using PromoCodeFactory.WebHost.Models;
+using System.Diagnostics.Eventing.Reader;
+using System.Reflection.Metadata.Ecma335;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
@@ -34,7 +37,9 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+
+        return employee != null ? Ok(Mapper.ToEmployeeResponse(employee)) : NotFound();
     }
 
     /// <summary>
@@ -45,7 +50,23 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+
+        if (role != null)
+        {
+            try
+            {
+                await employeeRepository.Add(Mapper.ToEmployee(request, role), ct);
+
+                return Created();
+            }
+            catch (BadHttpRequestException)
+            {
+                return BadRequest();
+            }
+        }
+        else
+            return NotFound();
     }
 
     /// <summary>
@@ -60,7 +81,33 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+
+        var employee = await employeeRepository.GetById(id, ct);
+
+        var role = await roleRepository.GetById(request.RoleId, ct);
+
+        if (employee == null || role == null)
+            return NotFound();
+
+        try
+        {
+            await employeeRepository.Update(new Employee()
+            {
+                Id = employee.Id,
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Role = role,
+                AppliedPromocodesCount = employee.AppliedPromocodesCount,
+            }, ct);
+
+            return Ok();
+        }
+        catch (BadHttpRequestException)
+        {
+            return BadRequest();
+        }
+
     }
 
     /// <summary>
@@ -73,6 +120,16 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await employeeRepository.Delete(id, ct);
+
+            return NoContent();
+        }
+        catch (EntityNotFoundException)
+        {
+            return NotFound();
+        }
+
     }
 }
