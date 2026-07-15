@@ -19,7 +19,9 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task<T?> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        _data.TryGetValue(id, out var entity);
+
+        return Task.FromResult(entity);
     }
 
     public Task Add(T entity, CancellationToken ct)
