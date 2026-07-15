@@ -97,6 +97,8 @@ public class EmployeesController(
         employee.Email = request.Email;
         employee.Role = role;
 
+        await employeeRepository.Update(employee, ct);
+
         return Ok(Mapper.ToEmployeeResponse(employee));
     }
 

@@ -27,7 +27,8 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task Add(T entity, CancellationToken ct)
     {
-        _data.TryAdd(entity.Id, entity);
+        if(!_data.TryAdd(entity.Id, entity))
+            throw new EntityNotFoundException<T>(entity.Id);
 
         return Task.CompletedTask;
     }
