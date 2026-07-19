@@ -11,6 +11,7 @@ public static class DependencyInjection
 {
     public static void AddInMemoryDataAccess(this IServiceCollection services)
     {
+     /*  
         services.AddSingleton<IRepository<Employee>>(_ =>
             new InMemoryRepository<Employee>(SeedData.Employees));
         services.AddSingleton<IRepository<Preference>>(_ =>
@@ -23,6 +24,7 @@ public static class DependencyInjection
             new InMemoryRepository<PromoCode>(SeedData.PromoCodes));
         services.AddSingleton<IRepository<CustomerPromoCode>>(_ =>
             new InMemoryRepository<CustomerPromoCode>(SeedData.CustomerPromoCodes));
+        */
     }
 
     public static void AddEfDataAccess(this IServiceCollection services)
