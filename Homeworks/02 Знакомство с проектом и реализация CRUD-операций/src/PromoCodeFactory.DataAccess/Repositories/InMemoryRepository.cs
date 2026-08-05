@@ -20,6 +20,9 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task<T?> GetById(Guid id, CancellationToken ct)
     {
+        if (!_data.ContainsKey(id))
+            throw new EntityNotFoundException<T>(id);
+
         return Task.FromResult(_data.GetValueOrDefault(id));
     }
 
@@ -30,7 +33,10 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task Update(T entity, CancellationToken ct)
     {
-        return Task.FromResult(_data.AddOrUpdate(entity.Id, entity, (k, v) => entity));
+        if (!_data.ContainsKey(entity.Id))
+            throw new EntityNotFoundException<T>(entity.Id);
+
+       return Task.FromResult(_data.AddOrUpdate(entity.Id, entity, (k, v) => entity));
     }
 
     public Task Delete(Guid id, CancellationToken ct)

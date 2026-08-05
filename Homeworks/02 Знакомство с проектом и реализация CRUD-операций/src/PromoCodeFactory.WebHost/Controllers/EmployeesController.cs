@@ -34,12 +34,16 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        var employee = await employeeRepository.GetById(id, ct);
+        try
+        {
+            var employee = await employeeRepository.GetById(id, ct);
 
-        if (employee == null)
+            return Ok(employee);
+        }
+        catch (EntityNotFoundException)
+        {
             return NotFound();
-
-        return Ok(employee);
+        }
     }
 
     /// <summary>
@@ -48,20 +52,29 @@ public class EmployeesController(
     [HttpPost]
     [ProducesResponseType(typeof(EmployeeResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
+    public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request,
+        CancellationToken ct)
     {
-        var role = await roleRepository.GetById(request.RoleId, ct);
+        Role? role;
 
-        if(role == null)
+        try
+        {
+            role = await roleRepository.GetById(request.RoleId, ct);
+        }
+        catch (EntityNotFoundException)
+        {
             return BadRequest();
+        }
 
         var employee = new Employee()
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            Role = role
+            Role = role!
         };
+
+        await employeeRepository.Add(employee, ct);
 
         return Ok(Mapper.ToEmployeeResponse(employee));
     }
@@ -78,22 +91,35 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        var employee = await employeeRepository.GetById(id, ct);
+        Employee? employee;
 
-        if(employee == null)
+        try
+        {
+            employee = await employeeRepository.GetById(id, ct);
+
+            employee!.FirstName = request.FirstName;
+            employee.LastName = request.LastName;
+            employee.Email = request.Email;
+
+        }
+        catch (EntityNotFoundException)
+        {
             return NotFound();
+        }
 
-        employee.FirstName = request.FirstName;
-        employee.LastName = request.LastName;
-        employee.Email = request.Email;
+        try
+        {
+            var role = await roleRepository.GetById(request.RoleId, ct);
+            employee.Role = role!;
 
-        var role = await roleRepository.GetById(request.RoleId, ct);
-        if(role == null)
+            await employeeRepository.Update(employee, ct);
+
+            return Ok(Mapper.ToEmployeeResponse(employee));
+        }
+        catch (EntityNotFoundException)
+        {
             return BadRequest();
-
-        await employeeRepository.Update(employee, ct);
-
-        return Ok(Mapper.ToEmployeeResponse(employee));
+        }
     }
 
     /// <summary>
