@@ -1,0 +1,14 @@
+# Игнорируем SqlLite
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+
+# Игнорируем файлы сборки
+**/bin/
+**/obj/
+
+# Игонрруем файлы среды разработки
+.gitignore
+.git
+.vs
+.idea
