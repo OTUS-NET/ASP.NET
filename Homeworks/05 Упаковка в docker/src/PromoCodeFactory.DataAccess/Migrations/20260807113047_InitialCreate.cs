@@ -1,3 +1,4 @@
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -14,10 +15,10 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,8 +29,8 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "Preferences",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -40,9 +41,9 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,8 +54,8 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "CustomerPreference",
                 columns: table => new
                 {
-                    CustomersId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PreferencesId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    CustomersId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PreferencesId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,11 +78,11 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    RoleId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,25 +96,67 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Partners",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    ManagerId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Partners", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Partners_Employees_ManagerId",
+                        column: x => x.ManagerId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PartnerPromoCodeLimits",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PartnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EndAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CanceledAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Limit = table.Column<int>(type: "integer", nullable: false),
+                    IssuedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PartnerPromoCodeLimits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PartnerPromoCodeLimits_Partners_PartnerId",
+                        column: x => x.PartnerId,
+                        principalTable: "Partners",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PromoCodes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    ServiceInfo = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    BeginDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    EndDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    PartnerName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    PartnerManagerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PreferenceId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Code = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    ServiceInfo = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    BeginDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    PartnerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PreferenceId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PromoCodes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PromoCodes_Employees_PartnerManagerId",
-                        column: x => x.PartnerManagerId,
-                        principalTable: "Employees",
+                        name: "FK_PromoCodes_Partners_PartnerId",
+                        column: x => x.PartnerId,
+                        principalTable: "Partners",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -128,11 +171,11 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "CustomerPromoCodes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PromoCodeId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    AppliedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PromoCodeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    AppliedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -173,9 +216,19 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PromoCodes_PartnerManagerId",
+                name: "IX_PartnerPromoCodeLimits_PartnerId",
+                table: "PartnerPromoCodeLimits",
+                column: "PartnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Partners_ManagerId",
+                table: "Partners",
+                column: "ManagerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PromoCodes_PartnerId",
                 table: "PromoCodes",
-                column: "PartnerManagerId");
+                column: "PartnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PromoCodes_PreferenceId",
@@ -193,16 +246,22 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 name: "CustomerPromoCodes");
 
             migrationBuilder.DropTable(
+                name: "PartnerPromoCodeLimits");
+
+            migrationBuilder.DropTable(
                 name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "PromoCodes");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "Partners");
 
             migrationBuilder.DropTable(
                 name: "Preferences");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Roles");
