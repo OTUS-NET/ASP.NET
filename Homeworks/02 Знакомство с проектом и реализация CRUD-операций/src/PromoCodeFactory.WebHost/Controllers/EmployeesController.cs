@@ -34,7 +34,12 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+
+        if (employee is null)
+            return NotFound();
+
+        return Ok(Mapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -45,7 +50,19 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role is null)
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Не найдена роль",
+                Detail = $"Роль с Id = {request.RoleId} не найдена"
+            }
+            );
+
+        var employee = Mapper.ToEmployee(request, role);
+        await employeeRepository.Add(employee, ct);
+
+        return Ok(employee);
     }
 
     /// <summary>
@@ -60,7 +77,29 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+        if(employee is null)
+            return NotFound();
+
+        //проверяем роль, реализация аналогично сделанной в Create
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role is null)
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Не найдена роль",
+                Detail = $"Роль с Id = {request.RoleId} не найдена"
+            }
+            );
+
+        //обновляем данные. нужно наверное сравнивать с текущими и если есть отличия, то обновляем
+        employee.FirstName = request.FirstName;
+        employee.LastName = request.LastName;
+        employee.Email = request.Email;
+        employee.Role = role;
+
+        await employeeRepository.Update(employee, ct);
+
+        return Ok(Mapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -73,6 +112,12 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+        if (employee is null)
+            return NotFound();
+
+        await employeeRepository.Delete(id, ct);
+
+        return NoContent();
     }
 }

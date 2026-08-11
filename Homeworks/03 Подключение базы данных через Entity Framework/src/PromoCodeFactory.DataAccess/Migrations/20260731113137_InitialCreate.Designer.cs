@@ -11,7 +11,7 @@ using PromoCodeFactory.DataAccess;
 namespace PromoCodeFactory.DataAccess.Migrations
 {
     [DbContext(typeof(PromoCodeFactoryDbContext))]
-    [Migration("20260228163536_InitialCreate")]
+    [Migration("20260731113137_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,7 +32,7 @@ namespace PromoCodeFactory.DataAccess.Migrations
 
                     b.HasIndex("PreferencesId");
 
-                    b.ToTable("CustomerPreference");
+                    b.ToTable("CustomerPreference", (string)null);
                 });
 
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.Administration.Employee", b =>
@@ -132,10 +132,9 @@ namespace PromoCodeFactory.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PromoCodeId");
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("CustomerId", "PromoCodeId")
-                        .IsUnique();
+                    b.HasIndex("PromoCodeId");
 
                     b.ToTable("CustomerPromoCodes");
                 });
@@ -218,7 +217,7 @@ namespace PromoCodeFactory.DataAccess.Migrations
                     b.HasOne("PromoCodeFactory.Core.Domain.Administration.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");
@@ -244,13 +243,13 @@ namespace PromoCodeFactory.DataAccess.Migrations
                     b.HasOne("PromoCodeFactory.Core.Domain.Administration.Employee", "PartnerManager")
                         .WithMany()
                         .HasForeignKey("PartnerManagerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PromoCodeFactory.Core.Domain.PromoCodeManagement.Preference", "Preference")
                         .WithMany()
                         .HasForeignKey("PreferenceId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("PartnerManager");

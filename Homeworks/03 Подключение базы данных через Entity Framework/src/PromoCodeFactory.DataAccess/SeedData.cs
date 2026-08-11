@@ -25,7 +25,8 @@ internal static class SeedData
     [
         new Preference { Id = Guid.Parse("ef7f299f-92d7-459f-a716-22d27e0a8f86"), Name = "Театр" },
         new Preference { Id = Guid.Parse("c4bda62e-fc74-4256-a956-476641b679d2"), Name = "Семинары" },
-        new Preference { Id = Guid.Parse("76324d47-68b2-4d88-ae67-4dc65a2f3e1a"), Name = "Кинопремьеры" }
+        new Preference { Id = Guid.Parse("76324d47-68b2-4d88-ae67-4dc65a2f3e1a"), Name = "Кинопремьеры" },
+        new Preference { Id = Guid.Parse("830a054a-8049-40e2-bcb8-638b367e5d23"), Name = "Спортзалы" }
     ];
 
     public static IReadOnlyCollection<Employee> Employees { get; } =

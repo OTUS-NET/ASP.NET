@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PromoCodeFactory.DataAccess;
 
 #nullable disable
@@ -16,50 +15,46 @@ namespace PromoCodeFactory.DataAccess.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
 
             modelBuilder.Entity("CustomerPreference", b =>
                 {
                     b.Property<Guid>("CustomersId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("PreferencesId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("CustomersId", "PreferencesId");
 
                     b.HasIndex("PreferencesId");
 
-                    b.ToTable("CustomerPreference");
+                    b.ToTable("CustomerPreference", (string)null);
                 });
 
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.Administration.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -72,16 +67,16 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -92,22 +87,22 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -118,95 +113,39 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("AppliedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("PromoCodeId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("PromoCodeId");
 
-                    b.HasIndex("CustomerId", "PromoCodeId")
-                        .IsUnique();
-
                     b.ToTable("CustomerPromoCodes");
-                });
-
-            modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Partner", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("ManagerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ManagerId");
-
-                    b.ToTable("Partners");
-                });
-
-            modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.PartnerPromoCodeLimit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset?>("CanceledAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("EndAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("IssuedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Limit")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("PartnerId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PartnerId");
-
-                    b.ToTable("PartnerPromoCodeLimits");
                 });
 
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Preference", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -217,33 +156,38 @@ namespace PromoCodeFactory.DataAccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("BeginDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PartnerId")
-                        .HasColumnType("uuid");
+                    b.Property<Guid>("PartnerManagerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PartnerName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("PreferenceId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ServiceInfo")
                         .IsRequired()
                         .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PartnerId");
+                    b.HasIndex("PartnerManagerId");
 
                     b.HasIndex("PreferenceId");
 
@@ -270,7 +214,7 @@ namespace PromoCodeFactory.DataAccess.Migrations
                     b.HasOne("PromoCodeFactory.Core.Domain.Administration.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");
@@ -291,43 +235,21 @@ namespace PromoCodeFactory.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Partner", b =>
-                {
-                    b.HasOne("PromoCodeFactory.Core.Domain.Administration.Employee", "Manager")
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Manager");
-                });
-
-            modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.PartnerPromoCodeLimit", b =>
-                {
-                    b.HasOne("PromoCodeFactory.Core.Domain.PromoCodeManagement.Partner", "Partner")
-                        .WithMany("PartnerLimits")
-                        .HasForeignKey("PartnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Partner");
-                });
-
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.PromoCode", b =>
                 {
-                    b.HasOne("PromoCodeFactory.Core.Domain.PromoCodeManagement.Partner", "Partner")
+                    b.HasOne("PromoCodeFactory.Core.Domain.Administration.Employee", "PartnerManager")
                         .WithMany()
-                        .HasForeignKey("PartnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("PartnerManagerId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PromoCodeFactory.Core.Domain.PromoCodeManagement.Preference", "Preference")
                         .WithMany()
                         .HasForeignKey("PreferenceId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Partner");
+                    b.Navigation("PartnerManager");
 
                     b.Navigation("Preference");
                 });
@@ -335,11 +257,6 @@ namespace PromoCodeFactory.DataAccess.Migrations
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Customer", b =>
                 {
                     b.Navigation("CustomerPromoCodes");
-                });
-
-            modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.Partner", b =>
-                {
-                    b.Navigation("PartnerLimits");
                 });
 
             modelBuilder.Entity("PromoCodeFactory.Core.Domain.PromoCodeManagement.PromoCode", b =>

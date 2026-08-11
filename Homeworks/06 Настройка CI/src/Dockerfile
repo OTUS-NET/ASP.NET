@@ -1,3 +1,4 @@
+# Build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 ARG BUILD_CONFIGURATION=Release
@@ -5,8 +6,14 @@ WORKDIR /src
 COPY . .
 RUN dotnet restore
 RUN dotnet build -c $BUILD_CONFIGURATION --no-restore
+# Test
+FROM build AS test
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet test ./PromoCodeFactory.UnitTests/PromoCodeFactory.UnitTests.csproj \
+    -c $BUILD_CONFIGURATION --no-restore  --no-build
 
-FROM build AS publish
+# Publish
+FROM test AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish ./PromoCodeFactory.WebHost/PromoCodeFactory.WebHost.csproj \
     -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-build

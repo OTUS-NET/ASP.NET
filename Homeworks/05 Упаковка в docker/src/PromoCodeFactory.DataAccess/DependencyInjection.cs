@@ -14,9 +14,13 @@ public static class DependencyInjection
     {
         services.AddDbContext<PromoCodeFactoryDbContext>((sp, builder) =>
         {
-            var conncetionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("PromocodeFactoryDb")
-                ?? "Filename=PromoCodeFactory.sqlite";
-            builder.UseSqlite(conncetionString);
+            // var conncetionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("PromocodeFactoryDb")
+            //     ?? "Filename=PromoCodeFactory.sqlite";
+            // builder.UseSqlite(conncetionString);
+            // исправил имя
+            var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("PromocodeFactoryDb")
+                                   ?? throw new InvalidOperationException("Connection string 'PromocodeFactoryDb' not found.");
+            builder.UseNpgsql(connectionString);
         });
 
         services.AddScoped<IRepository<Employee>, EmployeeEfRepository>();

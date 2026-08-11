@@ -1,0 +1,40 @@
+﻿services:
+    promocode-factory-api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+
+        ports:
+            - "8091:8080"
+
+        environment:
+            ASPNETCORE_ENVIRONMENT: Development
+            ConnectionStrings__PromocodeFactoryDb: Host=postgres;Port=5432;Database=PromoCodeFactoryDb;Username=postgres;Password=postgres
+
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+    postgres:
+        image: postgres:16
+        container_name: promocode-factory-postgres
+
+        environment:
+            POSTGRES_DB: PromoCodeFactoryDb
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+
+        ports:
+            - "5432:5432"
+
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres -d PromoCodeFactoryDb"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    postgres_data:
