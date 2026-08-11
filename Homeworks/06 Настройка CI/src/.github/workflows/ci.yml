@@ -1,4 +1,4 @@
-name: CI/src
+name: CI
 
 on:
     push:
