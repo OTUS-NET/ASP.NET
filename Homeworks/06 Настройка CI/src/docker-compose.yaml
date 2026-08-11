@@ -1,0 +1,8 @@
+name: PromoCode_GHCR
+services:
+    promocode-factory-api:
+        image: ghcr.io/skorpk/asp.net.otus:latest
+        ports:
+            - "8091:8080"
+        environment:
+            ASPNETCORE_ENVIRONMENT: Development
