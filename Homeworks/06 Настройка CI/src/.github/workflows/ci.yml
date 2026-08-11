@@ -7,6 +7,10 @@ on:
         paths:
             - 'Homeworks/06 Настройка CI/**'
 
+    pull_request:
+        branches:
+            - main
+
     workflow_dispatch:
 
 env:
