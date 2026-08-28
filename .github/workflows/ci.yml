@@ -1,0 +1,66 @@
+name: Build and publish Docker image
+
+on:
+  # Запускаем CI при коммите в main, только если изменилось текущее домашнее задание.
+  push:
+    branches:
+      - main
+    paths:
+      - 'Homeworks/06 Настройка CI/**'
+  # Ручной запуск workflow из интерфейса GitHub Actions.
+  workflow_dispatch:
+
+permissions:
+  # Доступ на чтение коду репозитория.
+  contents: read
+  # Доступ на публикацию Docker-образа в GitHub Container Registry.
+  packages: write
+
+env:
+  # Имя образа нормализуется к нижнему регистру отдельным шагом ниже.
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/promocode-factory
+  # Dockerfile лежит внутри папки src, поэтому контекст сборки указывает туда же.
+  DOCKER_CONTEXT: 'Homeworks/06 Настройка CI/src'
+  DOCKERFILE: 'Homeworks/06 Настройка CI/src/Dockerfile'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Normalize image name
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> "$GITHUB_ENV"
+
+      # Авторизация нужна для публикации образа в ghcr.io.
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Собираем test stage из Dockerfile: внутри него запускаются unit-тесты.
+      - name: Run tests in Docker
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.DOCKER_CONTEXT }}
+          file: ${{ env.DOCKERFILE }}
+          target: test
+          push: false
+
+      # Финальный образ публикуется с тегами latest и SHA текущего коммита.
+      - name: Build and publish Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.DOCKER_CONTEXT }}
+          file: ${{ env.DOCKERFILE }}
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
