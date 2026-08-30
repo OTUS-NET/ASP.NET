@@ -1,18 +1,18 @@
 services:
   promocode-factory-api:
-    # Собираем образ локально из Dockerfile в папке src.
-    build: src/
+    # Используем образ, опубликованный workflow в GitHub Container Registry GCHR.
+    image: ghcr.io/alexey-blagov/promocode-factory:latest
     container_name: promocode-factory-api
     restart: always
     ports:
       # Открываем API на локальном порту 8091.
       - "8091:8080"
     volumes:
-      # Храним SQLite-базу в volume для локальной разработки.
+      # Храним SQLite-базу в volume, чтобы данные переживали пересоздание контейнера.
       - db:/app/db
     environment:
-      # Используем настройки окружения Development.
-      ASPNETCORE_ENVIRONMENT: Development
+      # Запускаем приложение в production-режиме.
+      ASPNETCORE_ENVIRONMENT: Production
       # Передаем строку подключения к SQLite внутри контейнера.
       ConnectionStrings__PromocodeFactoryDb: Filename=/app/db/PromoCodeFactoryDb.sqlite
 
