@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Castle.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -35,16 +33,16 @@ namespace Pcf.GivingToCustomer.WebHost
         {
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
+            services.AddScoped<IDbInitializer, MongoDbInitializer>();
+            services.AddSingleton(_ =>
             {
-                //x.UseSqlite("Filename=PromocodeFactoryGivingToCustomerDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryGivingToCustomerDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
+                return Configuration
+                    .GetSection(nameof(MongoDbSettings))
+                    .Get<MongoDbSettings>();
             });
+            services.AddSingleton<MongoContext>();
 
             services.AddOpenApiDocument(options =>
             {

@@ -15,13 +15,13 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
     public class CustomersControllerTests: IClassFixture<EfDatabaseFixture>
     {
         private readonly CustomersController _customersController;
-        private readonly EfRepository<Customer> _customerRepository;
-        private readonly EfRepository<Preference> _preferenceRepository;
+        private readonly MongoRepository<Customer> _customerRepository;
+        private readonly MongoRepository<Preference> _preferenceRepository;
         
         public CustomersControllerTests(EfDatabaseFixture efDatabaseFixture)
         {
-            _customerRepository = new EfRepository<Customer>(efDatabaseFixture.DbContext);
-            _preferenceRepository = new EfRepository<Preference>(efDatabaseFixture.DbContext);
+            _customerRepository = new MongoRepository<Customer>(efDatabaseFixture.DbContext);
+            _preferenceRepository = new MongoRepository<Preference>(efDatabaseFixture.DbContext);
             
             _customersController = new CustomersController(
                 _customerRepository, 
