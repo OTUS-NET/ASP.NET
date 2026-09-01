@@ -43,16 +43,19 @@ services:
     depends_on: 
       - promocode-factory-receiving-from-partner-db
   
-  #GivingToCustomer Db
+  # База данных микросервиса GivingToCustomer.
+  # Для этого сервиса PostgreSQL заменён на MongoDB по условию ТЗ.
   promocode-factory-giving-to-customer-db:
-    image: "postgres:latest"
+    # Используем требуемый в задании официальный образ MongoDB по ТЗ включая версию Mongo.
+    image: "mongo:4.2.3"
     container_name: 'promocode-factory-giving-to-customer-db'
     restart: always 
     ports:
-      - 5435:5432
-    environment: 
-      - POSTGRES_PASSWORD=docker
-  #GivingToCustomer Api
+      # Пробрасываем стандартный порт MongoDB наружу, чтобы сервис и тесты могли подключаться к базе локально.
+      - 27017:27017
+
+  # API микросервиса GivingToCustomer.
+  # Приложение теперь получает настройки MongoDB через секцию MongoDbSettings.
   promocode-factory-giving-to-customer-api:
     build: src/Pcf.GivingToCustomer/
     container_name: 'promocode-factory-giving-to-customer-api'
@@ -60,6 +63,10 @@ services:
     ports:
       - "8093:8080"
     environment:
-      - "ConnectionStrings:PromocodeFactoryGivingToCustomerDb=Host=promocode-factory-giving-to-customer-db;Database=promocode_factory_giving_to_customer_db;Username=postgres;Password=docker"          
+      # В docker-compose подключаемся к MongoDB по имени контейнера внутри общей docker-сети.
+      - "MongoDbSettings:ConnectionString=mongodb://promocode-factory-giving-to-customer-db:27017"
+      # Имя базы данных, где будут храниться клиенты, предпочтения и выданные промокоды.
+      - "MongoDbSettings:DatabaseName=promocode_factory_giving_to_customer_db"
     depends_on: 
+      # API должен стартовать после контейнера MongoDB.
       - promocode-factory-giving-to-customer-db

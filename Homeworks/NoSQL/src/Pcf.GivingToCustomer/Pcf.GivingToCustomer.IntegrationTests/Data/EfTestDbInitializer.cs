@@ -1,33 +1,43 @@
-﻿using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.DataAccess.Data;
 
 namespace Pcf.GivingToCustomer.IntegrationTests.Data
 {
+    /// <summary>
+    /// Инициализатор тестовой MongoDB-базы.
+    /// Имя класса сохранено прежним после миграции с EF, чтобы минимально менять существующую тестовую инфраструктуру.
+    /// </summary>
     public class EfTestDbInitializer
         : IDbInitializer
     {
-        private readonly DataContext _dataContext;
+        private readonly DataAccess.MongoContext _context;
 
-        public EfTestDbInitializer(DataContext dataContext)
+        /// <summary>
+        /// Создаёт инициализатор для указанного тестового Mongo-контекста.
+        /// </summary>
+        /// <param name="context">Mongo-контекст тестовой базы.</param>
+        public EfTestDbInitializer(DataAccess.MongoContext context)
         {
-            _dataContext = dataContext;
+            _context = context;
         }
-        
+
+        /// <summary>
+        /// Полностью очищает тестовую базу и заполняет её тестовыми предпочтениями и клиентами.
+        /// </summary>
         public void InitializeDb()
         {
-            _dataContext.Database.EnsureDeleted();
-            _dataContext.Database.EnsureCreated();
+            CleanDb();
 
-            _dataContext.AddRange(TestDataFactory.Preferences);
-            _dataContext.SaveChanges();
-            
-            _dataContext.AddRange(TestDataFactory.Customers);
-            _dataContext.SaveChanges();
+            _context.GetCollection<Core.Domain.Preference>().InsertMany(TestDataFactory.Preferences);
+            _context.GetCollection<Core.Domain.Customer>().InsertMany(TestDataFactory.Customers);
         }
 
+        /// <summary>
+        /// Удаляет тестовую MongoDB-базу целиком.
+        /// Используется перед заполнением и при освобождении fixture.
+        /// </summary>
         public void CleanDb()
         {
-            _dataContext.Database.EnsureDeleted();
+            _context.Client.DropDatabase(_context.DatabaseName);
         }
     }
 }

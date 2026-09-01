@@ -58,6 +58,9 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         {
             var customer =  await _customerRepository.GetByIdAsync(id);
 
+            if (customer == null)
+                return NotFound();
+
             var response = new CustomerResponse(customer);
 
             return Ok(response);

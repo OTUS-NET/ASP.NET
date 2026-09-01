@@ -1,0 +1,19 @@
+services:
+  promocode-factory-api:
+    # Собираем API из Dockerfile, который лежит в каталоге src.
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      # Пробрасываем порт хоста 8091 на порт контейнера 8080.
+      - "8091:8080"
+    volumes:
+      # Храним SQLite-базу в именованном Docker volume, чтобы данные переживали пересоздание контейнера.
+      - db:/app/db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__PromocodeFactoryDb: Filename=/app/db/PromoCodeFactoryDb.sqlite
+
+volumes:
+  # Именованный volume для файла базы данных приложения.
+  db:

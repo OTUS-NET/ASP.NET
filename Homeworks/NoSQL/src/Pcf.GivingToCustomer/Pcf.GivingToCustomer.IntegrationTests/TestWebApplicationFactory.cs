@@ -1,8 +1,6 @@
-﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
@@ -12,46 +10,53 @@ using Pcf.GivingToCustomer.IntegrationTests.Data;
 
 namespace Pcf.GivingToCustomer.IntegrationTests
 {
+    /// <summary>
+    /// Тестовая фабрика веб-приложения.
+    /// Переопределяет MongoDB-настройки приложения, чтобы API-тесты работали с отдельной тестовой базой.
+    /// </summary>
+    /// <typeparam name="TStartup">Startup-класс тестируемого приложения.</typeparam>
     public class TestWebApplicationFactory<TStartup>
         : WebApplicationFactory<TStartup> where TStartup: class
     {
+        /// <summary>
+        /// Настраивает тестовый web host перед запуском API-тестов.
+        /// Удаляет production Mongo-настройки из DI, добавляет тестовые настройки и заполняет тестовую базу начальными данными.
+        /// </summary>
+        /// <param name="builder">Конструктор web host, предоставленный Microsoft.AspNetCore.Mvc.Testing.</param>
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+            });
+
             builder.ConfigureServices(services =>
             {
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType ==
-                         typeof(DbContextOptions<DataContext>));
+                // Удаляем Mongo-настройки основного приложения, чтобы тесты не писали в рабочую базу.
+                var settingsDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(MongoDbSettings));
+                if (settingsDescriptor != null)
+                    services.Remove(settingsDescriptor);
 
-                services.Remove(descriptor);
+                var contextDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(MongoContext));
+                if (contextDescriptor != null)
+                    services.Remove(contextDescriptor);
 
                 services.AddScoped<INotificationGateway, NotificationGateway>();
-                
-                services.AddDbContext<DataContext>(x =>
+
+                services.AddSingleton(new MongoDbSettings
                 {
-                    x.UseSqlite("Filename=PromoCodeFactoryDb.sqlite");
-                    //x.UseNpgsql(Configuration.GetConnectionString("PromoCodeFactoryDb"));
-                    x.UseSnakeCaseNamingConvention();
-                    x.UseLazyLoadingProxies();
+                    ConnectionString = "mongodb://127.0.0.1:27017/?serverSelectionTimeoutMS=3000",
+                    DatabaseName = "promocode_factory_giving_to_customer_api_tests"
                 });
+                services.AddSingleton<MongoContext>();
 
                 var sp = services.BuildServiceProvider();
 
                 using var scope = sp.CreateScope();
                 var scopedServices = scope.ServiceProvider;
-                var dbContext = scopedServices.GetRequiredService<DataContext>();
-                var logger = scopedServices
-                    .GetRequiredService<ILogger<TestWebApplicationFactory<TStartup>>>();
-                
-                try
-                {
-                    new EfTestDbInitializer(dbContext).InitializeDb();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Проблема во время заполнения тестовой базы. " +
-                                        "Ошибка: {Message}", ex.Message);
-                }
+                var dbContext = scopedServices.GetRequiredService<MongoContext>();
+
+                new EfTestDbInitializer(dbContext).InitializeDb();
             });
         }
     }
