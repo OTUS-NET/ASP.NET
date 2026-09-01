@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Pcf.GivingToCustomer.Core.Abstractions.Gateways;
 using Pcf.GivingToCustomer.DataAccess;
 using Pcf.GivingToCustomer.Integration;
@@ -24,6 +25,11 @@ namespace Pcf.GivingToCustomer.IntegrationTests
         /// <param name="builder">Конструктор web host, предоставленный Microsoft.AspNetCore.Mvc.Testing.</param>
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+            });
+
             builder.ConfigureServices(services =>
             {
                 // Удаляем Mongo-настройки основного приложения, чтобы тесты не писали в рабочую базу.

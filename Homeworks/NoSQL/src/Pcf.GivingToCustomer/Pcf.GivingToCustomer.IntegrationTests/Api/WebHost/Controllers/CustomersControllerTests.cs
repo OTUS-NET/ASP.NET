@@ -106,7 +106,8 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Api.WebHost.Controllers
                         Id = Guid.Parse("76324c47-68d2-472d-abb8-33cfa8cc0c84"),
                         Name = "Дети",                    
                     }
-                }
+                },
+                PromoCodes = new List<PromoCodeShortResponse>()
             };
 
             //Act
@@ -120,6 +121,19 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Api.WebHost.Controllers
                 await response.Content.ReadAsStringAsync());
 
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task GetCustomerAsync_CustomerNotExisted_ShouldReturnNotFound()
+        {
+            //Arrange
+            var client = _factory.CreateClient();
+
+            //Act
+            var response = await client.GetAsync($"/api/v1/customers/{Guid.NewGuid()}");
+
+            //Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
     }
 }

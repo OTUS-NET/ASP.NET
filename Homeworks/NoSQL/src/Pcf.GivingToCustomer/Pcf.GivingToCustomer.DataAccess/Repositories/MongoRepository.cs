@@ -53,7 +53,8 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
         /// <returns>Найденная сущность или нул, если документа с таким Id нет.</returns>
         public async Task<T> GetByIdAsync(Guid id)
         {
-            var entity = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var entities = await _collection.Find(_ => true).ToListAsync();
+            var entity = entities.FirstOrDefault(x => x.Id == id);
 
             await HydrateAsync(entity);
 
@@ -68,7 +69,11 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
         /// <returns>Коллекция найденных сущностей.</returns>
         public async Task<IEnumerable<T>> GetRangeByIdsAsync(List<Guid> ids)
         {
-            var entities = await _collection.Find(x => ids.Contains(x.Id)).ToListAsync();
+            if (ids == null || ids.Count == 0)
+                return new List<T>();
+
+            var allEntities = await _collection.Find(_ => true).ToListAsync();
+            var entities = allEntities.Where(x => ids.Contains(x.Id)).ToList();
 
             await HydrateAsync(entities);
 
@@ -120,9 +125,15 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
         /// <param name="entity">Обновлённая сущность.</param>
         public async Task UpdateAsync(T entity)
         {
+            var entities = await _collection.Find(_ => true).ToListAsync();
+            var entityIndex = entities.FindIndex(x => x.Id == entity.Id);
+            if (entityIndex < 0)
+                return;
+
             PrepareForSave(entity);
 
-            await _collection.ReplaceOneAsync(x => x.Id == entity.Id, entity);
+            entities[entityIndex] = entity;
+            await ReplaceCollectionAsync(entities);
         }
 
         /// <summary>
@@ -131,7 +142,21 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
         /// <param name="entity">Удаляемая сущность.</param>
         public async Task DeleteAsync(T entity)
         {
-            await _collection.DeleteOneAsync(x => x.Id == entity.Id);
+            var entities = await _collection.Find(_ => true).ToListAsync();
+            var entityToRemove = entities.FirstOrDefault(x => x.Id == entity.Id);
+            if (entityToRemove == null)
+                return;
+
+            entities.Remove(entityToRemove);
+            await ReplaceCollectionAsync(entities);
+        }
+
+        private async Task ReplaceCollectionAsync(List<T> entities)
+        {
+            await _collection.DeleteManyAsync(_ => true);
+
+            if (entities.Count > 0)
+                await _collection.InsertManyAsync(entities);
         }
 
         /// <summary>
@@ -185,11 +210,13 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
                 .ToList();
 
             var preferences = await _context.GetCollection<Preference>()
-                .Find(x => preferenceIds.Contains(x.Id))
+                .Find(_ => true)
                 .ToListAsync();
 
             // Возвращаем объект Preference в каждую связь CustomerPreference, потому что модели ответа читают x.Preference.Name.
-            var preferencesById = preferences.ToDictionary(x => x.Id);
+            var preferencesById = preferences
+                .Where(x => preferenceIds.Contains(x.Id))
+                .ToDictionary(x => x.Id);
             foreach (var customer in customers)
             {
                 customer.Preferences ??= new List<CustomerPreference>();
@@ -204,8 +231,12 @@ namespace Pcf.GivingToCustomer.DataAccess.Repositories
             // Находим все промокоды, которые были выданы прочитанным клиентам.
             var customerIds = customers.Select(x => x.Id).ToList();
             var promoCodes = await _context.GetCollection<PromoCode>()
-                .Find(x => x.Customers.Any(c => customerIds.Contains(c.CustomerId)))
+                .Find(_ => true)
                 .ToListAsync();
+            promoCodes = promoCodes
+                .Where(x => (x.Customers ?? Array.Empty<PromoCodeCustomer>())
+                    .Any(c => customerIds.Contains(c.CustomerId)))
+                .ToList();
 
             // Собираем Customer.PromoCodes так, чтобы CustomerResponse мог построить список выданных промокодов.
             foreach (var customer in customers)
