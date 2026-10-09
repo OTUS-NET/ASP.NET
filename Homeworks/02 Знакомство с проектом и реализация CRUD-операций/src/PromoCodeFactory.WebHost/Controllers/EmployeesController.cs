@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using PromoCodeFactory.Core.Abstractions.Services;
 using PromoCodeFactory.Core.Services;
 using PromoCodeFactory.WebHost.Mapping;
@@ -66,9 +67,9 @@ public class EmployeesController(
 
 
         var employee = Mapper.ToEmployee(request, idRole);
-        var result = employeesService.CreateEmployee(employee, ct);
-
-        return Ok(result);
+        await employeesService.CreateEmployee(employee, ct);
+        var employeesModel = Mapper.ToEmployeeResponse(employee);
+        return Ok(employeesModel);
     }
 
     /// <summary>
@@ -83,7 +84,23 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeesService.GetById(id, ct);
+
+        if (employee == null)
+            return NotFound();
+
+        var idRole = await roleService.GetById(request.RoleId, ct);
+        
+        if (idRole == null)
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid role",
+                Detail = $"Role with id {request.RoleId} not found",
+                Status = StatusCodes.Status400BadRequest
+            });
+        employee = Mapper.ToEmployee(request, id, idRole);
+        var result = employeesService.UpdateEmployee(employee, ct);
+        return Ok(result);
     }
 
     /// <summary>

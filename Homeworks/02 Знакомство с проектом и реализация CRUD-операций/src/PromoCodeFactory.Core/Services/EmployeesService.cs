@@ -18,4 +18,9 @@ public class EmployeesService(IRepository<Employee> _repository) : IEmployeesSer
     {
         return _repository.Add(request, ct);
     }
+
+    public Task UpdateEmployee(Employee request, CancellationToken ct)
+    {
+        return _repository.Update(request, ct);
+    }
 }

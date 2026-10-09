@@ -9,4 +9,5 @@ public interface IEmployeesService
 {
     Task<Employee> GetById(Guid id, CancellationToken ct);
     Task CreateEmployee(Employee request, CancellationToken ct);
+    Task UpdateEmployee(Employee request, CancellationToken ct);
 }
