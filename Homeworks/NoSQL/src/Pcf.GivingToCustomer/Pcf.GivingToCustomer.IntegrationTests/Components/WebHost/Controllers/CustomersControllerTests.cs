@@ -1,31 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Pcf.GivingToCustomer.Core.Domain;
-using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.WebHost.Controllers;
 using Pcf.GivingToCustomer.WebHost.Models;
 using Xunit;
 
 namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
 {
-    [Collection(EfDatabaseCollection.DbCollection)]
-    public class CustomersControllerTests: IClassFixture<EfDatabaseFixture>
+    [Collection(MongoDatabaseCollection.DbCollection)]
+    public class CustomersControllerTests : IClassFixture<MongoDatabaseFixture>
     {
         private readonly CustomersController _customersController;
-        private readonly EfRepository<Customer> _customerRepository;
-        private readonly EfRepository<Preference> _preferenceRepository;
+        private readonly MongoDatabaseFixture _fixture;
         
-        public CustomersControllerTests(EfDatabaseFixture efDatabaseFixture)
+        public CustomersControllerTests(MongoDatabaseFixture fixture)
         {
-            _customerRepository = new EfRepository<Customer>(efDatabaseFixture.DbContext);
-            _preferenceRepository = new EfRepository<Preference>(efDatabaseFixture.DbContext);
-            
+            _fixture = fixture;
             _customersController = new CustomersController(
-                _customerRepository, 
-                _preferenceRepository);
+                fixture.CustomerRepository,
+                fixture.PreferenceRepository);
         }
         
         [Fact]
@@ -38,10 +34,7 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
                 Email = "some@mail.ru",
                 FirstName = "Иван",
                 LastName = "Петров",
-                PreferenceIds = new List<Guid>()
-                {
-                    preferenceId
-                }
+                PreferenceIds = new List<Guid>() { preferenceId }
             };
 
             //Act
@@ -50,7 +43,7 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
             var id = (Guid)actionResult.Value;
             
             //Assert
-            var actual = await _customerRepository.GetByIdAsync(id);
+            var actual = await _fixture.CustomerRepository.GetByIdAsync(id);
             
             actual.Email.Should().Be(request.Email);
             actual.FirstName.Should().Be(request.FirstName);
