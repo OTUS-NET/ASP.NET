@@ -1,5 +1,6 @@
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain;
+using PromoCodeFactory.Core.Exceptions;
 using System.Collections.Concurrent;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
@@ -19,21 +20,55 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task<T?> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        _data.TryGetValue(id, out T? value);
+
+        return Task.FromResult(value);
     }
 
     public Task Add(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (_data.TryAdd(entity.Id, entity))
+        {
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return Task.FromCanceled(ct);
+        }
     }
 
     public Task Update(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (!_data.TryGetValue(entity.Id, out _))
+        {
+            throw new EntityNotFoundException(typeof(T), entity.Id);
+        }
+
+
+        if (_data.TryUpdate(entity.Id, entity, _data[entity.Id]))
+        {
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return Task.FromCanceled(ct);
+        }
     }
 
     public Task Delete(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (!_data.TryGetValue(id, out _))
+        {
+            throw new EntityNotFoundException(typeof(T), id);
+        }
+
+        if (_data.TryRemove(id, out _))
+        {
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return Task.FromCanceled(ct);
+        }
     }
 }
