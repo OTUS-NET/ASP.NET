@@ -9,7 +9,7 @@ namespace PromoCodeFactory.Core.Services;
 
 public class EmployeesService(IRepository<Employee> _repository) : IEmployeesService
 {
-    public async Task<Employee> GetById(Guid id, CancellationToken ct)
+    public async Task<Employee?> GetById(Guid id, CancellationToken ct)
     {
         return await _repository.GetById(id, ct);
     }
@@ -22,5 +22,10 @@ public class EmployeesService(IRepository<Employee> _repository) : IEmployeesSer
     public Task UpdateEmployee(Employee request, CancellationToken ct)
     {
         return _repository.Update(request, ct);
+    }
+
+    public Task DeleteEmployee(Guid id, CancellationToken ct)
+    {
+        return _repository.Delete(id, ct);
     }
 }

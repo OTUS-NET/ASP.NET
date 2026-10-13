@@ -45,6 +45,11 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task Delete(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        ct.ThrowIfCancellationRequested();
+        var res = _data.Remove(id, out var value);
+        if (!res)
+            throw new EntityNotFoundException(typeof(T), id);
+
+        return Task.CompletedTask;
     }
 }

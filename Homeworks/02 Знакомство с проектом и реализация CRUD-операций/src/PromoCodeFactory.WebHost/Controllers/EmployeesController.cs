@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using PromoCodeFactory.Core.Abstractions.Services;
@@ -69,7 +70,7 @@ public class EmployeesController(
         var employee = Mapper.ToEmployee(request, idRole);
         await employeesService.CreateEmployee(employee, ct);
         var employeesModel = Mapper.ToEmployeeResponse(employee);
-        return Ok(employeesModel);
+        return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employeesModel);
     }
 
     /// <summary>
@@ -99,8 +100,8 @@ public class EmployeesController(
                 Status = StatusCodes.Status400BadRequest
             });
         employee = Mapper.ToEmployee(request, id, idRole);
-        var result = employeesService.UpdateEmployee(employee, ct);
-        return Ok(result);
+        await employeesService.UpdateEmployee(employee, ct);
+        return Ok(Mapper.ToEmployeeResponse(employee));
     }
 
     /// <summary>
@@ -113,6 +114,12 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeesService.GetById(id, ct);
+
+        if (employee == null)
+            return NotFound();
+
+        await employeesService.DeleteEmployee(id, ct);
+        return NoContent();
     }
 }
