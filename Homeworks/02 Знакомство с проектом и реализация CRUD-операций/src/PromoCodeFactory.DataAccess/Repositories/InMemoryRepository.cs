@@ -20,9 +20,12 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
     public Task<T?> GetById(Guid id, CancellationToken ct)
     {
-        _data.TryGetValue(id, out T? value);
+        if (_data.TryGetValue(id, out T? value))
+        {
+            return Task.FromResult(value);
+        }
 
-        return Task.FromResult(value);
+        throw new EntityNotFoundException(typeof(T), id);
     }
 
     public Task Add(T entity, CancellationToken ct)

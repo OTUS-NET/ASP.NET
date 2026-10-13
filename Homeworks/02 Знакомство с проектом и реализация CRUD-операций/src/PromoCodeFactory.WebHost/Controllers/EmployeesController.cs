@@ -34,16 +34,23 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        var employee = await employeeRepository.GetById(id, ct);
-
-        if (employee is null)
+        try
         {
-            return NotFound();
+            var employee = await employeeRepository.GetById(id, ct);
+
+            if (employee is null)
+            {
+                return NotFound();
+            }
+
+            var response = Mapper.ToEmployeeResponse(employee);
+
+            return Ok(response);
         }
-
-        var response = Mapper.ToEmployeeResponse(employee);
-
-        return Ok(response);
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     /// <summary>
@@ -93,7 +100,7 @@ public class EmployeesController(
 
         if (employee is null)
         {
-            return BadRequest();
+            return NotFound();
         }
         else
         {
