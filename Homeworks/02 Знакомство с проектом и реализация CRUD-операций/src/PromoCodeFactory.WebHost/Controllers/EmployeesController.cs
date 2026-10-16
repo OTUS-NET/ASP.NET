@@ -51,7 +51,7 @@ public class EmployeesController(
         var role = await roleRepository.GetById(request.RoleId, ct);
         if (role == null) return BadRequest();
         var employee = Mapper.ToEmployee(request, role);
-        await employeeRepository.Add(employee, ct);
+        employee = await employeeRepository.Add(employee, ct);
         var model = Mapper.ToEmployeeResponse(employee);
         return Ok(model);
     }

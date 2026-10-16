@@ -26,12 +26,13 @@ public class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
         return Task.FromResult(_data.Values.FirstOrDefault(x=>x.Id == id));
     }
 
-    public Task Add(T entity, CancellationToken ct)
+    public Task<T> Add(T entity, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-
-        _data.TryAdd(Guid.NewGuid(), entity);
-        return Task.CompletedTask;
+        Guid id = Guid.NewGuid();
+        entity.Id = id;
+        _data.TryAdd(id, entity);
+        return Task.FromResult(entity);
     }
 
     public Task Update(T entity, CancellationToken ct)
