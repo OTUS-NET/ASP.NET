@@ -76,4 +76,12 @@ internal class InMemoryRepository<T> : IRepository<T> where T : BaseEntity
 
         return Task.CompletedTask;
     }
+
+    /// <summary>Выполняет операцию (in-memory, без транзакций).</summary>
+    /// <param name="action">Асинхронная операция с изменениями.</param>
+    /// <param name="ct">Токен отмены операции.</param>
+    public Task ExecuteInTransaction(Func<Task> action, CancellationToken ct)
+    {
+        return action();
+    }
 }
