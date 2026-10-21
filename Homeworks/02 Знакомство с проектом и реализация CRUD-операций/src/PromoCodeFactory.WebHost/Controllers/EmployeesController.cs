@@ -34,7 +34,10 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+        if (employee == null) return NotFound();
+        var model = Mapper.ToEmployeeResponse(employee);
+        return Ok(model);
     }
 
     /// <summary>
@@ -45,7 +48,12 @@ public class EmployeesController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] EmployeeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role == null) return BadRequest();
+        var employee = Mapper.ToEmployee(request, role);
+        employee = await employeeRepository.Add(employee, ct);
+        var model = Mapper.ToEmployeeResponse(employee);
+        return Ok(model);
     }
 
     /// <summary>
@@ -60,7 +68,13 @@ public class EmployeesController(
         [FromBody] EmployeeUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var role = await roleRepository.GetById(request.RoleId, ct);
+        if (role == null) return BadRequest();
+        var employee = Mapper.ToEmployee(request, role);
+        employee.Id = id;
+        await employeeRepository.Update(employee, ct);
+        var model = Mapper.ToEmployeeResponse(employee);
+        return Ok(model);
     }
 
     /// <summary>
@@ -73,6 +87,9 @@ public class EmployeesController(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var employee = await employeeRepository.GetById(id, ct);
+        if (employee == null) return NotFound();
+        await employeeRepository.Delete(id, ct);
+        return Ok();
     }
 }

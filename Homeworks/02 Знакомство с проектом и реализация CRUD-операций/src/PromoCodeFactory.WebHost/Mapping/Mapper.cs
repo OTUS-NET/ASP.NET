@@ -42,4 +42,16 @@ public static class Mapper
             AppliedPromocodesCount = 0
         };
     }
+
+    public static Employee ToEmployee(EmployeeUpdateRequest request, Role role)
+    {
+        return new Employee
+        {
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            Role = role,
+            AppliedPromocodesCount = 0
+        };
+    }
 }
