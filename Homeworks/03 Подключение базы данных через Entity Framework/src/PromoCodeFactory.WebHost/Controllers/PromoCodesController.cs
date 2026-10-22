@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.WebHost.Models.PromoCodes;
 
 namespace PromoCodeFactory.WebHost.Controllers;
@@ -8,6 +9,19 @@ namespace PromoCodeFactory.WebHost.Controllers;
 /// </summary>
 public class PromoCodesController : BaseController
 {
+    private IRepository<PromoCode> _promoCodeRepository;
+    private IRepository<Preference> _preferenceRepository;
+    private IRepository<Employee> _employeeRepository;
+    private IRepository<CustomerPromoCode> _customerPromoCodeRepository;
+
+    public PromoCodesController(IRepository<PromoCode> promoCodeRepository, IRepository<Preference> preferenceRepository, IRepository<Employee> employeeRepository, IRepository<CustomerPromoCode> customerPromoCodeRepository)
+    {
+        _promoCodeRepository = promoCodeRepository;
+        _preferenceRepository = preferenceRepository;
+        _employeeRepository = employeeRepository;
+        _customerPromoCodeRepository = customerPromoCodeRepository;
+    }
+
     /// <summary>
     /// Получить все промокоды
     /// </summary>
@@ -15,7 +29,18 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(typeof(IEnumerable<PromoCodeShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PromoCodeShortResponse>>> Get(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var data = (await _promoCodeRepository.GetAll(true, ct)).Select(x => new PromoCodeShortResponse
+        (
+            x.Id,
+            x.Code,
+            x.ServiceInfo,
+            x.PartnerName,
+            x.BeginDate,
+            x.EndDate,
+            x.PartnerManager.Id,
+            x.Preference.Id
+        ));
+        return Ok(data);
     }
 
     /// <summary>
@@ -26,7 +51,19 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PromoCodeShortResponse>> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var promoCode = await _promoCodeRepository.GetById(id, false, ct);
+        var data = new PromoCodeShortResponse
+        (
+            promoCode!.Id,
+            promoCode.Code,
+            promoCode.ServiceInfo,
+            promoCode.PartnerName,
+            promoCode.BeginDate,
+            promoCode.EndDate,
+            promoCode.PartnerManager.Id,
+            promoCode.Preference.Id
+        );
+        return Ok(data);
     }
 
     /// <summary>
@@ -38,7 +75,37 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PromoCodeShortResponse>> Create(PromoCodeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var partner = await _employeeRepository.GetById(request.PartnerManagerId, false, ct);
+        if (partner == null) return BadRequest("Partner not found.");
+
+        var preference = await _preferenceRepository.GetById(request.PreferenceId, false, ct);
+        if (preference == null) return BadRequest("Preference not found.");
+
+        Guid newId = Guid.NewGuid();
+        var promoCode = new PromoCode
+        {
+            Id = newId,
+            Code = request.Code,
+            BeginDate = request.BeginDate,
+            EndDate = request.EndDate,
+            PartnerName = request.PartnerName,
+            ServiceInfo = request.ServiceInfo,
+            PartnerManager = partner,
+            Preference = preference
+        };
+        promoCode = await _promoCodeRepository.GetById(newId, true, ct);
+        var data = new PromoCodeShortResponse
+        (
+            promoCode!.Id,
+            promoCode.Code,
+            promoCode.ServiceInfo,
+            promoCode.PartnerName,
+            promoCode.BeginDate,
+            promoCode.EndDate,
+            promoCode.PartnerManager.Id,
+            promoCode.Preference.Id
+        );
+        return Ok(data);
     }
 
     /// <summary>
@@ -53,6 +120,10 @@ public class PromoCodesController : BaseController
         [FromBody] PromoCodeApplyRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var customerPromoCode = (await _customerPromoCodeRepository.GetWhere(_ => _.PromoCodeId == id && _.CustomerId == request.CustomerId, false, ct)).FirstOrDefault();
+        if (customerPromoCode == null) return NotFound();
+        customerPromoCode.AppliedAt = DateTimeOffset.UtcNow;
+        await _customerPromoCodeRepository.Update(customerPromoCode, ct);
+        return Ok();
     }
 }
