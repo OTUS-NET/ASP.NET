@@ -12,7 +12,7 @@ public class PromoCode : BaseEntity
 
     public required DateTimeOffset EndDate { get; set; }
 
-    public required string PartnerName { get; set; }
+    public required string PartnerName { get; set; } 
 
     public required Employee PartnerManager { get; set; }
 

@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddDbContext<PromoCodeFactoryDbContext>(builder =>
                 builder.UseSqlite("Filename=PromoCodeFactory.sqlite"));
 
+        services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
         services.AddScoped<IRepository<Employee>, EmployeeEfRepository>();
         services.AddScoped<IRepository<Role>, EfRepository<Role>>();
         services.AddScoped<IRepository<Customer>, CustomerEfRepository>();
