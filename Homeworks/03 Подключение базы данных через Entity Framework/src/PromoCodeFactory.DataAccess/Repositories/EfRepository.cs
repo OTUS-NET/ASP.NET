@@ -8,17 +8,19 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
 {
     protected virtual IQueryable<T> ApplyIncludes(IQueryable<T> query) => query;
 
-    public Task Add(T entity, CancellationToken ct)
+    public async Task Add(T entity, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        await context.AddAsync(entity, ct);
+        await context.SaveChangesAsync(ct);
     }
 
-    public Task Delete(Guid id, CancellationToken ct)
+    public async Task Delete(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        context.Remove(id);
+        await context.SaveChangesAsync(ct);
     }
 
-    public Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
+    public async Task<IReadOnlyCollection<T>> GetAll(bool withIncludes = false, CancellationToken ct = default)
     {
         throw new NotImplementedException();
     }
