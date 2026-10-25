@@ -1,0 +1,14 @@
+{
+    "profiles": {
+        "Pcf.GivingToCustomer.WebHost": {
+            "commandName": "Project",
+            "launchUrl": "swagger",
+            "dotnetRunMessages": true,
+            "launchBrowser": true,
+            "applicationUrl": "http://localhost:8092",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+services:
+  # Administration
+  pcf-administration-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.Administration/Dockerfile
+    container_name: pcf-administration-api
+    restart: always
+    ports:
+      - "8091:8080"
+    volumes:
+      - db:/app/db
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: Filename=/app/db/pcf_administration_db.sqlite
+      ASPNETCORE_ENVIRONMENT: Development
+
+  # GivingToCustomer
+
+  # ReceivingFromPartner
+
+volumes:
+  db:

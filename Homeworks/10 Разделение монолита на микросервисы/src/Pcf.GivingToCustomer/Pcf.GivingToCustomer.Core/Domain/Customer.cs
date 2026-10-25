@@ -1,0 +1,18 @@
+using Pcf.Common.Core.Domain;
+
+namespace Pcf.GivingToCustomer.Core.Domain;
+
+public class Customer : BaseEntity
+{
+    public required string FirstName { get; set; }
+
+    public required string LastName { get; set; }
+
+    public string FullName => $"{FirstName} {LastName}";
+
+    public required string Email { get; set; }
+
+    public ICollection<Preference> Preferences { get; set; } = [];
+
+    public ICollection<CustomerPromoCode> CustomerPromoCodes { get; set; } = [];
+}
