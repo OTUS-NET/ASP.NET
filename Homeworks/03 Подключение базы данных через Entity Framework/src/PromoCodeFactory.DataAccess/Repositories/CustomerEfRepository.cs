@@ -3,7 +3,7 @@ using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.DataAccess.Repositories;
 
-internal class CustomerEfRepository(PromoCodeFactoryDbContext context) : EfRepository<Customer>(context)
+public class CustomerEfRepository(PromoCodeFactoryDbContext context) : EfRepository<Customer>(context)
 {
     protected override IQueryable<Customer> ApplyIncludes(IQueryable<Customer> query)
     {

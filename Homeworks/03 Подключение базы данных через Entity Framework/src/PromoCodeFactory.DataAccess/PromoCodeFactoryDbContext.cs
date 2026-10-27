@@ -11,9 +11,9 @@ public class PromoCodeFactoryDbContext : DbContext
         : base(options)
     {
     }
-    public DbSet<BaseEntity> baseEntities { get; set; }
+    //public DbSet<BaseEntity> baseEntities { get; set; }
     public DbSet<Employee> Employees { get; set; }
-    public DbSet<Role> Roles { get ; set; }
+    public DbSet<Role> Roles { get; set; }
     public DbSet<Customer>  Customers { get ; set; }
     public DbSet<CustomerPromoCode>  customerPromoCodes { get ; set; }
     public DbSet<Preference> Preferences { get ; set; }
