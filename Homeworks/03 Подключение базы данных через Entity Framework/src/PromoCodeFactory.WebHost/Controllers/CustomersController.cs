@@ -1,12 +1,18 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Abstractions.Sevices;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.WebHost.Mapping;
 using PromoCodeFactory.WebHost.Models.Customers;
+using PromoCodeFactory.WebHost.Models.Preferences;
+using PromoCodeFactory.WebHost.Models.PromoCodes;
 
 namespace PromoCodeFactory.WebHost.Controllers;
 
 /// <summary>
 /// Клиенты
 /// </summary>
-public class CustomersController : BaseController
+public class CustomersController(ICustomerService _customerService) : BaseController
 {
     /// <summary>
     /// Получить данные всех клиентов
@@ -15,7 +21,9 @@ public class CustomersController : BaseController
     [ProducesResponseType(typeof(IEnumerable<CustomerShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<CustomerShortResponse>>> Get(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var customers = await _customerService.GetAllAsync(false, ct);
+        var response = customers.Select(c => c.ToCustomerShortResponse()).ToList();
+        return Ok(response);
     }
 
     /// <summary>
@@ -26,7 +34,15 @@ public class CustomersController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CustomerResponse>> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var result = await _customerService.GetByIdAsync(id, true, ct);
+
+        if (result == null)
+        {
+            return NotFound();
+        }
+
+        var customerResponse = result.ToCustomerResponse();
+        return Ok(customerResponse);
     }
 
     /// <summary>
@@ -37,7 +53,10 @@ public class CustomersController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CustomerShortResponse>> Create([FromBody] CustomerCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var customer = request.ToCustomer();
+        await _customerService.CreateAsync(customer, request.PreferenceIds, ct);
+        var response = customer.ToCustomerShortResponse();
+        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
     }
 
     /// <summary>
@@ -52,7 +71,16 @@ public class CustomersController : BaseController
         [FromBody] CustomerUpdateRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var customer = request.ToCustomer(id);
+        var updatedCustomer = await _customerService.UpdateAsync(id, customer, request.PreferenceIds, ct);
+
+        if (updatedCustomer == null)
+        {
+            return NotFound();
+        }
+
+        var response = updatedCustomer.ToCustomerShortResponse();
+        return Ok(response);
     }
 
     /// <summary>
@@ -63,6 +91,7 @@ public class CustomersController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        await _customerService.DeleteAsync(id, ct);
+        return Ok();
     }
 }
