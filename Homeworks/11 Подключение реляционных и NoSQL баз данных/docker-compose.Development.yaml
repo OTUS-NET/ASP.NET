@@ -1,0 +1,53 @@
+services:
+  # Administration
+  pcf-administration-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.Administration/Dockerfile
+    container_name: pcf-administration-api
+    restart: always
+    ports:
+      - "8091:8080"
+    volumes:
+      - db:/app/db
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: Filename=/app/db/pcf_administration_db.sqlite
+      ASPNETCORE_ENVIRONMENT: Development
+
+  # GivingToCustomer
+  pcf-givingtocustomer-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.GivingToCustomer/Dockerfile
+    container_name: pcf-givingtocustomer-api
+    restart: always
+    ports:
+      - "8092:8080"
+    volumes:
+      - db:/app/db
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: Filename=/app/db/pcf_givingtocustomer_db.sqlite
+      ASPNETCORE_ENVIRONMENT: Development
+
+  # ReceivingFromPartner
+  pcf-receivingfrompartner-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.ReceivingFromPartner/Dockerfile
+    container_name: pcf-receivingfrompartner-api
+    restart: always
+    depends_on:
+      - pcf-administration-api
+      - pcf-givingtocustomer-api
+    ports:
+      - "8093:8080"
+    volumes:
+      - db:/app/db
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: Filename=/app/db/pcf_receivingfrompartner_db.sqlite
+      IntegrationSettings__AdministrationApiUrl: http://pcf-administration-api:8080
+      IntegrationSettings__GivingToCustomerApiUrl: http://pcf-givingtocustomer-api:8080
+      ASPNETCORE_ENVIRONMENT: Development
+
+volumes:
+  db:
