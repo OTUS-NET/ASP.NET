@@ -340,4 +340,4 @@ ASALocalRun/
 
 .vscode/
 
-PromoCodeFactory.sqlite*
+*.sqlite*
