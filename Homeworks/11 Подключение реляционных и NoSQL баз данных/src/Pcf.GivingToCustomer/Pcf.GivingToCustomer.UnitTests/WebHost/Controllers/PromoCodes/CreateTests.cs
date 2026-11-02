@@ -25,7 +25,6 @@ public class CreateTests
         _sut = new PromoCodesController(
             _promoCodesRepositoryMock.Object,
             _customersRepositoryMock.Object,
-            Mock.Of<IRepository<CustomerPromoCode>>(),
             _preferencesRepositoryMock.Object);
     }
 
@@ -69,6 +68,10 @@ public class CreateTests
             .Setup(r => r.Add(It.IsAny<PromoCode>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
+        _customersRepositoryMock
+            .Setup(r => r.Update(It.IsAny<Customer>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
         var result = await _sut.Create(request, CancellationToken.None);
 
         result.Result.Should().BeOfType<CreatedAtActionResult>();
@@ -82,11 +85,14 @@ public class CreateTests
                 pc.Code == request.Code &&
                 pc.ServiceInfo == request.ServiceInfo &&
                 pc.PartnerId == request.PartnerId &&
-                pc.Preference == preference &&
-                pc.CustomerPromoCodes.Count == customers.Count &&
-                pc.CustomerPromoCodes.All(cpc => cpc.PromoCodeId == request.Id) &&
-                customers.All(c => pc.CustomerPromoCodes.Any(cpc => cpc.CustomerId == c.Id))),
+                pc.PreferenceId == request.PreferenceId),
                 It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        customers.Should().AllSatisfy(c =>
+            c.CustomerPromoCodes.Should().ContainSingle(cpc => cpc.PromoCodeId == request.Id));
+        _customersRepositoryMock.Verify(
+            r => r.Update(customers.First(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 

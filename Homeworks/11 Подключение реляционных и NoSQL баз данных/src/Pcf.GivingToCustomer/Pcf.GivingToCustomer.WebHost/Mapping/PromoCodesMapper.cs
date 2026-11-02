@@ -14,6 +14,6 @@ public static class PromoCodesMapper
             promoCode.PartnerId,
             promoCode.BeginDate,
             promoCode.EndDate,
-            promoCode.Preference.Id);
+            promoCode.PreferenceId);
     }
 }

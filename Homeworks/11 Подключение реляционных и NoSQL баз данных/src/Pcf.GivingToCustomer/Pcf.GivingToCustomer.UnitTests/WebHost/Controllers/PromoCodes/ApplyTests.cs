@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using AwesomeAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -13,17 +12,16 @@ namespace Pcf.GivingToCustomer.UnitTests.WebHost.Controllers.PromoCodes;
 public class ApplyTests
 {
     private readonly Mock<IRepository<PromoCode>> _promoCodesRepositoryMock;
-    private readonly Mock<IRepository<CustomerPromoCode>> _customerPromoCodesRepositoryMock;
+    private readonly Mock<IRepository<Customer>> _customersRepositoryMock;
     private readonly PromoCodesController _sut;
 
     public ApplyTests()
     {
         _promoCodesRepositoryMock = new Mock<IRepository<PromoCode>>();
-        _customerPromoCodesRepositoryMock = new Mock<IRepository<CustomerPromoCode>>();
+        _customersRepositoryMock = new Mock<IRepository<Customer>>();
         _sut = new PromoCodesController(
             _promoCodesRepositoryMock.Object,
-            Mock.Of<IRepository<Customer>>(),
-            _customerPromoCodesRepositoryMock.Object,
+            _customersRepositoryMock.Object,
             Mock.Of<IRepository<Preference>>());
     }
 
@@ -40,8 +38,8 @@ public class ApplyTests
         var result = await _sut.Apply(promoCodeId, request, CancellationToken.None);
 
         result.Should().BeOfType<NotFoundResult>();
-        _customerPromoCodesRepositoryMock.Verify(
-            r => r.GetWhere(It.IsAny<Expression<Func<CustomerPromoCode, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+        _customersRepositoryMock.Verify(
+            r => r.GetById(It.IsAny<Guid>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -56,9 +54,9 @@ public class ApplyTests
             .Setup(r => r.GetById(promoCodeId, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(promoCode);
 
-        _customerPromoCodesRepositoryMock
-            .Setup(r => r.GetWhere(It.IsAny<Expression<Func<CustomerPromoCode, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<CustomerPromoCode>());
+        _customersRepositoryMock
+            .Setup(r => r.GetById(request.CustomerId, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CreateCustomer(request.CustomerId));
 
         var result = await _sut.Apply(promoCodeId, request, CancellationToken.None);
 
@@ -77,44 +75,51 @@ public class ApplyTests
         var customerPromoCode = new CustomerPromoCode
         {
             Id = Guid.NewGuid(),
-            CustomerId = customerId,
             PromoCodeId = promoCodeId,
             CreatedAt = DateTimeOffset.UtcNow.AddDays(-1)
         };
+        var customer = CreateCustomer(customerId);
+        customer.CustomerPromoCodes.Add(customerPromoCode);
         var request = new PromoCodeApplyRequest(customerId);
 
         _promoCodesRepositoryMock
             .Setup(r => r.GetById(promoCodeId, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(promoCode);
 
-        _customerPromoCodesRepositoryMock
-            .Setup(r => r.GetWhere(It.IsAny<Expression<Func<CustomerPromoCode, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync([customerPromoCode]);
+        _customersRepositoryMock
+            .Setup(r => r.GetById(customerId, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(customer);
 
-        _customerPromoCodesRepositoryMock
-            .Setup(r => r.Update(It.IsAny<CustomerPromoCode>(), It.IsAny<CancellationToken>()))
+        _customersRepositoryMock
+            .Setup(r => r.Update(It.IsAny<Customer>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var result = await _sut.Apply(promoCodeId, request, CancellationToken.None);
 
         result.Should().BeOfType<NoContentResult>();
         customerPromoCode.AppliedAt.Should().NotBeNull();
-        _customerPromoCodesRepositoryMock.Verify(
-            r => r.Update(customerPromoCode, It.IsAny<CancellationToken>()),
+        _customersRepositoryMock.Verify(
+            r => r.Update(customer, It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     private static PromoCode CreatePromoCode(Guid promoCodeId)
     {
-        var preference = new AutoFaker<Preference>()
-            .RuleFor(p => p.Customers, _ => [])
-            .Generate();
-
         return new AutoFaker<PromoCode>()
             .RuleFor(p => p.Id, _ => promoCodeId)
-            .RuleFor(p => p.Preference, preference)
             .RuleFor(p => p.PartnerId, _ => Guid.NewGuid())
-            .RuleFor(p => p.CustomerPromoCodes, _ => [])
+            .RuleFor(p => p.PreferenceId, _ => Guid.NewGuid())
             .Generate();
+    }
+
+    private static Customer CreateCustomer(Guid customerId)
+    {
+        return new Customer
+        {
+            Id = customerId,
+            FirstName = "Ivan",
+            LastName = "Ivanov",
+            Email = "ivan@example.com"
+        };
     }
 }

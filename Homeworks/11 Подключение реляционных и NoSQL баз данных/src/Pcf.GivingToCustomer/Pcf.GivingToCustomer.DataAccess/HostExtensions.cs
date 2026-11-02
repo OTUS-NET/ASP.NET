@@ -19,9 +19,8 @@ public static class HostExtensions
         logger.LogInformation("Starting database seed...");
 
         await scope.ServiceProvider.SeedEntity(logger, SeedData.Preferences, ct);
-        await scope.ServiceProvider.SeedEntity(logger, SeedData.Customers, ct);
         await scope.ServiceProvider.SeedEntity(logger, SeedData.PromoCodes, ct);
-        await scope.ServiceProvider.SeedEntity(logger, SeedData.CustomerPromoCodes, ct);
+        await scope.ServiceProvider.SeedEntity(logger, SeedData.Customers, ct);
 
         logger.LogInformation("Database seed completed.");
     }

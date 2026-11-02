@@ -27,7 +27,7 @@ public class PromoCodeFactoryDbContext(DbContextOptions<PromoCodeFactoryDbContex
                 .WithMany(p => p.Customers);
             entity.HasMany(e => e.CustomerPromoCodes)
                 .WithOne()
-                .HasForeignKey(cpc => cpc.CustomerId)
+                .HasForeignKey("CustomerId")
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -35,19 +35,19 @@ public class PromoCodeFactoryDbContext(DbContextOptions<PromoCodeFactoryDbContex
         {
             entity.Property(e => e.Code).HasMaxLength(100);
             entity.Property(e => e.ServiceInfo).HasMaxLength(256);
-            entity.HasOne(e => e.Preference)
+            entity.HasOne<Preference>()
                 .WithMany()
-                .HasForeignKey("PreferenceId")
+                .HasForeignKey(e => e.PreferenceId)
                 .OnDelete(DeleteBehavior.Restrict);
-            entity.HasMany(e => e.CustomerPromoCodes)
-                .WithOne()
-                .HasForeignKey(cpc => cpc.PromoCodeId)
-                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<CustomerPromoCode>(entity =>
         {
-            entity.HasIndex(cpc => new { cpc.CustomerId, cpc.PromoCodeId }).IsUnique();
+            entity.HasOne<PromoCode>()
+                .WithMany()
+                .HasForeignKey(cpc => cpc.PromoCodeId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex("CustomerId", nameof(CustomerPromoCode.PromoCodeId)).IsUnique();
         });
 
         base.OnModelCreating(modelBuilder);

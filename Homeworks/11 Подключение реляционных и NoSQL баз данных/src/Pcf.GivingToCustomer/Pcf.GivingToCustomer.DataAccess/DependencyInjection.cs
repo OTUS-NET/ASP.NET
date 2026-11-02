@@ -21,7 +21,7 @@ public static class DependencyInjection
 
         services.AddScoped<IRepository<Customer>, CustomerEfRepository>();
         services.AddScoped<IRepository<Preference>, EfRepository<PromoCodeFactoryDbContext, Preference>>();
-        services.AddScoped<IRepository<PromoCode>, PromoCodeEfRepository>();
+        services.AddScoped<IRepository<PromoCode>, EfRepository<PromoCodeFactoryDbContext, PromoCode>>();
         services.AddScoped<IRepository<CustomerPromoCode>, EfRepository<PromoCodeFactoryDbContext, CustomerPromoCode>>();
         return services;
     }

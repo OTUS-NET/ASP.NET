@@ -37,7 +37,7 @@ public static class CustomersMapper
                     p.PartnerId,
                     p.BeginDate,
                     p.EndDate,
-                    p.Preference.Id,
+                    p.PreferenceId,
                     customerPromoCode.CreatedAt,
                     customerPromoCode.AppliedAt);
         }).ToList();

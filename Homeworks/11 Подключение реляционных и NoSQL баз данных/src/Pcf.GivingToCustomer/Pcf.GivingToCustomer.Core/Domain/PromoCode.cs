@@ -14,7 +14,5 @@ public class PromoCode : BaseEntity
 
     public required Guid PartnerId { get; set; }
 
-    public required Preference Preference { get; set; }
-
-    public ICollection<CustomerPromoCode> CustomerPromoCodes { get; set; } = [];
+    public required Guid PreferenceId { get; set; }
 }

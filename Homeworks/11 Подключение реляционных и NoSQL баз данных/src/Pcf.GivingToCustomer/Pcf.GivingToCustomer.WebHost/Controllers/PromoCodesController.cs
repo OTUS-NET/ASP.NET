@@ -12,7 +12,6 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers;
 public class PromoCodesController(
     IRepository<PromoCode> promoCodesRepository,
     IRepository<Customer> customersRepository,
-    IRepository<CustomerPromoCode> customerPromoCodesRepository,
     IRepository<Preference> preferencesRepository)
     : BaseController
 {
@@ -60,6 +59,7 @@ public class PromoCodesController(
 
         var customersWithPreference = await customersRepository.GetWhere(
             c => c.Preferences.Any(p => p.Id == request.PreferenceId),
+            withIncludes: true,
             ct: ct);
 
         var promoCode = new PromoCode
@@ -70,17 +70,23 @@ public class PromoCodesController(
             BeginDate = request.BeginDate,
             EndDate = request.EndDate,
             PartnerId = request.PartnerId,
-            Preference = preference,
-            CustomerPromoCodes = customersWithPreference.Select(c => new CustomerPromoCode
-            {
-                Id = Guid.NewGuid(),
-                CustomerId = c.Id,
-                PromoCodeId = request.Id,
-                CreatedAt = DateTimeOffset.UtcNow
-            }).ToList()
+            PreferenceId = request.PreferenceId
         };
 
         await promoCodesRepository.Add(promoCode, ct);
+
+        foreach (var customer in customersWithPreference)
+        {
+            customer.CustomerPromoCodes.Add(new CustomerPromoCode
+            {
+                Id = Guid.NewGuid(),
+                PromoCodeId = request.Id,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
+        }
+
+        if (customersWithPreference.Count > 0)
+            await customersRepository.Update(customersWithPreference.First(), ct);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -103,11 +109,9 @@ public class PromoCodesController(
         if (promoCode is null)
             return NotFound();
 
-        var customerPromoCodes = await customerPromoCodesRepository.GetWhere(
-            cpc => cpc.PromoCodeId == id && cpc.CustomerId == request.CustomerId,
-            ct: ct);
-        var customerPromoCode = customerPromoCodes.FirstOrDefault();
-        if (customerPromoCode is null)
+        var customer = await customersRepository.GetById(request.CustomerId, withIncludes: true, ct);
+        var customerPromoCode = customer?.CustomerPromoCodes.FirstOrDefault(cpc => cpc.PromoCodeId == id);
+        if (customer is null || customerPromoCode is null)
             return NotFound(new ProblemDetails
             {
                 Title = "Customer promo code not found",
@@ -115,7 +119,7 @@ public class PromoCodesController(
             });
 
         customerPromoCode.AppliedAt = DateTimeOffset.UtcNow;
-        await customerPromoCodesRepository.Update(customerPromoCode, ct);
+        await customersRepository.Update(customer, ct);
 
         return NoContent();
     }
