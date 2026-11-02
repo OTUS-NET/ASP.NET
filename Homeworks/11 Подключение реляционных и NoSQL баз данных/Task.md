@@ -1,48 +1,44 @@
 ### Цель
 
-Разделение монолита на микросервисы и интеграция через HTTP API.
+Перевести микросервисы с SQLite на PostgreSQL, MongoDB, Redis.
 
 ---
 
 ### Описание
 
-Ссылка на [GitHub](https://github.com/OTUS-NET/ASP.NET/blob/main/Homeworks/10%20Разделение%20монолита%20на%20микросервисы/Task.md)
+Ссылка на [GitHub](https://github.com/OTUS-NET/ASP.NET/blob/main/Homeworks/11%20Подключение%20реляционных%20и%20NoSQL%20баз%20данных/Task.md)
 
 Перед выполнением нужно ознакомиться с [Правилами отправки домашнего задания на проверку](https://github.com/OTUS-NET/ASP.NET/blob/main/Homeworks/docs/homework-rules.md)
 
-Роли микросервисов:
+1. Перевод Pcf.Administration и Pcf.ReceivingFromPartner на PostgreSQL
+   - В `Pcf.Administration.DataAccess` и `Pcf.ReceivingFromPartner.DataAccess` заменить `Microsoft.EntityFrameworkCore.Sqlite` на `Npgsql.EntityFrameworkCore.PostgreSQL`. В регистрации контекста вызывать `UseNpgsql`.
+   - Удалить миграции SQLite и создать миграцию заново. Снимок SQLite на PostgreSQL не переносится.
+   - В `docker-compose.yaml` уже добавлен отдельный контейнер Postgres для каждого сервиса: `pcf-administration-db` и `pcf-receivingfrompartner-db`.
+2. Перевод Pcf.GivingToCustomer на MongoDB через EF Core
+   - В `Pcf.GivingToCustomer.DataAccess` заменить `Microsoft.EntityFrameworkCore.Sqlite` на `MongoDB.EntityFrameworkCore`. В регистрации контекста вызывать `UseMongoDB`. `MongoClient` зарегистрировать один на приложение.
+   - Провайдер не поддерживает миграции и внешние ключи. Удалить миграции SQLite. При старте вызывать `Database.EnsureCreated`.
+   - Коллекции: `preferences`, `customers`, `promoCodes`. Связи между коллекциями — только идентификаторы: у клиента `PreferenceIds`, у промокода `PreferenceId`. Выданные промокоды хранить вложенным массивом клиента (`OwnsMany`), отдельную коллекцию для них не заводить.
+   - В `PromoCodesController.Create` искать клиентов по `PreferenceIds`, добавлять выданный промокод в массив клиента и сохранять клиента. Имена предпочтений для ответов брать из коллекции `preferences`.
+   - В конструкторе контекста выставить `Database.AutoTransactionBehavior = AutoTransactionBehavior.Never`: контейнер MongoDB без replica set транзакции не поддерживает.
+   - В `docker-compose.yaml` уже добавлен отдельный Mongo контейнер с именем `pcf-givingtocustomer-db`.
+3. Справочник предпочтений Pcf.ReceivingFromPartner в Redis
+   - Таблицу `Preferences` из PostgreSQL. В `PromoCodes` колонка `PreferenceId` остаётся без внешнего ключа.
+   - Убрать `Preference` из `PromoCode`, оставить только `PreferenceId`
+   - В `Pcf.ReceivingFromPartner.DataAccess` подключить `StackExchange.Redis`. `IConnectionMultiplexer` зарегистрировать один на приложение.
+   - Добавить `PreferenceRedisRepository`, который реализует `IRepository<Preference` и получает `IConnectionMultiplexer`. Справочник хранить хешем `preferences`: поле — `Id`, значение — `Name`.
+   - В `docker-compose.yaml` уже добавлен контейнер Redis с `appendonly yes` и `maxmemory-policy noeviction`.
 
-- **Pcf.Administration** — сотрудники и роли. `GET api/v1/employees/{id}` возвращает сотрудника вместе с ролью. Роль `PartnerManager` — партнерский менеджер.
-- **Pcf.GivingToCustomer** — клиенты и выдача им промокодов. `POST api/v1/promocodes` сохраняет промокод и выдаёт его клиентам с указанным предпочтением.
-- **Pcf.ReceivingFromPartner** — партнёры и промокоды от партнёров. При создании и изменении партнёра проверяет менеджера в Administration. После создания промокода передаёт его в GivingToCustomer.
-
-Контракты уже заданы интерфейсами `IAdministrationGateway` и `IGivingToCustomerGateway`. Базовые адреса лежат в `IntegrationSettings` файла `Pcf.ReceivingFromPartner.WebHost/appsettings.json`: `AdministrationApiUrl` и `GivingToCustomerApiUrl`.
-
-0. Ознакомиться с новой архитектурной проекта и изучить разделение на микросервисы.
-1. Интеграция с Administration
-   - В `Pcf.ReceivingFromPartner.Integration` реализовать `IAdministrationGateway`: `GET api/v1/employees/{employeeId}`.
-   - Если получен ответ 404 или роль, отличная от `PartnerManager`, — сотрудник не является партнерским менеджером. Остальные неуспешные ответы запроса завершают операцию ошибкой.
-   - Зарегистрировать в `AddIntegration`. Адрес сервиса брать из `IntegrationSettings:AdministrationApiUrl`. Если значение не задано, регистрация должна завершаться ошибкой.
-   - В `PartnersController` принимать `IAdministrationGateway`. В `Create` и `Update` до сохранения проверять менеджера. Если проверка не пройдена, вернуть `400` с `ProblemDetails` и заголовком `Invalid manager`, партнёра не сохранять.
-2. Интеграция с GivingToCustomer
-   - В `Pcf.ReceivingFromPartner.Integration` реализовать `IGivingToCustomerGateway`: `POST api/v1/promocodes`.
-   - В теле передать `Id`, `Code`, `ServiceInfo`, `BeginDate`, `EndDate`, `PartnerId` и `PreferenceId` созданного промокода. Неуспешный ответ завершает операцию ошибкой.
-   - Зарегистрировать в `AddIntegration`. Адрес сервиса брать из `IntegrationSettings:GivingToCustomerApiUrl`. Если значение не задано, регистрация должна завершаться ошибкой.
-   - В `PromoCodesController.Create` после сохранения промокода и увеличения `IssuedCount` вызвать `CreatePromoCode`.
-3. docker compose
-   - В `docker-compose.Development.yaml` добавить `pcf-givingtocustomer-api` и `pcf-receivingfrompartner-api` аналогично `pcf-administration-api`.
-   - ReceivingFromPartner: зависит от `pcf-administration-api` и `pcf-givingtocustomer-api`, просписать строки подключения в env
-   - Проверить сборку образов и запуск docker compose
-4. CI
-   - Обновить CI, должны собираться и публиковаться образы для каждого микросервиса.
+Дополнительная информация:
+1. Установка EF Core Tools: `dotnet tool install --global dotnet-ef`
+2. Миграция Administration: `dotnet ef migrations add Initial --project src/Pcf.Administration/Pcf.Administration.DataAccess --startup-project src/Pcf.Administration/Pcf.Administration.WebHost`
+3. Миграция ReceivingFromPartner: `dotnet ef migrations add Initial --project src/Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.DataAccess --startup-project src/Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.WebHost`
 
 ---
 
 ### Критерии оценивания
 
-- Пункт 1 — 3 балла
+- Пункт 1 — 4 балла
 - Пункт 2 — 3 балла
 - Пункт 3 — 3 балла
-- Пункт 4 — 1 балл
 
-Для зачёта домашнего задания достаточно 8 баллов.
+Для зачёта домашнего задания достаточно 7 баллов.
