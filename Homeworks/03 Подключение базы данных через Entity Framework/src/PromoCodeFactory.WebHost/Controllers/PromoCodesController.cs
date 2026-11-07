@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.WebHost.Mapping;
 using PromoCodeFactory.WebHost.Models.PromoCodes;
 
 namespace PromoCodeFactory.WebHost.Controllers;
@@ -6,7 +8,9 @@ namespace PromoCodeFactory.WebHost.Controllers;
 /// <summary>
 /// Промокоды
 /// </summary>
-public class PromoCodesController : BaseController
+public class PromoCodesController(IRepository<PromoCode> promoCodeRepository,
+    IRepository<Employee> employeeRepository,
+    IRepository<Preference> preferenceRepository, IRepository<CustomerPromoCode> customerPromoCodeRepository) : BaseController
 {
     /// <summary>
     /// Получить все промокоды
@@ -15,7 +19,15 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(typeof(IEnumerable<PromoCodeShortResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PromoCodeShortResponse>>> Get(CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            IReadOnlyCollection<PromoCode> data = await promoCodeRepository.GetAll(withIncludes: false, ct);
+            return Ok(data);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
     }
 
     /// <summary>
@@ -26,7 +38,20 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PromoCodeShortResponse>> GetById(Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            PromoCode? item = await promoCodeRepository.GetById(id, withIncludes: false, ct);
+            if (item is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(item);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
     }
 
     /// <summary>
@@ -38,7 +63,42 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PromoCodeShortResponse>> Create(PromoCodeCreateRequest request, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        try
+        {
+            Employee? manager = await employeeRepository.GetById(request.PartnerManagerId, withIncludes: false, ct);
+            if (manager is null)
+            {
+                return NotFound($"Partner manager with id {request.PartnerManagerId} not found");
+            }
+
+            Preference? preference = await preferenceRepository.GetById(request.PreferenceId, withIncludes: false, ct);
+
+            if (preference is null)
+            {
+                return NotFound($"Preference with id {request.PreferenceId} not found");
+            }
+
+            var promoCode = new PromoCode
+            {
+                Code = request.Code,
+                ServiceInfo = request.ServiceInfo,
+                BeginDate = request.BeginDate,
+                EndDate = request.EndDate,
+                PartnerName = request.PartnerName,
+                PartnerManager = manager,
+                Preference = preference
+            };
+
+            await promoCodeRepository.Add(promoCode, ct);
+
+            var response = PromoCodesMapper.ToPromoCodeShortResponse(promoCode);
+
+            return Created($"api/v1/[controller]/Create", response);
+        }
+        catch (Exception ex)
+        {
+            return Problem(ex.Message);
+        }
     }
 
     /// <summary>
@@ -48,11 +108,34 @@ public class PromoCodesController : BaseController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Apply(
+    public async Task<IActionResult?> Apply(
         [FromRoute] Guid id,
         [FromBody] PromoCodeApplyRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        PromoCode? promoCode = await promoCodeRepository.GetById(id, withIncludes: true, ct);
+        if (promoCode is null)
+        {
+            return NotFound();
+        }
+
+        CustomerPromoCode? customerPromoCode = promoCode.CustomerPromoCodes.FirstOrDefault(x => x.CustomerId == request.CustomerId);
+        if (customerPromoCode is null)
+        {
+            return BadRequest();
+        }
+        DateTime date = DateTime.UtcNow;
+        customerPromoCode.CustomerId = request.CustomerId;
+        customerPromoCode.AppliedAt = date;
+
+
+        await customerPromoCodeRepository.Update(customerPromoCode, ct);
+
+        return Ok();
     }
 }
