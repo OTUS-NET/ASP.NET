@@ -10,7 +10,7 @@ namespace PromoCodeFactory.WebHost.Controllers;
 /// </summary>
 public class PromoCodesController(IRepository<PromoCode> promoCodeRepository,
     IRepository<Employee> employeeRepository,
-    IRepository<Preference> preferenceRepository) : BaseController
+    IRepository<Preference> preferenceRepository, IRepository<CustomerPromoCode> customerPromoCodeRepository) : BaseController
 {
     /// <summary>
     /// Получить все промокоды
@@ -108,11 +108,34 @@ public class PromoCodesController(IRepository<PromoCode> promoCodeRepository,
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Apply(
+    public async Task<IActionResult?> Apply(
         [FromRoute] Guid id,
         [FromBody] PromoCodeApplyRequest request,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        PromoCode? promoCode = await promoCodeRepository.GetById(id, withIncludes: true, ct);
+        if (promoCode is null)
+        {
+            return NotFound();
+        }
+
+        CustomerPromoCode? customerPromoCode = promoCode.CustomerPromoCodes.FirstOrDefault(x => x.CustomerId == request.CustomerId);
+        if (customerPromoCode is null)
+        {
+            return BadRequest();
+        }
+        DateTime date = DateTime.UtcNow;
+        customerPromoCode.CustomerId = request.CustomerId;
+        customerPromoCode.AppliedAt = date;
+
+
+        await customerPromoCodeRepository.Update(customerPromoCode, ct);
+
+        return Ok();
     }
 }
