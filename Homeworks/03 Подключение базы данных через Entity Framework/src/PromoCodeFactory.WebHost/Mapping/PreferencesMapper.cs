@@ -5,7 +5,7 @@ namespace PromoCodeFactory.WebHost.Mapping;
 
 public static class PreferencesMapper
 {
-    public static PreferenceShortResponse ToPreferenceShortResponse(Preference preference)
+    public static PreferenceShortResponse ToPreferenceShortResponse(this Preference preference)
     {
         return new PreferenceShortResponse(preference.Id, preference.Name);
     }
