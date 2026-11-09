@@ -4,13 +4,8 @@ using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 
 namespace PromoCodeFactory.DataAccess;
 
-public class PromoCodeFactoryDbContext : DbContext
+public class PromoCodeFactoryDbContext(DbContextOptions<PromoCodeFactoryDbContext> options) : DbContext(options)
 {
-    public PromoCodeFactoryDbContext(DbContextOptions<PromoCodeFactoryDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Customer> Customers => Set<Customer>();

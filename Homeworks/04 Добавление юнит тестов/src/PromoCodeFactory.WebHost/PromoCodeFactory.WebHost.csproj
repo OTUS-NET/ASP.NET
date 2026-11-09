@@ -14,6 +14,8 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
+      <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.4" />
     </ItemGroup>
 

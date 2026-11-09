@@ -41,7 +41,7 @@ public static class HostExtensions
             .CreateLogger("MigrateDatabase");
 
         var connectionString = appContext.Database.GetConnectionString();
-        logger.LogInformation($"Use connectionString: '{connectionString}'");
+        logger.LogInformation("Use connectionString: '{ConnectionString}'", connectionString);
 
         var pendingMigrations = appContext.Database.GetPendingMigrations().ToArray();
         var message = pendingMigrations.Length > 0
@@ -54,7 +54,7 @@ public static class HostExtensions
         return host;
     }
 
-    public static async Task SeedEntity<T>(
+    private static async Task SeedEntity<T>(
         IServiceProvider serviceProvider,
         ILogger logger,
         IReadOnlyCollection<T> entities,
@@ -63,13 +63,13 @@ public static class HostExtensions
     {
         var repository = serviceProvider.GetRequiredService<IRepository<T>>();
 
-        if ((await repository.GetAll()).Count > 0)
+        if ((await repository.GetAll(ct: ct)).Count > 0)
         {
-            logger.LogInformation($"Entity '{typeof(T).Name}' is not empty. Skip seeding");
+            logger.LogInformation("Entity '{Name}' is not empty. Skip seeding", typeof(T).Name);
             return;
         }
 
-        logger.LogInformation($"Starting seed {typeof(T).Name}");
+        logger.LogInformation("Starting seed {Name}", typeof(T).Name);
 
         foreach (var entity in entities)
             await repository.Add(entity, ct);
