@@ -36,7 +36,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
             }
 
             context.Set<T>().Remove(item);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(ct);
         }
         catch
         {
@@ -48,7 +48,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
     {
         try
         {
-            IQueryable<T> query = context.Set<T>();
+            IQueryable<T> query = context.Set<T>().AsNoTracking();
             if (withIncludes)
             {
                 query = ApplyIncludes(query);
@@ -123,7 +123,7 @@ internal class EfRepository<T>(PromoCodeFactoryDbContext context) : IRepository<
         try
         {
             context.Set<T>().Update(entity);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(ct);
         }
         catch
         {
