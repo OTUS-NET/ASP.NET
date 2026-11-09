@@ -27,4 +27,19 @@ public interface IRepository<T> where T : BaseEntity
 
     /// <exception cref="EntityNotFoundException"/>
     Task Delete(Guid id, CancellationToken ct);
+
+    /// <summary>
+    /// Выполняет указанную асинхронную операцию в рамках одной транзакции.
+    /// Все изменения, произведённые внутри <paramref name="action"/>, фиксируются атомарно:
+    /// при успехе — коммит, при исключении — откат.
+    /// </summary>
+    /// <param name="action">
+    /// Асинхронная операция, содержащая изменения репозитория (например, несколько вызовов <c>Add</c>).
+    /// </param>
+    /// <param name="ct">Токен отмены операции.</param>
+    /// <remarks>
+    /// Для хранилищ без поддержки транзакций (например, in-memory) операция просто выполняется
+    /// без явного коммита/отката, но контракт остаётся единым.
+    /// </remarks>
+    Task ExecuteInTransaction(Func<Task> action, CancellationToken ct);
 }
