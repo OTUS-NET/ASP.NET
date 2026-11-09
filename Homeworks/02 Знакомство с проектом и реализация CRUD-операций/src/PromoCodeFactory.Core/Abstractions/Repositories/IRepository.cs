@@ -9,7 +9,7 @@ public interface IRepository<T> where T : BaseEntity
 
     Task<T?> GetById(Guid id, CancellationToken ct);
 
-    Task Add(T entity, CancellationToken ct);
+    Task<T> Add(T entity, CancellationToken ct);
 
     /// <exception cref="EntityNotFoundException"/>
     Task Update(T entity, CancellationToken ct);
