@@ -2,7 +2,7 @@ name: CI
 
 on: 
   push:
-    branches: [ main ]
+    branches: [ main, feature/homework_06 ]
     paths:
       - 'Homeworks/06 Настройка CI/**'
   workflow_dispatch:
