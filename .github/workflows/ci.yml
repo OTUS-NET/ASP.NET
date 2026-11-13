@@ -58,4 +58,5 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Print published image
-        run: echo "Published image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+        run: |
+          echo "Published image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
