@@ -9,7 +9,7 @@ namespace PromoCodeFactory.WebHost.Controllers;
 /// <summary>
 /// Клиенты
 /// </summary>
-public class CustomersController(IRepository<Customer> customerRepository, IRepository<PromoCode> promoCodeRepository) : BaseController
+public class CustomersController(IRepository<Customer> customerRepository, IRepository<PromoCode> promoCodeRepository, IRepository<Preference> preferenceRepository) : BaseController
 {
     /// <summary>
     /// Получить данные всех клиентов
@@ -94,4 +94,83 @@ public class CustomersController(IRepository<Customer> customerRepository, IRepo
             return Problem(ex.Message);
         }
     }
+
+    [HttpPost("Create")]
+    public async Task<ActionResult> Create(CustomerCreateRequest request, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+        try
+        {
+            IReadOnlyCollection<Preference> preference = await preferenceRepository.GetByRangeId(request.PreferenceIds, false, ct);
+
+            var customer = new Customer
+            {
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Preferences = preference.ToArray()
+            };
+            await customerRepository.Add(customer, ct);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPatch("{id:guid}")]
+    public async Task<ActionResult<CustomerResponse>> Update(Guid id, CustomerUpdateRequest updateRequest, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+        try
+        {
+            IReadOnlyCollection<Preference> preference = await preferenceRepository.GetByRangeId(updateRequest.PreferenceIds, false, ct);
+            var customer = await customerRepository.GetById(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            customer.FirstName = updateRequest.FirstName;
+            customer.LastName = updateRequest.LastName;
+            customer.Email = updateRequest.Email;
+            customer.Preferences = preference.ToArray();
+
+            await customerRepository.Update(customer, ct);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+        try
+        {
+            await customerRepository.Delete(id, ct);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
 }
