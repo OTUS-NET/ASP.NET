@@ -34,7 +34,7 @@ public class CancelLimitTests
             .ReturnsAsync((Partner?)null);
 
         // Act
-        var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
+        IActionResult result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -50,14 +50,14 @@ public class CancelLimitTests
         // Arrange
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
-        var partner = CreatePartnerWithLimit(partnerId, limitId, isActive: false);
+        Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: false);
 
         _partnersRepositoryMock
             .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
 
         // Act
-        var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
+        IActionResult result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<UnprocessableEntityObjectResult>();
@@ -74,14 +74,14 @@ public class CancelLimitTests
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
         var otherLimitId = Guid.NewGuid();
-        var partner = CreatePartnerWithLimit(partnerId, otherLimitId, isActive: true);
+        Partner partner = CreatePartnerWithLimit(partnerId, otherLimitId, isActive: true);
 
         _partnersRepositoryMock
             .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
 
         // Act
-        var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
+        IActionResult result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -97,14 +97,14 @@ public class CancelLimitTests
         // Arrange
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
-        var partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true, canceledAt: DateTimeOffset.UtcNow);
+        Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true, canceledAt: DateTimeOffset.UtcNow);
 
         _partnersRepositoryMock
             .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
 
         // Act
-        var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
+        IActionResult result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<UnprocessableEntityObjectResult>();
@@ -120,7 +120,7 @@ public class CancelLimitTests
         // Arrange
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
-        var partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true);
+        Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true);
 
         _partnersRepositoryMock
             .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
@@ -131,7 +131,7 @@ public class CancelLimitTests
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
+        IActionResult result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
@@ -147,7 +147,7 @@ public class CancelLimitTests
         // Arrange
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
-        var partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true);
+        Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true);
 
         _partnersRepositoryMock
             .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
@@ -158,7 +158,7 @@ public class CancelLimitTests
             .ThrowsAsync(new EntityNotFoundException<Partner>(partnerId));
 
         // Act
-        var result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
+        IActionResult result = await _sut.CancelLimit(partnerId, limitId, CancellationToken.None);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -170,24 +170,24 @@ public class CancelLimitTests
         bool isActive,
         DateTimeOffset? canceledAt = null)
     {
-        var role = new AutoFaker<Role>()
+        Role role = new AutoFaker<Role>()
             .RuleFor(r => r.Id, _ => Guid.NewGuid())
             .Generate();
 
-        var employee = new AutoFaker<Employee>()
+        Employee employee = new AutoFaker<Employee>()
             .RuleFor(e => e.Id, _ => Guid.NewGuid())
             .RuleFor(e => e.Role, role)
             .Generate();
 
         var limits = new List<PartnerPromoCodeLimit>();
-        var partner = new AutoFaker<Partner>()
+        Partner partner = new AutoFaker<Partner>()
             .RuleFor(p => p.Id, _ => partnerId)
             .RuleFor(p => p.IsActive, _ => isActive)
             .RuleFor(p => p.Manager, employee)
             .RuleFor(p => p.PartnerLimits, limits)
             .Generate();
 
-        var limit = new AutoFaker<PartnerPromoCodeLimit>()
+        PartnerPromoCodeLimit limit = new AutoFaker<PartnerPromoCodeLimit>()
             .RuleFor(l => l.Id, _ => limitId)
             .RuleFor(l => l.Partner, partner)
             .RuleFor(l => l.CanceledAt, _ => canceledAt)
