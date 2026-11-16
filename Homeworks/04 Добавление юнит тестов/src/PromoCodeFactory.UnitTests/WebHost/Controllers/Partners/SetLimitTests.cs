@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PromoCodeFactory.Core.Abstractions.Repositories;
@@ -37,16 +38,18 @@ public class SetLimitTests
         // Assert
 
         // 1. Проверяем, что возвращен тип NotFoundObjectResult (404 с телом ответа)
-        NotFoundResult notfoundResult = Assert.IsType<NotFoundResult>(result.Result);
-        ProblemDetails problemDetails = Assert.IsType<ProblemDetails>(result.Value);
-        Assert.Equal(404, notfoundResult.StatusCode);
+        NotFoundObjectResult notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+        ProblemDetails problemDetails = Assert.IsType<ProblemDetails>(notFoundResult.Value);
+        Assert.Equal(404, notFoundResult.StatusCode);
         problemDetails.Title.Should().Be($"Partner by id {partnerId} not found");
+        problemDetails.Status.Should().Be(StatusCodes.Status404NotFound);
 
     }
 
     [Fact]
     public async Task CreateLimit_WhenPartnerBlocked_ReturnsUnprocessableEntity()
     {
+
     }
 
     [Fact]

@@ -34,7 +34,11 @@ public class PartnersController(
     {
         var partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
         if (partner is null)
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = $"Partner by id {partnerId} not found"
+            });
 
         return Ok(PartnersMapper.ToPartnerResponse(partner));
     }
