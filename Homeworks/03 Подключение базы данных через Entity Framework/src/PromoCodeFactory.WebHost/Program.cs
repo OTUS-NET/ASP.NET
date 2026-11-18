@@ -1,4 +1,9 @@
+using PromoCodeFactory.Core.Abstractions.Sevices;
+using PromoCodeFactory.Core.Services;
+using PromoCodeFactory.Core.Domain.PromoCodeManagement;
 using PromoCodeFactory.DataAccess;
+using PromoCodeFactory.DataAccess.Repositories;
+
 
 var builder = WebApplication.CreateBuilder();
 
@@ -12,6 +17,9 @@ builder.Services.AddRouting(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi(builder.Environment);
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IPreferencesService, PreferencesService>();
+builder.Services.AddScoped<IPromoCodesService, PromoCodesService>();
 
 var app = builder.Build();
 

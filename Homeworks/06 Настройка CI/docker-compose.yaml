@@ -1,6 +1,6 @@
 services:
   promocode-factory-api:
-    build: src/
+    image: ghcr.io/sergeyzdanov/asp.net:latest
     container_name: 'promocode-factory-api'
     restart: always
     ports:
