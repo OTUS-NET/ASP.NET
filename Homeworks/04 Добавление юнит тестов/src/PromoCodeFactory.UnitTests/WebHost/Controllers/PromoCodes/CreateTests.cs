@@ -17,7 +17,7 @@ public class CreateTests
     private readonly Mock<IRepository<Customer>> _mockCustomersRepository;
     private readonly Mock<IRepository<CustomerPromoCode>> _mockCustomerPromoCodesRepository;
     private readonly Mock<IRepository<Partner>> _mockPartnersRepository;
-    private readonly Mock<IRepository<Preference>> _mockPreferencesRepositor;
+    private readonly Mock<IRepository<Preference>> _mockPreferencesRepository;
 
     public CreateTests()
     {
@@ -25,12 +25,12 @@ public class CreateTests
         _mockCustomersRepository = new Mock<IRepository<Customer>>();
         _mockCustomerPromoCodesRepository = new Mock<IRepository<CustomerPromoCode>>();
         _mockPartnersRepository = new Mock<IRepository<Partner>>();
-        _mockPreferencesRepositor = new Mock<IRepository<Preference>>();
+        _mockPreferencesRepository = new Mock<IRepository<Preference>>();
         _promoCodeController = new PromoCodesController(_mockPromoCodesRepository.Object,
             _mockCustomersRepository.Object,
             _mockCustomerPromoCodesRepository.Object,
             _mockPartnersRepository.Object,
-            _mockPreferencesRepositor.Object);
+            _mockPreferencesRepository.Object);
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class CreateTests
             DateTime.Now.AddDays(1),
             new Guid());
         _mockPartnersRepository.Setup(x => x.GetById(partnerId, true, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Partner)null);
+            .ReturnsAsync((Partner?)null);
 
-        var responce = await _promoCodeController.Create(request, CancellationToken.None);
+        ActionResult<PromoCodeShortResponse> responce = await _promoCodeController.Create(request, CancellationToken.None);
 
         NotFoundObjectResult notFoundResult = Assert.IsType<NotFoundObjectResult>(responce.Result);
         ProblemDetails problemDetails = Assert.IsType<ProblemDetails>(notFoundResult.Value);
@@ -60,6 +60,7 @@ public class CreateTests
     public async Task Create_WhenPreferenceNotFound_ReturnsNotFound()
     {
         var partnerId = Guid.NewGuid();
+        var preferenceId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
         Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: false);
         var request = new PromoCodeCreateRequest(
@@ -68,14 +69,14 @@ public class CreateTests
             partnerId,
             DateTime.Now,
             DateTime.Now.AddDays(1),
-            Guid.NewGuid());
+            preferenceId);
 
         _mockPartnersRepository.Setup(x => x.GetById(partnerId, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
-        _mockPreferencesRepositor.Setup(x => x.GetById(request.PreferenceId, true, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Preference)null);
+        _mockPreferencesRepository.Setup(x => x.GetById(request.PreferenceId, true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Preference?)null);
 
-        var responce = await _promoCodeController.Create(request, CancellationToken.None);
+        ActionResult<PromoCodeShortResponse> responce = await _promoCodeController.Create(request, CancellationToken.None);
         NotFoundObjectResult notFoundResult = Assert.IsType<NotFoundObjectResult>(responce.Result);
         ProblemDetails problemDetails = Assert.IsType<ProblemDetails>(notFoundResult.Value);
         Assert.Equal(404, notFoundResult.StatusCode);
@@ -89,39 +90,43 @@ public class CreateTests
     {
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
+        var preferenceId = Guid.NewGuid();
         Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: false, DateTime.Now);
+        Preference preference = CreatePreference(preferenceId);
         var request = new PromoCodeCreateRequest(
             string.Empty,
             string.Empty,
             partnerId,
             DateTime.Now,
             DateTime.Now.AddDays(1),
-            Guid.NewGuid());
+            preferenceId);
 
         _mockPartnersRepository.Setup(x => x.GetById(partnerId, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
-        _mockPreferencesRepositor.Setup(x => x.GetById(request.PreferenceId, true, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Preference)null);
+        _mockPreferencesRepository.Setup(x => x.GetById(preferenceId, false, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(preference);
 
-        var responce = await _promoCodeController.Create(request, CancellationToken.None);
+        ActionResult<PromoCodeShortResponse> responce = await _promoCodeController.Create(request, CancellationToken.None);
 
-        //responce.Should().BeOfType<UnprocessableEntityObjectResult>();
-        //var badRequestResult = responce as UnprocessableEntityObjectResult;
-        //badRequestResult.Value.Should().BeOfType<ProblemDetails>();
-        //var problemDetails = (ProblemDetails)badRequestResult.Value!;
-        //problemDetails.Title.Should().Be("No active limit");
-        //problemDetails.Detail.Should().Be("Partner has no active promo code limit.");
+        responce.Should().BeOfType<UnprocessableEntityObjectResult>();
+        UnprocessableEntityObjectResult badRequestResult = Assert.IsType<UnprocessableEntityObjectResult>(responce.Result);
+        badRequestResult.Value.Should().BeOfType<ProblemDetails>();
+        var problemDetails = (ProblemDetails)badRequestResult.Value!;
+        problemDetails.Title.Should().Be("No active limit");
+        problemDetails.Detail.Should().Be("Partner has no active promo code limit.");
 
     }
 
     [Fact]
     public async Task Create_WhenLimitExceeded_ReturnsUnprocessableEntity()
     {
+        Assert.Fail();
     }
 
     [Fact]
     public async Task Create_WhenValidRequest_ReturnsCreatedAndIncrementsIssuedCount()
     {
+        Assert.Fail();
     }
 
     private static Partner CreatePartnerWithLimit(
@@ -157,5 +162,16 @@ public class CreateTests
 
         limits.Add(limit);
         return partner;
+    }
+
+    private Preference CreatePreference(Guid preferenceId)
+    {
+        Preference preference = new AutoFaker<Preference>()
+            .RuleFor(x => x.Id, _ => preferenceId)
+            .RuleFor(x => x.Name, "TestName")
+            .RuleFor(x => x.Customers, new List<Customer>())
+            .Generate();
+
+        return preference;
     }
 }
