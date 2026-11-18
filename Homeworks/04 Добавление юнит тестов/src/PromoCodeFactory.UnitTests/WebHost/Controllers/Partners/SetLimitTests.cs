@@ -4,6 +4,7 @@ using Moq;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.Core.Exceptions;
 using PromoCodeFactory.WebHost.Controllers;
 using PromoCodeFactory.WebHost.Models.Partners;
 using Soenneker.Utils.AutoBogus;
@@ -74,7 +75,7 @@ public class SetLimitTests
     {
         var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
-        int limit = 1;
+        var limit = 1;
 
         Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true);
         PartnerPromoCodeLimitCreateRequest fakeRequest = new(DateTime.UtcNow.AddYears(1), limit);
@@ -85,7 +86,7 @@ public class SetLimitTests
         ActionResult<PartnerPromoCodeLimitResponse> result = await _partnerController.CreateLimit(partnerId, fakeRequest, CancellationToken.None);
 
 
-        var responce = Assert.IsType<CreatedAtActionResult>(result.Result);
+        CreatedAtActionResult responce = Assert.IsType<CreatedAtActionResult>(result.Result);
         PartnerPromoCodeLimitResponse correctReponce = Assert.IsType<PartnerPromoCodeLimitResponse>(responce.Value);
         Assert.Equal(201, responce.StatusCode);
         correctReponce.Limit.Should().Be(limit);
@@ -95,8 +96,59 @@ public class SetLimitTests
     public async Task CreateLimit_WhenValidRequestWithActiveLimits_CancelsOldLimitsAndAddsNew()
     {
         var partnerId = Guid.NewGuid();
+        var oldLimitId = Guid.NewGuid();
+        var newLimitValue = 10;
+        PartnerPromoCodeLimit? addedLimit = null;
+        DateTimeOffset endAt = DateTimeOffset.UtcNow.AddYears(1);
+
+        Partner partner = CreatePartnerWithLimit(partnerId, oldLimitId, isActive: true);
+        PartnerPromoCodeLimit oldLimit = partner.PartnerLimits.Single();
+        PartnerPromoCodeLimitCreateRequest request = new(endAt, newLimitValue);
+
+        _partnersRepositoryMock
+            .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(partner);
+
+        _partnersRepositoryMock
+            .Setup(r => r.Update(partner, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _partnerLimitsRepositoryMock
+            .Setup(r => r.Add(It.IsAny<PartnerPromoCodeLimit>(), It.IsAny<CancellationToken>()))
+            .Callback<PartnerPromoCodeLimit, CancellationToken>((limit, _) => addedLimit = limit)
+            .Returns(Task.CompletedTask);
+
+        ActionResult<PartnerPromoCodeLimitResponse> result =
+            await _partnerController.CreateLimit(partnerId, request, CancellationToken.None);
+
+        CreatedAtActionResult response = Assert.IsType<CreatedAtActionResult>(result.Result);
+        PartnerPromoCodeLimitResponse body = Assert.IsType<PartnerPromoCodeLimitResponse>(response.Value);
+        Assert.Equal(201, response.StatusCode);
+
+        oldLimit.CanceledAt.Should().NotBeNull();
+        oldLimit.CanceledAt.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromSeconds(5));
+        _partnersRepositoryMock.Verify(
+            r => r.Update(partner, It.IsAny<CancellationToken>()),
+            Times.Once);
+        addedLimit.Should().NotBeNull();
+        addedLimit!.Id.Should().NotBe(oldLimitId);
+        addedLimit.Limit.Should().Be(newLimitValue);
+        addedLimit.EndAt.Should().Be(endAt);
+        addedLimit.CanceledAt.Should().BeNull();
+        addedLimit.IssuedCount.Should().Be(0);
+        addedLimit.Partner.Should().BeSameAs(partner);
+        body.Id.Should().Be(addedLimit.Id);
+        body.Limit.Should().Be(newLimitValue);
+        _partnerLimitsRepositoryMock.Verify(
+            r => r.Add(addedLimit, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+    [Fact]
+    public async Task CreateLimit_WhenUpdateThrowsEntityNotFoundException_ReturnsNotFound()
+    {
+        var partnerId = Guid.NewGuid();
         var limitId = Guid.NewGuid();
-        int limit = 1;
+        var limit = 1;
 
         Partner partner = CreatePartnerWithLimit(partnerId, limitId, isActive: true);
         PartnerPromoCodeLimitCreateRequest fakeRequest = new(DateTime.UtcNow.AddYears(1), limit);
@@ -104,12 +156,18 @@ public class SetLimitTests
             .Setup(r => r.GetById(partnerId, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(partner);
 
-        ActionResult<PartnerPromoCodeLimitResponse> result = await _partnerController.CreateLimit(partnerId, fakeRequest, CancellationToken.None);
-    }
+        _partnersRepositoryMock
+            .Setup(r => r.Update(partner, It.IsAny<CancellationToken>()))
+            .Throws(new EntityNotFoundException(typeof(Partner), partner.Id));
 
-    [Fact]
-    public async Task CreateLimit_WhenUpdateThrowsEntityNotFoundException_ReturnsNotFound()
-    {
+        ActionResult<PartnerPromoCodeLimitResponse> result = await _partnerController.CreateLimit(partnerId, fakeRequest, CancellationToken.None);
+
+        NotFoundObjectResult notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+        ProblemDetails problemDetails = Assert.IsType<ProblemDetails>(notFoundResult.Value);
+        Assert.Equal(404, notFoundResult.StatusCode);
+        problemDetails.Title.Should().Be($"Partner not found");
+        problemDetails.Detail.Should().Be($"{typeof(Partner).Name} with Id '{partner.Id}' was not found.");
+
     }
 
     private static Partner CreatePartnerWithLimit(
