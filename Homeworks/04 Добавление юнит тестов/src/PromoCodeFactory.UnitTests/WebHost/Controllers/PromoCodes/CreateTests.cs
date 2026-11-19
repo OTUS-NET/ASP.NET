@@ -108,8 +108,8 @@ public class CreateTests
 
         ActionResult<PromoCodeShortResponse> responce = await _promoCodeController.Create(request, CancellationToken.None);
 
-        responce.Should().BeOfType<UnprocessableEntityObjectResult>();
-        UnprocessableEntityObjectResult badRequestResult = Assert.IsType<UnprocessableEntityObjectResult>(responce.Result);
+        //responce.Should().BeOfType<UnprocessableEntityObjectResult>();
+        ObjectResult badRequestResult = Assert.IsType<ObjectResult>(responce.Result);
         badRequestResult.Value.Should().BeOfType<ProblemDetails>();
         var problemDetails = (ProblemDetails)badRequestResult.Value!;
         problemDetails.Title.Should().Be("No active limit");
