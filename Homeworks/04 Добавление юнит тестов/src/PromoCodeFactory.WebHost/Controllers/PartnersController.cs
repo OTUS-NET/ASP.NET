@@ -19,7 +19,7 @@ public class PartnersController(
     [ProducesResponseType(typeof(IEnumerable<PartnerResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<PartnerResponse>>> Get(CancellationToken ct)
     {
-        var partners = await partnersRepository.GetAll(withIncludes: true, ct: ct);
+        IReadOnlyCollection<Partner> partners = await partnersRepository.GetAll(withIncludes: true, ct: ct);
         var response = partners.Select(PartnersMapper.ToPartnerResponse).ToList();
         return Ok(response);
     }
@@ -32,9 +32,13 @@ public class PartnersController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<PartnerResponse>> GetById([FromRoute] Guid partnerId, CancellationToken ct)
     {
-        var partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
+        Partner? partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
         if (partner is null)
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = $"Partner by id {partnerId} not found"
+            });
 
         return Ok(PartnersMapper.ToPartnerResponse(partner));
     }
@@ -47,11 +51,11 @@ public class PartnersController(
         [FromRoute] Guid limitId,
         CancellationToken ct)
     {
-        var partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
+        Partner? partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
         if (partner is null)
             return NotFound();
 
-        var limit = partner.PartnerLimits.FirstOrDefault(l => l.Id == limitId);
+        PartnerPromoCodeLimit? limit = partner.PartnerLimits.FirstOrDefault(l => l.Id == limitId);
         if (limit is null)
             return NotFound();
 
@@ -68,7 +72,7 @@ public class PartnersController(
         [FromBody] PartnerPromoCodeLimitCreateRequest request,
         CancellationToken ct)
     {
-        var partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
+        Partner? partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
         if (partner is null)
             return NotFound(new ProblemDetails
             {
@@ -83,12 +87,12 @@ public class PartnersController(
                 Detail = "Cannot create limit for a blocked partner."
             });
 
-        var now = DateTimeOffset.UtcNow;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
 
         // Отключить предыдущие активные лимиты
         var activeLimits = partner.PartnerLimits.Where(l => l.CanceledAt == null).ToList();
 
-        foreach (var activeLimit in activeLimits)
+        foreach (PartnerPromoCodeLimit? activeLimit in activeLimits)
         {
             activeLimit.CanceledAt = now;
         }
@@ -99,9 +103,13 @@ public class PartnersController(
             {
                 await partnersRepository.Update(partner, ct);
             }
-            catch (EntityNotFoundException)
+            catch (EntityNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Partner not found",
+                    Detail = ex.Message
+                });
             }
         }
 
@@ -132,7 +140,7 @@ public class PartnersController(
         [FromRoute] Guid limitId,
         CancellationToken ct)
     {
-        var partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
+        Partner? partner = await partnersRepository.GetById(partnerId, withIncludes: true, ct);
         if (partner is null)
             return NotFound(new ProblemDetails
             {
@@ -147,7 +155,7 @@ public class PartnersController(
                 Detail = "Cannot cancel limit for a blocked partner."
             });
 
-        var limit = partner.PartnerLimits.FirstOrDefault(l => l.Id == limitId);
+        PartnerPromoCodeLimit? limit = partner.PartnerLimits.FirstOrDefault(l => l.Id == limitId);
         if (limit is null)
             return NotFound(new ProblemDetails
             {
