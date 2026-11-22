@@ -1,3 +1,4 @@
+using Pcf.Common.Contracts.GivingToCustomer;
 using Pcf.ReceivingFromPartner.Core.Abstractions;
 using Pcf.ReceivingFromPartner.Core.Domain;
 using System.Net.Http.Json;
@@ -9,16 +10,14 @@ public class GivingToCustomerGateway(HttpClient httpClient) : IGivingToCustomerG
     /// <inheritdoc/>
     public async Task CreatePromoCode(PromoCode promoCode, CancellationToken ct)
     {
-        var request = new CreatePromoCodeRequest
-        {
-            Id = promoCode.Id,
-            Code = promoCode.Code,
-            ServiceInfo = promoCode.ServiceInfo,
-            BeginDate = promoCode.BeginDate,
-            EndDate = promoCode.EndDate,
-            PartnerId = promoCode.Partner.Id,
-            PreferenceId = promoCode.PreferenceId,
-        };
+        var request = new CreatePromoCodeMessage(
+            promoCode.Id,
+            promoCode.Code,
+            promoCode.ServiceInfo,
+            promoCode.BeginDate,
+            promoCode.EndDate,
+            promoCode.Partner.Id,
+            promoCode.PreferenceId);
 
         using var response = await httpClient.PostAsJsonAsync("api/v1/promocodes", request, ct);
         response.EnsureSuccessStatusCode();
