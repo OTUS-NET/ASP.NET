@@ -1,4 +1,23 @@
 services:
+  pcf-rabbitmq:
+    image: rabbitmq:4-management
+    container_name: pcf-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: pcf
+      RABBITMQ_DEFAULT_PASS: pcf
+    volumes:
+      - pcf-rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
   # Administration
   pcf-administration-db:
     image: postgres:17
@@ -60,10 +79,13 @@ services:
     depends_on:
       pcf-givingtocustomer-db:
         condition: service_healthy
+      pcf-rabbitmq:
+        condition: service_healthy
     ports:
       - "8092:8080"
     environment:
       ConnectionStrings__PromocodeFactoryDb: mongodb://pcf:pcf@pcf-givingtocustomer-db:27017/?authSource=admin
+      RabbitMq__Url: amqp://pcf:pcf@pcf-rabbitmq:5672/
       ASPNETCORE_ENVIRONMENT: Development
 
   # ReceivingFromPartner
@@ -113,18 +135,19 @@ services:
         condition: service_healthy
       pcf-administration-api:
         condition: service_started
-      pcf-givingtocustomer-api:
-        condition: service_started
+      pcf-rabbitmq:
+        condition: service_healthy
     ports:
       - "8093:8080"
     environment:
       ConnectionStrings__PromocodeFactoryDb: Host=pcf-receivingfrompartner-db;Port=5432;Database=pcf_receivingfrompartner;Username=pcf;Password=pcf
       ConnectionStrings__Redis: pcf-receivingfrompartner-cache:6379
       IntegrationSettings__AdministrationApiUrl: http://pcf-administration-api:8080
-      IntegrationSettings__GivingToCustomerApiUrl: http://pcf-givingtocustomer-api:8080
+      RabbitMq__Url: amqp://pcf:pcf@pcf-rabbitmq:5672/
       ASPNETCORE_ENVIRONMENT: Development
 
 volumes:
+  pcf-rabbitmq:
   pcf-administration-db:
   pcf-receivingfrompartner-db:
   pcf-receivingfrompartner-cache:

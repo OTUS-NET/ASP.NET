@@ -3,6 +3,7 @@
     <Project Path="Common/Pcf.Common.Core/Pcf.Common.Core.csproj" Id="1a249665-c76a-4f96-a0f5-6ab7632d5e5f" />
     <Project Path="Common/Pcf.Common.Ef/Pcf.Common.Ef.csproj" Id="e7456f58-7c6a-45d3-9cb6-d3321c233089" />
     <Project Path="Common/Pcf.Common.Web/Pcf.Common.Web.csproj" Id="5f17acea-76bf-4073-89da-c137223bbe59" />
+    <Project Path="Common/Pcf.Common.Contracts/Pcf.Common.Contracts.csproj" />
   </Folder>
   <Folder Name="/Pcf.Administration/">
     <File Path="Pcf.Administration/Dockerfile" />
