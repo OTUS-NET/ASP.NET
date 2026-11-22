@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/Common/">
+    <Project Path="Common/Pcf.Common.Core/Pcf.Common.Core.csproj" Id="1a249665-c76a-4f96-a0f5-6ab7632d5e5f" />
+    <Project Path="Common/Pcf.Common.Ef/Pcf.Common.Ef.csproj" Id="e7456f58-7c6a-45d3-9cb6-d3321c233089" />
+    <Project Path="Common/Pcf.Common.Web/Pcf.Common.Web.csproj" Id="5f17acea-76bf-4073-89da-c137223bbe59" />
+  </Folder>
+  <Folder Name="/Pcf.Administration/">
+    <File Path="Pcf.Administration/Dockerfile" />
+    <Project Path="Pcf.Administration/Pcf.Administration.Core/Pcf.Administration.Core.csproj" />
+    <Project Path="Pcf.Administration/Pcf.Administration.DataAccess/Pcf.Administration.DataAccess.csproj" />
+    <Project Path="Pcf.Administration/Pcf.Administration.UnitTests/Pcf.Administration.UnitTests.csproj" />
+    <Project Path="Pcf.Administration/Pcf.Administration.WebHost/Pcf.Administration.WebHost.csproj" />
+  </Folder>
+  <Folder Name="/Pcf.GivingToCustomer/">
+    <File Path="Pcf.GivingToCustomer/Dockerfile" />
+    <Project Path="Pcf.GivingToCustomer/Pcf.GivingToCustomer.Core/Pcf.GivingToCustomer.Core.csproj" />
+    <Project Path="Pcf.GivingToCustomer/Pcf.GivingToCustomer.DataAccess/Pcf.GivingToCustomer.DataAccess.csproj" />
+    <Project Path="Pcf.GivingToCustomer/Pcf.GivingToCustomer.UnitTests/Pcf.GivingToCustomer.UnitTests.csproj" />
+    <Project Path="Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost/Pcf.GivingToCustomer.WebHost.csproj" />
+  </Folder>
+  <Folder Name="/Pcf.ReceivingFromPartner/">
+    <File Path="Pcf.ReceivingFromPartner/Dockerfile" />
+    <Project Path="Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.Core/Pcf.ReceivingFromPartner.Core.csproj" Id="2ae561c4-15a0-4205-8a2e-19d9daa271f6" />
+    <Project Path="Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.DataAccess/Pcf.ReceivingFromPartner.DataAccess.csproj" Id="f0d361c5-02ce-467a-8b2d-9bce2b919db2" />
+    <Project Path="Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.Integration/Pcf.ReceivingFromPartner.Integration.csproj" Id="6dbd8541-8ab9-4fc3-b9fc-5345f94d89d0" />
+    <Project Path="Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.UnitTests/Pcf.ReceivingFromPartner.UnitTests.csproj" />
+    <Project Path="Pcf.ReceivingFromPartner/Pcf.ReceivingFromPartner.WebHost/Pcf.ReceivingFromPartner.WebHost.csproj" />
+  </Folder>
+  <Properties Name="ExtensibilityGlobals" Scope="PostLoad">
+    <Property Name="FileExplorer" Value="..\..\..\" />
+  </Properties>
+</Solution>

@@ -1,0 +1,131 @@
+services:
+  # Administration
+  pcf-administration-db:
+    image: postgres:17
+    container_name: pcf-administration-db
+    restart: always
+    environment:
+      POSTGRES_USER: pcf
+      POSTGRES_PASSWORD: pcf
+      POSTGRES_DB: pcf_administration
+    volumes:
+      - pcf-administration-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pcf -d pcf_administration"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pcf-administration-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.Administration/Dockerfile
+    container_name: pcf-administration-api
+    restart: always
+    depends_on:
+      pcf-administration-db:
+        condition: service_healthy
+    ports:
+      - "8091:8080"
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: Host=pcf-administration-db;Port=5432;Database=pcf_administration;Username=pcf;Password=pcf
+      ASPNETCORE_ENVIRONMENT: Development
+
+  # GivingToCustomer
+  pcf-givingtocustomer-db:
+    image: mongo:8
+    container_name: pcf-givingtocustomer-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: pcf
+      MONGO_INITDB_ROOT_PASSWORD: pcf
+    volumes:
+      - pcf-givingtocustomer-db:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--username", "pcf", "--password", "pcf", "--authenticationDatabase", "admin", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pcf-givingtocustomer-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.GivingToCustomer/Dockerfile
+    container_name: pcf-givingtocustomer-api
+    restart: always
+    depends_on:
+      pcf-givingtocustomer-db:
+        condition: service_healthy
+    ports:
+      - "8092:8080"
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: mongodb://pcf:pcf@pcf-givingtocustomer-db:27017/?authSource=admin
+      ASPNETCORE_ENVIRONMENT: Development
+
+  # ReceivingFromPartner
+  pcf-receivingfrompartner-cache:
+    image: redis:8
+    container_name: pcf-receivingfrompartner-cache
+    restart: always
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - pcf-receivingfrompartner-cache:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pcf-receivingfrompartner-db:
+    image: postgres:17
+    container_name: pcf-receivingfrompartner-db
+    restart: always
+    environment:
+      POSTGRES_USER: pcf
+      POSTGRES_PASSWORD: pcf
+      POSTGRES_DB: pcf_receivingfrompartner
+    volumes:
+      - pcf-receivingfrompartner-db:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pcf -d pcf_receivingfrompartner"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pcf-receivingfrompartner-api:
+    build:
+      context: ./src
+      dockerfile: Pcf.ReceivingFromPartner/Dockerfile
+    container_name: pcf-receivingfrompartner-api
+    restart: always
+    depends_on:
+      pcf-receivingfrompartner-db:
+        condition: service_healthy
+      pcf-receivingfrompartner-cache:
+        condition: service_healthy
+      pcf-administration-api:
+        condition: service_started
+      pcf-givingtocustomer-api:
+        condition: service_started
+    ports:
+      - "8093:8080"
+    environment:
+      ConnectionStrings__PromocodeFactoryDb: Host=pcf-receivingfrompartner-db;Port=5432;Database=pcf_receivingfrompartner;Username=pcf;Password=pcf
+      ConnectionStrings__Redis: pcf-receivingfrompartner-cache:6379
+      IntegrationSettings__AdministrationApiUrl: http://pcf-administration-api:8080
+      IntegrationSettings__GivingToCustomerApiUrl: http://pcf-givingtocustomer-api:8080
+      ASPNETCORE_ENVIRONMENT: Development
+
+volumes:
+  pcf-administration-db:
+  pcf-receivingfrompartner-db:
+  pcf-receivingfrompartner-cache:
+  pcf-givingtocustomer-db:
